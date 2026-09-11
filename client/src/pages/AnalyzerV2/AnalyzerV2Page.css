@@ -1,0 +1,896 @@
+/* Ticket Analyzer v2
+   ============================================================================
+
+   Colours, spacing, radii and type all come from styles/tokens.css. There are
+   no raw hex values in this file, on purpose: the old analyzer's stylesheet
+   drifted to a 1:1 ratio of hardcoded hex to tokens, which is how it ended up
+   with six ad-hoc greys and three different blues that nobody could retheme.
+
+   Sections below run in the order the page renders. Every selector is declared
+   exactly once - if you need to change a rule, change it where it lives rather
+   than appending an override at the bottom. That append-and-override habit is
+   what left `.ta-detail` declared seven times in the old file.
+   ========================================================================= */
+
+/* --- Page shell ---------------------------------------------------------- */
+
+.analyzer-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+}
+
+.av2-header__title {
+  margin: 0 0 var(--space-2);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.av2-header__subtitle {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* --- Upload -------------------------------------------------------------- */
+
+.av2-upload {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.av2-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-5);
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.av2-dropzone--active {
+  background: var(--accent-dim);
+  border-color: var(--accent-border);
+}
+
+.av2-dropzone__button {
+  padding: var(--space-3) var(--space-5);
+  font: inherit;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--bg-chip);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.av2-dropzone__button:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--accent-border);
+}
+
+.av2-dropzone__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.av2-dropzone__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.av2-dropzone__input {
+  display: none;
+}
+
+.av2-filelist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.av2-filelist__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
+
+.av2-filelist__name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.av2-filelist__size {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.av2-filelist__remove {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color var(--transition), background var(--transition);
+}
+
+.av2-filelist__remove:hover:not(:disabled) {
+  color: var(--danger);
+  background: var(--danger-dim);
+}
+
+.av2-upload__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* --- Buttons ------------------------------------------------------------- */
+
+.av2-button {
+  padding: var(--space-3) var(--space-5);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-chip);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+
+.av2-button:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.av2-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.av2-button--primary {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.av2-button--primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  color: #fff;
+}
+
+/* --- Messages ------------------------------------------------------------ */
+
+.av2-error {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  font-size: 13px;
+  color: var(--danger);
+  background: var(--danger-dim);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-md);
+}
+
+.av2-warnings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.av2-warning {
+  padding: var(--space-3) var(--space-4);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--warning);
+  background: var(--warning-dim);
+  border: 1px solid var(--warning-border);
+  border-radius: var(--radius-md);
+}
+
+.av2-empty {
+  padding: var(--space-8);
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.av2-empty h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 15px;
+}
+
+.av2-empty p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* --- Results ------------------------------------------------------------- */
+
+.av2-results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.av2-section-title {
+  margin: 0 0 var(--space-3);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* --- Passengers and their tickets ---------------------------------------- */
+
+.av2-passengers__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.av2-passenger {
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.av2-passenger__identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.av2-passenger__name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.av2-passenger__printed {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.av2-tickets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.av2-ticket {
+  display: grid;
+  grid-template-columns: 150px 90px 1fr auto;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: 12px;
+}
+
+.av2-ticket__number {
+  font-family: var(--font-mono);
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+}
+
+.av2-ticket__issuer {
+  color: var(--text-secondary);
+}
+
+.av2-ticket__legs {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.av2-ticket__reissued {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--warning);
+}
+
+/* --- Summary (passengers, references, evidence) -------------------------- */
+
+.av2-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-5);
+  padding: var(--space-5);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.av2-summary__title {
+  margin: 0 0 var(--space-2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.av2-summary__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.av2-summary__code {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.av2-summary__carrier {
+  margin-left: var(--space-2);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.av2-summary__none {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-faint);
+}
+
+.av2-summary__evidence {
+  margin: 0;
+  font-size: 13px;
+}
+
+.av2-summary__note {
+  margin: var(--space-1) 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+/* --- Route block ---------------------------------------------------------- */
+/* The old analyzer's flight-card route, ported: at each end the code, the
+   airport's name and "City, Country"; the distance over a dashed AIR line
+   between them. Shared by the journey heading and the flight rows.
+
+   Values are the analyzer's FINAL computed ones - TicketAnalyzerPage.css
+   792-879 plus the overrides it stacks on later (2032, 2588-2609) - with each
+   colour mapped to the nearest token. */
+
+.av2-route {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(56px, 88px) minmax(0, 2fr);
+  align-items: start;
+  gap: 10px;
+  padding: 2px 0 6px;
+}
+
+.av2-route__point {
+  display: block;
+  min-width: 0;
+}
+
+.av2-route__point:last-child {
+  text-align: right;
+}
+
+.av2-route__code {
+  display: block;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 35px;
+  font-weight: 800;
+  line-height: 0.95;
+}
+
+.av2-route__name,
+.av2-route__place {
+  display: block;
+  min-width: 0;
+  font-size: 10px;
+  font-style: normal;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.av2-route__name {
+  margin-top: 4px;
+  line-height: 1.25;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.av2-route__place {
+  line-height: 1.3;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-weight: 800;
+}
+
+.av2-route__line {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding-top: 5px;
+  text-align: center;
+}
+
+.av2-route__distance {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* The dashed line with AIR sitting on it. Drawn as a dash either side of the
+   label rather than a label painted over one line, so it needs no background
+   colour behind it and reads the same on any surface. */
+.av2-route__air {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.av2-route__air::before,
+.av2-route__air::after {
+  content: '';
+  flex: 1;
+  border-top: 1px dashed var(--text-ghost);
+}
+
+/* The journey heading's version: the whole trip, end to end, on a tinted panel
+   in the role chip's accent, so it reads as the summary of the flights under
+   it rather than as one more of them. */
+.av2-route--journey {
+  padding: var(--space-4) var(--space-5);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-md);
+}
+
+.av2-route--journey .av2-route__distance,
+.av2-route--journey .av2-route__air {
+  color: var(--accent-hover);
+}
+
+.av2-route--journey .av2-route__air::before,
+.av2-route--journey .av2-route__air::after {
+  border-top-color: var(--accent-border);
+}
+
+/* --- Journey ------------------------------------------------------------- */
+
+.av2-journey {
+  padding: var(--space-5);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.av2-journey + .av2-journey {
+  margin-top: var(--space-3);
+}
+
+.av2-journey__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-inner);
+}
+
+.av2-journey__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.av2-journey__role {
+  padding: 3px var(--space-2);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-sm);
+}
+
+/* The journey's two ends, in the same route block the flight rows use - on its
+   own row under the role and the date. */
+.av2-journey__route {
+  flex-basis: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.av2-journey__facts {
+  display: flex;
+  gap: var(--space-2);
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.av2-journey__connection-notes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+}
+
+.av2-journey__connection-notes li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+}
+
+/* --- Flight rows --------------------------------------------------------- */
+
+.av2-flights {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Flight number, airline, date and PNR on one line, the route block under it
+   at full width - the order of the old analyzer's flight card. On a direct
+   trip the row is just that one line: the heading already shows its airports. */
+.av2-flight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.av2-flight__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+}
+
+.av2-flight:last-child {
+  border-bottom: 0;
+}
+
+.av2-flight--muted {
+  opacity: 0.58;
+}
+
+.av2-flight__id {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.av2-flight__number {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.av2-flight__airline {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.av2-flight__operated {
+  font-size: 11px;
+  color: var(--purple);
+}
+
+.av2-flight__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.av2-flight__date {
+  font-variant-numeric: tabular-nums;
+}
+
+.av2-flight__pnr {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Per-passenger booking references, shown only where they actually differ. */
+.av2-flight__split-pnrs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  grid-column: 1 / -1;
+  margin: var(--space-1) 0 0;
+  padding: var(--space-2) var(--space-3);
+  list-style: none;
+  background: var(--warning-dim);
+  border: 1px solid var(--warning-border);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+}
+
+.av2-flight__split-pnrs li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.av2-flight__split-name {
+  color: var(--text-secondary);
+}
+
+.av2-flight__split-code {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+/* --- Chips --------------------------------------------------------------- */
+
+.av2-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  grid-column: 1 / -1;
+  margin: var(--space-1) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.av2-chip {
+  padding: 2px var(--space-2);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.av2-chip--neutral {
+  color: var(--text-secondary);
+  background: var(--bg-chip);
+  border: 1px solid var(--border);
+}
+
+.av2-chip--muted {
+  color: var(--text-muted);
+  background: var(--bg-inset);
+  border: 1px solid var(--border);
+}
+
+.av2-chip--accent {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+}
+
+.av2-chip--warning {
+  color: var(--warning);
+  background: var(--warning-dim);
+  border: 1px solid var(--warning-border);
+}
+
+/* --- Disruption story ---------------------------------------------------- */
+
+.av2-story {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  background: var(--bg-inset);
+  border: 1px solid var(--border-inner);
+  border-radius: var(--radius-md);
+}
+
+.av2-story__title {
+  margin: 0 0 var(--space-3);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.av2-story__diff {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0 0 var(--space-3);
+  font-size: 12px;
+}
+
+.av2-story__diff-row {
+  display: contents;
+}
+
+.av2-story__diff dt {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.av2-story__diff dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+}
+
+.av2-story__diff-row--flown dd {
+  color: var(--text-primary);
+}
+
+.av2-story__events {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: var(--space-5);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.av2-story__outcome {
+  margin: var(--space-3) 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* --- Replacement groups -------------------------------------------------- */
+
+.av2-replacement {
+  padding: var(--space-5);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--accent-border);
+  border-radius: var(--radius-lg);
+}
+
+.av2-replacement + .av2-replacement {
+  margin-top: var(--space-3);
+}
+
+.av2-replacement__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-inner);
+  font-size: 13px;
+}
+
+.av2-replacement__label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.av2-replacement__original {
+  color: var(--text-secondary);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-ghost);
+}
+
+.av2-replacement__date {
+  text-decoration: none;
+}
+
+.av2-replacement__reason {
+  font-size: 12px;
+  color: var(--warning);
+}
+
+/* --- Run metadata -------------------------------------------------------- */
+
+.av2-runmeta {
+  display: flex;
+  gap: var(--space-4);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+}
+
+/* --- Narrow screens ------------------------------------------------------ */
+
+@media (max-width: 720px) {
+  .av2-journey__facts {
+    margin-left: 0;
+  }
+}
+
+/* The analyzer's own phone rule (TicketAnalyzerPage.css:1869): the codes step
+   down so both ends still fit beside the AIR line. */
+@media (max-width: 460px) {
+  .av2-route__code {
+    font-size: 30px;
+  }
+}
+
+/* --- Booking references --------------------------------------------------- */
+
+.av2-summary__block--wide {
+  grid-column: span 2;
+}
+
+.av2-reference {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+}
+
+.av2-reference__legs {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}

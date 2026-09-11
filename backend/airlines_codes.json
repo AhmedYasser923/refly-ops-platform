@@ -79,31 +79,36 @@
     "name": "Abaeté Linhas Aéreas",
     "iata": "BJ",
     "icao": "ABJ",
-    "country": "Brazil"
+    "country": "Brazil",
+    "ceasedOperations": true
   },
   {
     "name": "Abakan-Avia",
     "iata": "RL",
     "icao": "ABG",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "AccessAir",
     "iata": "ZA",
     "icao": "CYD",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "ACES Colombia",
     "iata": "VX",
     "icao": "AES",
-    "country": "Colombia"
+    "country": "Colombia",
+    "ceasedOperations": true
   },
   {
     "name": "Adam Air",
     "iata": "KI",
     "icao": "DHI",
-    "country": "Indonesia"
+    "country": "Indonesia",
+    "ceasedOperations": true
   },
   {
     "name": "ADC Airlines",
@@ -116,7 +121,8 @@
     "iata": "JP",
     "icao": "ADR",
     "country": "Slovenia",
-    "ticketPrefix": "165"
+    "ticketPrefix": "165",
+    "ceasedOperations": true
   },
   {
     "name": "Advanced Air",
@@ -141,7 +147,8 @@
     "name": "Aero Costa Rica",
     "iata": "ML",
     "icao": "AEK",
-    "country": "Costa Rica"
+    "country": "Costa Rica",
+    "ceasedOperations": true
   },
   {
     "name": "AJet",
@@ -163,7 +170,8 @@
     "name": "Aeroflot-Plus",
     "iata": "P3",
     "icao": "PLS",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Aeronautic de Los Pirineos",
@@ -175,19 +183,22 @@
     "name": "Austrian Airtransport",
     "iata": "OB",
     "icao": "AAT",
-    "country": "Austria"
+    "country": "Austria",
+    "ceasedOperations": true
   },
   {
     "name": "Allied Airways",
     "iata": "SM",
     "icao": "AAW",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Asian Air",
     "iata": "KJ",
     "icao": "AAZ",
-    "country": "Kyrgyzstan"
+    "country": "Kyrgyzstan",
+    "ceasedOperations": true
   },
   {
     "name": "Avio Delta",
@@ -199,13 +210,15 @@
     "name": "Africa Airways",
     "iata": "VJ",
     "icao": "AFF",
-    "country": "Benin"
+    "country": "Benin",
+    "ceasedOperations": true
   },
   {
     "name": "Air Florida",
     "iata": "QH",
     "icao": "FLA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Air Arabia Maroc",
@@ -240,6 +253,14 @@
     
   },
   {
+    "name": "All-America Airlines",
+    "iata": "A2",
+    "icao": "AL2",
+    "country": "United States",
+    "claimNote": "short-lived regional carrier named All-America Airlines (which operated in California in 1994), that specific A2 entity ceased operations, A2 is now used by Animawings",
+    "ceasedOperations": true
+  },
+  {
     "name": "Avion Express",
     "iata": "X9",
     "icao": "NVD",
@@ -264,7 +285,8 @@
     "name": "Air Kyrgyzstan",
     "iata": "QH",
     "icao": "LYN",
-    "country": "Kyrgyzstan"
+    "country": "Kyrgyzstan",
+    "ceasedOperations": true
   },
   {
     "name": "Air Corsica / Corse-Mediterranee",
@@ -286,7 +308,8 @@
     "name": "Aer Lingus UK",
     "iata": "EG",
     "icao": "EUK",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Aerolink Uganda",
@@ -318,7 +341,8 @@
     "name": "Air Ceylon",
     "iata": "AE",
     "icao": "AE",
-    "country": "Sri Lanka"
+    "country": "Sri Lanka",
+    "ceasedOperations": true
   },
   {
     "name": "Askari Aviation",
@@ -342,13 +366,15 @@
     "name": "Air Atlantique",
     "iata": "KI",
     "icao": "AAG",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Air Alma",
     "iata": "QB",
     "icao": "AAJ",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Air Hong Kong",
@@ -420,7 +446,8 @@
     "name": "Air Nippon Network Co. Ltd.",
     "iata": "EH",
     "icao": "AKX",
-    "country": "Japan"
+    "country": "Japan",
+    "ceasedOperations": true
   },
   {
     "name": "AirExplore",
@@ -451,7 +478,8 @@
     "name": "Air ACT",
     "iata": "9T",
     "icao": "RUN",
-    "country": "Turkey"
+    "country": "Turkey",
+    "ceasedOperations": true
   },
   {
     "name": "Air Albania",
@@ -465,7 +493,8 @@
     "name": "Air Alliance",
     "iata": "3J",
     "icao": "AAQ",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Air Antwerp",
@@ -484,7 +513,8 @@
     "name": "Air Costa",
     "iata": "LB",
     "icao": "LEP",
-    "country": "India"
+    "country": "India",
+    "ceasedOperations": true
   },
   {
     "name": "Air Greenland",
@@ -509,13 +539,15 @@
     "name": "Air Liberté",
     "iata": "IJ",
     "icao": "LIB",
-    "country": "France"
+    "country": "France",
+    "ceasedOperations": true
   },
   {
     "name": "Air Lithuania",
     "iata": "TT",
     "icao": "KLA",
-    "country": "Lithuania"
+    "country": "Lithuania",
+    "ceasedOperations": true
   },
   {
     "name": "Air Malawi",
@@ -527,7 +559,8 @@
     "name": "Air Maldives",
     "iata": "L6",
     "icao": "AMI",
-    "country": "Maldives"
+    "country": "Maldives",
+    "ceasedOperations": true
   },
   {
     "name": "Air Mediterranee",
@@ -540,7 +573,8 @@
     "name": "Air Mekong",
     "iata": "P8",
     "icao": "MKG",
-    "country": "Vietnam"
+    "country": "Vietnam",
+    "ceasedOperations": true
   },
   {
     "name": "Air Montenegro",
@@ -571,13 +605,15 @@
     "name": "Air BC",
     "iata": "ZX",
     "icao": "ABL",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Air Service Gabon",
     "iata": "G8",
     "icao": "AGB",
-    "country": "Gabon"
+    "country": "Gabon",
+    "ceasedOperations": true
   },
   {
     "name": "Air Glaciers",
@@ -589,7 +625,8 @@
     "name": "Air Vegas",
     "iata": "6V",
     "icao": "VGA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "All Nippon Airways",
@@ -603,7 +640,8 @@
     "name": "Air Senegal International",
     "iata": "V7",
     "icao": "SNG",
-    "country": "Senegal"
+    "country": "Senegal",
+    "ceasedOperations": true
   },
   {
     "name": "Air Berlin",
@@ -617,7 +655,8 @@
     "name": "Air Sinai",
     "iata": "4D",
     "icao": "ASD",
-    "country": "Egypt"
+    "country": "Egypt",
+    "ceasedOperations": true
   },
   {
     "name": "Air Armenia",
@@ -678,7 +717,8 @@
     "name": "Air Srpska",
     "iata": "RB",
     "icao": "SBK",
-    "country": "Bosnia and Herzegovina"
+    "country": "Bosnia and Herzegovina",
+    "ceasedOperations": true
   },
   {
     "name": "Air Tahiti Nui",
@@ -706,19 +746,22 @@
     "name": "Air Europe Italy",
     "iata": "PE",
     "icao": "AEL",
-    "country": "Italy"
+    "country": "Italy",
+    "ceasedOperations": true
   },
   {
     "name": "Air Jamaica",
     "iata": "JM",
     "icao": "AJM",
-    "country": "Jamaica"
+    "country": "Jamaica",
+    "ceasedOperations": true
   },
   {
     "name": "Air Wales",
     "iata": "6G",
     "icao": "AWW",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Air Caraïbes",
@@ -741,7 +784,19 @@
     "iata": "DN",
     "icao": "DNA",
     "country": "Romania",
-    "reqs": "Boarding pass, ID"
+    "reqs": "Boarding pass, ID",
+    "trackerSearchCodes": {
+      "flightStats": "JOC"
+    }
+  },
+  {
+    "name": "Dana Air",
+    "iata": "9J",
+    "icao": "DAN",
+    "country": "Nigeria",
+    "ceasedOperations": true,
+    "claimNote": "The Nigerian Civil Aviation Authority (NCAA) suspended Dana Air's operating licenses indefinitely following a runway excursion incident at Murtala Muhammed International Airport in Lagos on April 23, 2024. The government later moved to handle outstanding refunds and address the carrier's asset liquidation"
+    
   },
   {
     "name": "Air India Express",
@@ -761,7 +816,8 @@
     "name": "Air Nippon",
     "iata": "EL",
     "icao": "ANK",
-    "country": "Japan"
+    "country": "Japan",
+    "ceasedOperations": true
   },
   {
     "name": "Air Nostrum",
@@ -799,19 +855,22 @@
     "name": "AlbaStar",
     "iata": "AP",
     "icao": "LAV",
-    "country": "Spain"
+    "country": "Spain",
+    "claimNote": "PNR mandatory"
   },
   {
     "name": "Air Memphis",
     "iata": "E9",
     "icao": "MHS",
-    "country": "Egypt"
+    "country": "Egypt",
+    "ceasedOperations": true
   },
   {
     "name": "Air Exel",
     "iata": "XT",
     "icao": "AXL",
-    "country": "Netherlands"
+    "country": "Netherlands",
+    "ceasedOperations": true
   },
   {
     "name": "Air Zimbabwe",
@@ -863,7 +922,8 @@
     "name": "Antrak Air",
     "iata": "O4",
     "icao": "ABV",
-    "country": "Ghana"
+    "country": "Ghana",
+    "ceasedOperations": true
   },
   {
     "name": "Air Tindi",
@@ -888,7 +948,8 @@
     "name": "Air Enterprise",
     "iata": "KD",
     "icao": "AEN",
-    "country": "France"
+    "country": "France",
+    "ceasedOperations": true
   },
   {
     "name": "AmericanConnection[7]",
@@ -900,7 +961,8 @@
     "name": "Ansett Australia",
     "iata": "AN",
     "icao": "AAA",
-    "country": "Australia"
+    "country": "Australia",
+    "ceasedOperations": true
   },
   {
     "name": "Astraeus",
@@ -919,7 +981,8 @@
     "name": "American Falcon",
     "iata": "WK",
     "icao": "AFB",
-    "country": "Argentina"
+    "country": "Argentina",
+    "ceasedOperations": true
   },
   {
     "name": "Alliance Airlines",
@@ -943,7 +1006,8 @@
     "name": "Alliance Air",
     "iata": "Y2",
     "icao": "AFJ",
-    "country": "Uganda"
+    "country": "Uganda",
+    "ceasedOperations": true
   },
   {
     "name": "Aeroméxico Connect",
@@ -955,13 +1019,15 @@
     "name": "Aviogenex",
     "iata": "JJ",
     "icao": "AGX",
-    "country": "Serbia"
+    "country": "Serbia",
+    "ceasedOperations": true
   },
   {
     "name": "Aeroperú",
     "iata": "PL",
     "icao": "PLI",
-    "country": "Peru"
+    "country": "Peru",
+    "ceasedOperations": true
   },
   {
     "name": "Atlas Blue",
@@ -1030,7 +1096,7 @@
   },
   {
     "name": "Air Kiribati",
-    "iata": "4A",
+    "iata": "IK",
     "icao": "AKL",
     "country": "Kiribati"
   },
@@ -1044,7 +1110,8 @@
     "name": "America West Airlines",
     "iata": "HP",
     "icao": "AWE",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Aeropostal Alas de Venezuela",
@@ -1056,13 +1123,15 @@
     "name": "Air 2000",
     "iata": "DP",
     "icao": "AMM",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "ATA Airlines",
     "iata": "TZ",
     "icao": "AMT",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "AMC Airlines",
@@ -1086,7 +1155,7 @@
   },
   {
     "name": "Andes Líneas Aéreas",
-    "iata": "OY",
+    "iata": "O4",
     "icao": "ANS",
     "country": "Argentina",
     "ticketPrefix": "650"
@@ -1095,7 +1164,8 @@
     "name": "AOM French Airlines",
     "iata": "IW",
     "icao": "AOM",
-    "country": "France"
+    "country": "France",
+    "ceasedOperations": true
   },
   {
     "name": "AVCOM",
@@ -1126,13 +1196,15 @@
     "name": "Aero Flight",
     "iata": "GV",
     "icao": "ARF",
-    "country": "Germany"
+    "country": "Germany",
+    "ceasedOperations": true
   },
   {
     "name": "Arrow Air",
     "iata": "JW",
     "icao": "APW",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Albawings",
@@ -1166,19 +1238,22 @@
     "name": "Airstars",
     "iata": "PL",
     "icao": "ASE",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Astrakhan Airlines",
     "iata": "OB",
     "icao": "ASZ",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Aero-Tropics Air Services",
     "iata": "HC",
     "icao": "ATI",
-    "country": "Australia"
+    "country": "Australia",
+    "ceasedOperations": true
   },
   {
     "name": "Par Avion",
@@ -1212,13 +1287,15 @@
     "name": "Aus-Air",
     "iata": "NO",
     "icao": "AUS",
-    "country": "Australia"
+    "country": "Australia",
+    "ceasedOperations": true
   },
   {
     "name": "Austral Líneas Aéreas",
     "iata": "AU",
     "icao": "AUT",
-    "country": "Argentina"
+    "country": "Argentina",
+    "ceasedOperations": true
   },
   {
     "name": "Airlink Zambia",
@@ -1230,7 +1307,8 @@
     "name": "Air Bangladesh",
     "iata": "B9",
     "icao": "BGD",
-    "country": "Bangladesh"
+    "country": "Bangladesh",
+    "ceasedOperations": true
   },
   {
     "name": "AirAsia",
@@ -1248,7 +1326,8 @@
     "name": "AirAsia Japan",
     "iata": "DJ",
     "icao": "WAJ",
-    "country": "Japan"
+    "country": "Japan",
+    "ceasedOperations": true
   },
   {
     "name": "AirAsia India",
@@ -1260,13 +1339,15 @@
     "name": "Axis Airways",
     "iata": "6V",
     "icao": "AXY",
-    "country": "France"
+    "country": "France",
+    "ceasedOperations": true
   },
   {
     "name": "Atlantic Airlines",
     "iata": "EX",
     "icao": "BJK",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Atlant-Soyuz Airlines",
@@ -1278,7 +1359,8 @@
     "name": "Astra Airlines",
     "iata": "A2",
     "icao": "AZI",
-    "country": "Greece"
+    "country": "Greece",
+    "ceasedOperations": true
   },
   {
     "name": "Aserca Airlines",
@@ -1291,7 +1373,8 @@
     "name": "Aviaexpress",
     "iata": "RX",
     "icao": "AEH",
-    "country": "Hungary"
+    "country": "Hungary",
+    "ceasedOperations": true
   },
   {
     "name": "American Eagle Airlines",
@@ -1303,7 +1386,8 @@
     "name": "Azzurra Air",
     "iata": "ZS",
     "icao": "AZI",
-    "country": "Italy"
+    "country": "Italy",
+    "ceasedOperations": true
   },
   {
     "name": "Airshop",
@@ -1327,7 +1411,8 @@
     "name": "Air Ivoire",
     "iata": "VU",
     "icao": "VUN",
-    "country": "Ivory Coast"
+    "country": "Ivory Coast",
+    "ceasedOperations": true
   },
   {
     "name": "Air Botswana",
@@ -1359,7 +1444,8 @@
     "name": "Africa West",
     "iata": "FK",
     "icao": "WTA",
-    "country": "Togo"
+    "country": "Togo",
+    "ceasedOperations": true
   },
   {
     "name": "Avirex",
@@ -1397,13 +1483,15 @@
     "name": "Arctic Circle Air Service",
     "iata": "5F",
     "icao": "CIR",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Air Corridor",
     "iata": "QC",
     "icao": "CRD",
-    "country": "Mozambique"
+    "country": "Mozambique",
+    "ceasedOperations": true
   },
   {
     "name": "Air Central",
@@ -1452,7 +1540,8 @@
     "name": "Air Madrid",
     "iata": "NM",
     "icao": "DRD",
-    "country": "Spain"
+    "country": "Spain",
+    "ceasedOperations": true
   },
   {
     "name": "Alrosa Air Company",
@@ -1476,7 +1565,8 @@
     "name": "Alpi Eagles",
     "iata": "E8",
     "icao": "ELG",
-    "country": "Italy"
+    "country": "Italy",
+    "ceasedOperations": true
   },
   {
     "name": "Aero K",
@@ -1488,7 +1578,8 @@
     "name": "Air São Tomé and Príncipe",
     "iata": "KY",
     "icao": "EQL",
-    "country": "São Tomé and Príncipe"
+    "country": "São Tomé and Príncipe",
+    "ceasedOperations": true
   },
   {
     "name": "Eurowings Europe",
@@ -1500,7 +1591,8 @@
     "name": "Air Fiji",
     "iata": "PC",
     "icao": "FAJ",
-    "country": "Fiji"
+    "country": "Fiji",
+    "ceasedOperations": true
   },
   {
     "name": "Fuji Dream Airlines",
@@ -1512,7 +1604,8 @@
     "name": "Air Finland",
     "iata": "OF",
     "icao": "FIF",
-    "country": "Finland"
+    "country": "Finland",
+    "ceasedOperations": true
   },
   {
     "name": "Fiji Airways",
@@ -1539,7 +1632,8 @@
     "name": "Air Georgian",
     "iata": "ZX",
     "icao": "GGN",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Air Guinee Express",
@@ -1563,7 +1657,8 @@
     "name": "Allegro",
     "iata": "LL",
     "icao": "GRO",
-    "country": "Mexico"
+    "country": "Mexico",
+    "ceasedOperations": true
   },
   {
     "name": "Atlas Air",
@@ -1576,43 +1671,50 @@
     "name": "Air Guyane",
     "iata": "GG",
     "icao": "GUY",
-    "country": "French Guiana"
+    "country": "French Guiana",
+    "ceasedOperations": true
   },
   {
     "name": "Air d'Ayiti",
     "iata": "H9",
     "icao": "HAD",
-    "country": "Haiti"
+    "country": "Haiti",
+    "ceasedOperations": true
   },
   {
     "name": "Air Comores International",
     "iata": "GG",
     "icao": "HAH",
-    "country": "Comoros"
+    "country": "Comoros",
+    "ceasedOperations": true
   },
   {
     "name": "Air Holland",
     "iata": "HD",
     "icao": "HLN",
-    "country": "Netherlands"
+    "country": "Netherlands",
+    "ceasedOperations": true
   },
   {
     "name": "Air Horizon",
     "iata": "8C",
     "icao": "HZT",
-    "country": "Togo"
+    "country": "Togo",
+    "ceasedOperations": true
   },
   {
     "name": "Air Bagan",
     "iata": "W9",
     "icao": "JAB",
-    "country": "Myanmar"
+    "country": "Myanmar",
+    "ceasedOperations": true
   },
   {
     "name": "Atyrau Air Ways",
     "iata": "IP",
     "icao": "JOL",
-    "country": "Kazakhstan"
+    "country": "Kazakhstan",
+    "ceasedOperations": true
   },
   {
     "name": "Air Canada Jazz",
@@ -1659,7 +1761,8 @@
     "name": "Air Alfa",
     "iata": "H7",
     "icao": "LFA",
-    "country": "Turkey"
+    "country": "Turkey",
+    "ceasedOperations": true
   },
   {
     "name": "Alidaunia",
@@ -1684,19 +1787,22 @@
     "name": "Air Leap",
     "iata": "FL",
     "icao": "LPA",
-    "country": "Sweden"
+    "country": "Sweden",
+    "ceasedOperations": true
   },
   {
     "name": "Air Alps Aviation",
     "iata": "A6",
     "icao": "LPV",
-    "country": "Austria"
+    "country": "Austria",
+    "ceasedOperations": true
   },
   {
     "name": "Atlantis European Airways",
     "iata": "TD",
     "icao": "LUR",
-    "country": "Armenia"
+    "country": "Armenia",
+    "ceasedOperations": true
   },
   {
     "name": "Air Luxor GB",
@@ -1737,7 +1843,8 @@
     "name": "Air Mali",
     "iata": "L9",
     "icao": "MLI",
-    "country": "Mali"
+    "country": "Mali",
+    "ceasedOperations": true
   },
   {
     "name": "Air Plus Comet",
@@ -1749,13 +1856,15 @@
     "name": "Aeromexpress",
     "iata": "QO",
     "icao": "MPX",
-    "country": "Mexico"
+    "country": "Mexico",
+    "ceasedOperations": true
   },
   {
     "name": "Air Mauritanie",
     "iata": "MR",
     "icao": "MRT",
-    "country": "Mauritania"
+    "country": "Mauritania",
+    "ceasedOperations": true
   },
   {
     "name": "Air Cairo",
@@ -1764,7 +1873,10 @@
     "country": "Egypt",
     "reqs": "Boarding pass, ID",
     "ticketNumberCanReplacePnr": true,
-    "ticketPrefix": "381"
+    "ticketPrefix": "381",
+    "trackerSearchCodes": {
+      "flightStats": "MSC"
+    }
   },
   {
     "name": "Albarka Air",
@@ -1796,7 +1908,8 @@
     "name": "Air Paradise International",
     "iata": "AD",
     "icao": "PRZ",
-    "country": "Indonesia"
+    "country": "Indonesia",
+    "ceasedOperations": true
   },
   {
     "name": "Air Class Líneas Aéreas",
@@ -1808,7 +1921,8 @@
     "name": "African Safari Airways",
     "iata": "QS",
     "icao": "QSC",
-    "country": "Kenya"
+    "country": "Kenya",
+    "ceasedOperations": true
   },
   {
     "name": "Aruba Airlines",
@@ -1821,7 +1935,8 @@
     "name": "Aer Arann",
     "iata": "RE",
     "icao": "REA",
-    "country": "Ireland"
+    "country": "Ireland",
+    "ceasedOperations": true
   },
   {
     "name": "Air Austral",
@@ -1846,25 +1961,29 @@
     "name": "Airlinair",
     "iata": "A5",
     "icao": "RLA",
-    "country": "France"
+    "country": "France",
+    "ceasedOperations": true
   },
   {
     "name": "Air Nelson",
     "iata": "NZ",
     "icao": "RLK",
-    "country": "New Zealand"
+    "country": "New Zealand",
+    "ceasedOperations": true
   },
   {
     "name": "Aero Lanka",
     "iata": "QL",
     "icao": "RLN",
-    "country": "Sri Lanka"
+    "country": "Sri Lanka",
+    "ceasedOperations": true
   },
   {
     "name": "Armenian Airlines",
     "iata": "R3",
     "icao": "RME",
-    "country": "Armenia"
+    "country": "Armenia",
+    "ceasedOperations": true
   },
   {
     "name": "Air Mediterranean",
@@ -1883,13 +2002,15 @@
     "name": "Armavia",
     "iata": "U8",
     "icao": "RNV",
-    "country": "Armenia"
+    "country": "Armenia",
+    "ceasedOperations": true
   },
   {
     "name": "Aeromar Lineas Aereas Dominicanas",
     "iata": "BQ",
     "icao": "ROM",
-    "country": "Dominican Republic"
+    "country": "Dominican Republic",
+    "ceasedOperations": true
   },
   {
     "name": "Aeroitalia",
@@ -1912,16 +2033,29 @@
     "name": "Aero Asia International",
     "iata": "E4",
     "icao": "RSO",
-    "country": "Pakistan"
+    "country": "Pakistan",
+    "ceasedOperations": true
   },
   {
     "name": "Aero-Service",
-    "iata": "BF",
+    "iata": "**BF**",
     "icao": "RSR",
     "country": "Republic of the Congo",
+    "ceasedOperations": true,
     "trackerSearchCodes": {
       "flightStats": "BF*"
     }
+
+  },
+  {
+ "name": "French bee",
+    "iata": "BF",
+    "icao": "FBU",
+    "country": "France",
+    "trackerSearchCodes": {
+      "flightStats": "B2F"
+    },
+    "ticketPrefix": "396"
   },
   {
     "name": "AeroSur",
@@ -1933,7 +2067,8 @@
     "name": "Air Santo Domingo",
     "iata": "EX",
     "icao": "SDO",
-    "country": "Dominican Republic"
+    "country": "Dominican Republic",
+    "ceasedOperations": true
   },
   {
     "name": "Aero California",
@@ -1951,7 +2086,8 @@
     "name": "Air Service",
     "iata": "M3",
     "icao": "SPJ",
-    "country": "Macedonia"
+    "country": "Macedonia",
+    "ceasedOperations": true
   },
   {
     "name": "Astair",
@@ -2008,7 +2144,8 @@
     "name": "AirTran Airways",
     "iata": "FL",
     "icao": "TRS",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Air Transat",
@@ -2020,7 +2157,7 @@
   },
   {
     "name": "Avialeasing Aviation Company",
-    "iata": "EC",
+    "iata": "V2",
     "icao": "TWN",
     "country": "Uzbekistan"
   },
@@ -2028,7 +2165,8 @@
     "name": "Air Uganda",
     "iata": "U7",
     "icao": "UGA",
-    "country": "Uganda"
+    "country": "Uganda",
+    "ceasedOperations": true
   },
   {
     "name": "Air Ukraine",
@@ -2046,7 +2184,8 @@
     "name": "Aloha Airlines",
     "iata": "AQ",
     "icao": "AAH",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "American Airlines",
@@ -2066,7 +2205,8 @@
     "name": "Antinea Airlines",
     "iata": "HO",
     "icao": "DJA",
-    "country": "Algeria"
+    "country": "Algeria",
+    "ceasedOperations": true
   },
   {
     "name": "Asiana Airlines",
@@ -2077,7 +2217,7 @@
   },
   {
     "name": "ASL Airlines Ireland",
-    "iata": "AG",
+    "iata": "5H",
     "icao": "ABR",
     "country": "Ireland"
   },
@@ -2097,13 +2237,15 @@
     "name": "Avensa",
     "iata": "VE",
     "icao": "AVE",
-    "country": "Venezuela"
+    "country": "Venezuela",
+    "ceasedOperations": true
   },
   {
     "name": "Aviacsa",
     "iata": "6A",
     "icao": "CHP",
-    "country": "Mexico"
+    "country": "Mexico",
+    "ceasedOperations": true
   },
   {
     "name": "Avianca",
@@ -2136,7 +2278,8 @@
     "name": "Avolar Aerolíneas",
     "iata": "V5",
     "icao": "VLI",
-    "country": "Mexico"
+    "country": "Mexico",
+    "ceasedOperations": true
   },
   {
     "name": "Azul Linhas Aéreas Brasileiras",
@@ -2156,7 +2299,8 @@
     "name": "BA Connect",
     "iata": "TH",
     "icao": "BRT",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "BACH Flugbetriebsges",
@@ -2187,7 +2331,8 @@
     "name": "BAL Bashkirian Airlines",
     "iata": "V9",
     "icao": "BTC",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Balkan Bulgarian Airlines",
@@ -2199,7 +2344,8 @@
     "name": "Baltia Air Lines",
     "iata": "BQ",
     "icao": "BTL",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Bamboo Airways",
@@ -2211,7 +2357,8 @@
     "name": "Bar Harbor Airlines",
     "iata": "QO",
     "icao": "AJC",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Bhutan Airlines",
@@ -2223,7 +2370,8 @@
     "name": "Belle Air Europe",
     "iata": "L9",
     "icao": "BAL",
-    "country": "Italy"
+    "country": "Italy",
+    "ceasedOperations": true
   },
   {
     "name": "British Airways",
@@ -2245,13 +2393,15 @@
     "iata": "BO",
     "icao": "BBD",
     "country": "Iceland",
-    "ticketNumberCanReplacePnr": true
+    "ticketNumberCanReplacePnr": true,
+    "ceasedOperations": true
   },
   {
     "name": "BB Airways",
     "iata": "BO",
     "icao": "BBW",
-    "country": "Nepal"
+    "country": "Nepal",
+    "ceasedOperations": true
   },
   {
     "name": "Blue Islands",
@@ -2264,7 +2414,8 @@
     "name": "British Caribbean Airways",
     "iata": "EO",
     "icao": "BCL",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "CityJet",
@@ -2277,11 +2428,12 @@
     "name": "B&H Airlines",
     "iata": "JA",
     "icao": "BON",
-    "country": "Bosnia and Herzegovina"
+    "country": "Bosnia and Herzegovina",
+    "ceasedOperations": true
   },
   {
     "name": "Buffalo Airways",
-    "iata": "J4",
+    "iata": "J0",
     "icao": "BFL",
     "country": "Canada"
   },
@@ -2296,7 +2448,8 @@
     "name": "Benin Golf Air",
     "iata": "A8",
     "icao": "BGL",
-    "country": "Benin"
+    "country": "Benin",
+    "ceasedOperations": true
   },
   {
     "name": "Buddha Air",
@@ -2340,7 +2493,8 @@
     "name": "Bellview Airlines",
     "iata": "B3",
     "icao": "BLV",
-    "country": "Nigeria"
+    "country": "Nigeria",
+    "ceasedOperations": true
   },
   {
     "name": "BMI",
@@ -2365,7 +2519,8 @@
     "name": "Bmibaby",
     "iata": "WW",
     "icao": "BMI",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Bemidji Airlines",
@@ -2383,7 +2538,8 @@
     "name": "Braniff International Airways",
     "iata": "BN",
     "icao": "BNF",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Bonza",
@@ -2395,7 +2551,8 @@
     "name": "Bouraq Indonesia Airlines",
     "iata": "BO",
     "icao": "BOU",
-    "country": "Indonesia"
+    "country": "Indonesia",
+    "ceasedOperations": true
   },
   {
     "name": "Blue Panorama Airlines",
@@ -2422,7 +2579,8 @@
     "name": "British Regional Airlines",
     "iata": "TH",
     "icao": "BRT",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Belavia Belarusian Airlines",
@@ -2435,7 +2593,8 @@
     "name": "Big Sky Airlines",
     "iata": "GQ",
     "icao": "BSY",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Batik Air",
@@ -2473,18 +2632,20 @@
     "name": "Bellview Airlines, Sierra Leone",
     "iata": "B3",
     "icao": "BVU",
-    "country": "Sierra Leone"
+    "country": "Sierra Leone",
+    "ceasedOperations": true
   },
   {
     "name": "Blue Wings",
     "iata": "QW",
     "icao": "BWG",
-    "country": "Germany"
+    "country": "Germany",
+    "ceasedOperations": true
   },
   {
     "name": "Brussels Airlines",
     "iata": "SN",
-    "icao": "BXI",
+    "icao": "BEL",
     "country": "Belgium",
     "claimNote": "PNR mandatory",
     "ticketPrefix": "082"
@@ -2493,7 +2654,8 @@
     "name": "Brit Air",
     "iata": "DB",
     "icao": "BZH",
-    "country": "France"
+    "country": "France",
+    "ceasedOperations": true
   },
   {
     "name": "Beijing Capital Airlines",
@@ -2506,14 +2668,8 @@
     "name": "Boston-Maine Airways",
     "iata": "E9",
     "icao": "CXS",
-    "country": "United States"
-  },
-  {
-    "name": "Brussels Airlines",
-    "iata": "SN",
-    "icao": "BEL",
-    "country": "Belgium",
-    "ticketPrefix": "082"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Binter Canarias",
@@ -2535,7 +2691,8 @@
     "name": "British Mediterranean Airways",
     "iata": "KJ",
     "icao": "LAJ",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Bulgaria Air",
@@ -2574,7 +2731,8 @@
     "name": "Canada Jetlines",
     "iata": "AU",
     "icao": "CJL",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "City Airlines",
@@ -2586,7 +2744,8 @@
     "name": "California Pacific Airlines",
     "iata": "4A",
     "icao": "DYN",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Camair-Co",
@@ -2618,7 +2777,8 @@
     "name": "Calima Aviación",
     "iata": "3C",
     "icao": "CMV",
-    "country": "Spain"
+    "country": "Spain",
+    "ceasedOperations": true
   },
   {
     "name": "Calm Air",
@@ -2656,11 +2816,12 @@
     "name": "Canadian Airlines",
     "iata": "CP",
     "icao": "CDN",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Canadian North",
-    "iata": "7F",
+    "iata": "5T",
     "icao": "AKT",
     "country": "Canada"
   },
@@ -2668,7 +2829,8 @@
     "name": "Canadian Pacific Airlines",
     "iata": "CP",
     "icao": "CPC",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Canadian Western Airlines",
@@ -2704,7 +2866,7 @@
   },
   {
     "name": "Caspian Airlines",
-    "iata": "RV",
+    "iata": "NA",
     "icao": "CPN",
     "country": "Iran"
   },
@@ -2745,7 +2907,8 @@
     "name": "Centre-Avia",
     "iata": "J7",
     "icao": "CVC",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Chair Airlines",
@@ -2775,7 +2938,8 @@
     "name": "Chari Aviation Services",
     "iata": "S8",
     "icao": "CSU",
-    "country": "Chad"
+    "country": "Chad",
+    "ceasedOperations": true
   },
   {
     "name": "Chautauqua Airlines",
@@ -2814,13 +2978,15 @@
     "name": "China Northern Airlines",
     "iata": "CJ",
     "icao": "CBF",
-    "country": "China"
+    "country": "China",
+    "ceasedOperations": true
   },
   {
     "name": "China Northwest Airlines",
     "iata": "WH",
     "icao": "CNW",
-    "country": "China"
+    "country": "China",
+    "ceasedOperations": true
   },
   {
     "name": "China Southern Airlines",
@@ -2839,13 +3005,15 @@
     "name": "China Xinhua Airlines",
     "iata": "XO",
     "icao": "CXH",
-    "country": "China"
+    "country": "China",
+    "ceasedOperations": true
   },
   {
     "name": "China Yunnan Airlines",
     "iata": "3Q",
     "icao": "CYH",
-    "country": "China"
+    "country": "China",
+    "ceasedOperations": true
   },
   {
     "name": "Chitaavia",
@@ -2863,7 +3031,8 @@
     "name": "Cielos Airlines",
     "iata": "A2",
     "icao": "CIU",
-    "country": "Peru"
+    "country": "Peru",
+    "ceasedOperations": true
   },
   {
     "name": "Cimber Sterling",
@@ -2888,20 +3057,15 @@
     "name": "City Connexion Airlines",
     "iata": "G3",
     "icao": "CIX",
-    "country": "Burundi"
-  },
-  {
-    "name": "CityJet",
-    "iata": "WX",
-    "icao": "BCY",
-    "country": "Ireland",
-    "ticketPrefix": "689"
+    "country": "Burundi",
+    "ceasedOperations": true
   },
   {
     "name": "CityFlyer Express",
     "iata": "CJ",
     "icao": "CFE",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Civil Air Transport",
@@ -2913,13 +3077,15 @@
     "name": "Club Air",
     "iata": "6P",
     "icao": "ISG",
-    "country": "Italy"
+    "country": "Italy",
+    "ceasedOperations": true
   },
   {
     "name": "Coast Air",
     "iata": "BX",
     "icao": "CST",
-    "country": "Norway"
+    "country": "Norway",
+    "ceasedOperations": true
   },
   {
     "name": "Coastal Air",
@@ -2943,7 +3109,8 @@
     "name": "Comair",
     "iata": "OH",
     "icao": "COM",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Comair",
@@ -2961,13 +3128,15 @@
     "name": "Comores Airlines",
     "iata": "KR",
     "icao": "CWK",
-    "country": "Comoros"
+    "country": "Comoros",
+    "ceasedOperations": true
   },
   {
     "name": "Compass Airlines",
     "iata": "CP",
     "icao": "CPZ",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Condor Flugdienst",
@@ -2993,13 +3162,15 @@
     "name": "Continental Micronesia",
     "iata": "CS",
     "icao": "CMI",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Cambrian Airways",
     "iata": "CS",
     "icao": "CS",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Conviasa",
@@ -3028,7 +3199,10 @@
     "icao": "CND",
     "country": "Netherlands",
     "reqs": "Ticket, Boarding pass, Reservation confirmation",
-    "ticketNumberCanReplacePnr": true
+    "ticketNumberCanReplacePnr": true,
+      "trackerSearchCodes": {
+      "flightStats": "CND"
+    }
   },
   {
     "name": "Corendon Airlines Europe",
@@ -3121,7 +3295,8 @@
     "name": "Clickair",
     "iata": "XG",
     "icao": "CLI",
-    "country": "Spain"
+    "country": "Spain",
+    "ceasedOperations": true
   },
   {
     "name": "West Air (China)",
@@ -3133,13 +3308,15 @@
     "name": "Deutsche Luft Hansa",
     "iata": "DL",
     "icao": "DLH",
-    "country": "Germany"
+    "country": "Germany",
+    "ceasedOperations": true
   },
   {
     "name": "DanubeWings",
     "iata": "V5",
     "icao": "VPA",
-    "country": "Slovakia"
+    "country": "Slovakia",
+    "ceasedOperations": true
   },
   {
     "name": "DAT Danish Air Transport",
@@ -3158,7 +3335,8 @@
     "name": "Dagestan Airlines",
     "iata": "N2",
     "icao": "DAG",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Dalian Airlines",
@@ -3176,7 +3354,8 @@
     "name": "Danish Air Lines",
     "iata": "DD",
     "icao": "DDL",
-    "country": "Denmark"
+    "country": "Denmark",
+    "ceasedOperations": true
   },
   {
     "name": "Darwin Airline",
@@ -3209,13 +3388,15 @@
     "name": "Denim Air",
     "iata": "J7",
     "icao": "DNM",
-    "country": "Netherlands"
+    "country": "Netherlands",
+    "ceasedOperations": true
   },
   {
     "name": "Dirgantara Air Service",
     "iata": "AW",
     "icao": "DIR",
-    "country": "Indonesia"
+    "country": "Indonesia",
+    "ceasedOperations": true
   },
   {
     "name": "Discover Airlines / Eurowings Discover",
@@ -3230,7 +3411,8 @@
     "name": "Discovery Airways",
     "iata": "DH",
     "icao": "DVA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Dniproavia",
@@ -3243,7 +3425,8 @@
     "iata": "YU",
     "icao": "ADM",
     "country": "Dominican Republic",
-    "ticketPrefix": "551"
+    "ticketPrefix": "551",
+    "ceasedOperations": true
   },
   {
     "name": "Dominicana de Aviación",
@@ -3255,7 +3438,8 @@
     "name": "Domodedovo Airlines",
     "iata": "E3",
     "icao": "DMO",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Donavia",
@@ -3268,7 +3452,8 @@
     "name": "DonbassAero",
     "iata": "5D",
     "icao": "UDC",
-    "country": "Ukraine"
+    "country": "Ukraine",
+    "ceasedOperations": true
   },
   {
     "name": "Donghai Airlines",
@@ -3286,7 +3471,8 @@
     "name": "Dba",
     "iata": "DI",
     "icao": "BAG",
-    "country": "Germany"
+    "country": "Germany",
+    "ceasedOperations": true
   },
   {
     "name": "Juneyao Air",
@@ -3305,7 +3491,8 @@
     "iata": "EL",
     "icao": "ELB",
     "country": "Greece",
-    "ticketPrefix": "241"
+    "ticketPrefix": "241",
+    "ceasedOperations": true
   },
   {
     "name": "Endeavor Air",
@@ -3323,7 +3510,8 @@
     "name": "EUjet",
     "iata": "VE",
     "icao": "EUJ",
-    "country": "Ireland"
+    "country": "Ireland",
+    "ceasedOperations": true
   },
   {
     "name": "Eagle Air",
@@ -3335,7 +3523,8 @@
     "name": "Eagle Airways",
     "iata": "NZ",
     "icao": "EAG",
-    "country": "New Zealand"
+    "country": "New Zealand",
+    "ceasedOperations": true
   },
   {
     "name": "East African Safari Air",
@@ -3347,7 +3536,8 @@
     "name": "East Asia Airlines",
     "iata": "E3",
     "icao": "EMU",
-    "country": "Macao"
+    "country": "Macao",
+    "ceasedOperations": true
   },
   {
     "name": "Eastar Jet",
@@ -3359,7 +3549,8 @@
     "name": "Eastern Air Lines",
     "iata": "EA",
     "icao": "EAL",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Eastern Airways",
@@ -3373,19 +3564,30 @@
     "name": "Eastern Australia Airlines",
     "iata": "QF",
     "icao": "EAQ",
-    "country": "Australia"
+    "country": "Australia",
+    "ceasedOperations": true
   },
   {
     "name": "Eastland Air",
     "iata": "DK",
     "icao": "ELA",
-    "country": "Australia"
+    "country": "Australia",
+    "ceasedOperations": true,
+    "claimNote": " The Australian regional airline stopped flying in 2003 after operating out of Toowoomba, Queensland, since 1991,  The DK code was later used by Thomas Cook Airlines Scandinavia, which is now [Sunclass Airlines]."
+  },
+  {
+    "name": "Sunclass Airlines (formerly Thomas Cook Airlines Scandinavia)",
+    "iata": "DK",
+    "icao": "VKG",
+    "country": "Denmark",
+    "ticketPrefix": "630"
   },
   {
     "name": "Eastwind Airlines",
     "iata": "W9",
     "icao": "SGR",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "easyJet Europe",
@@ -3470,7 +3672,8 @@
     "name": "Enkor JSC",
     "iata": "G8",
     "icao": "ENK",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Enter Air",
@@ -3492,7 +3695,8 @@
     "name": "Equatorial Congo Airlines",
     "iata": "EJ",
     "icao": "EQR",
-    "country": "Republic of the Congo"
+    "country": "Republic of the Congo",
+    "ceasedOperations": true
   },
   {
     "name": "Eritrean Airlines",
@@ -3535,7 +3739,7 @@
   },
   {
     "name": "EuroAtlantic Airways",
-    "iata": "MM",
+    "iata": "YU",
     "icao": "MMZ",
     "country": "Portugal"
   },
@@ -3555,7 +3759,8 @@
     "name": "Eurofly",
     "iata": "GJ",
     "icao": "EEZ",
-    "country": "Italy"
+    "country": "Italy",
+    "ceasedOperations": true
   },
   {
     "name": "Eurolot",
@@ -3582,7 +3787,8 @@
     "name": "European Air Express",
     "iata": "EA",
     "icao": "EAL",
-    "country": "Germany"
+    "country": "Germany",
+    "ceasedOperations": true
   },
   {
     "name": "European Air Transport",
@@ -3617,7 +3823,8 @@
     "name": "Evergreen International Airlines",
     "iata": "EZ",
     "icao": "EIA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Ewa Air",
@@ -3635,13 +3842,15 @@
     "name": "Executive Airlines",
     "iata": "OW",
     "icao": "EXK",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Express One International",
     "iata": "EO",
     "icao": "LHN",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "ExpressJet",
@@ -3660,13 +3869,15 @@
     "name": "Far Eastern Air Transport",
     "iata": "FE",
     "icao": "FEA",
-    "country": "Taiwan"
+    "country": "Taiwan",
+    "ceasedOperations": true
   },
   {
     "name": "FaroeJet",
     "iata": "F6",
     "icao": "RCK",
-    "country": "Faroe Islands"
+    "country": "Faroe Islands",
+    "ceasedOperations": true
   },
   {
     "name": "Faso Airways",
@@ -3684,7 +3895,8 @@
     "name": "Finalair Congo",
     "iata": "4S",
     "icao": "FNC",
-    "country": "Republic of the Congo"
+    "country": "Republic of the Congo",
+    "ceasedOperations": true
   },
   {
     "name": "Finnair",
@@ -3710,7 +3922,8 @@
     "name": "First Air",
     "iata": "7F",
     "icao": "FAB",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Fischer Air",
@@ -3740,19 +3953,22 @@
     "name": "Florida Coastal Airlines",
     "iata": "PA",
     "icao": "FCL",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Florida West International Airways",
     "iata": "RF",
     "icao": "FWL",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Fly Air",
     "iata": "F2",
     "icao": "FLM",
-    "country": "Turkey"
+    "country": "Turkey",
+    "ceasedOperations": true
   },
   {
     "name": "Fly All Ways",
@@ -3764,19 +3980,22 @@
     "name": "Fly Arna",
     "iata": "G6",
     "icao": "ACY",
-    "country": "Armenia"
+    "country": "Armenia",
+    "ceasedOperations": true
   },
   {
     "name": "Fly Georgia",
     "iata": "9Y",
     "icao": "FGE",
-    "country": "Georgia"
+    "country": "Georgia",
+    "ceasedOperations": true
   },
   {
     "name": "Fly Jamaica Airways",
     "iata": "OJ",
     "icao": "FJM",
-    "country": "Jamaica"
+    "country": "Jamaica",
+    "ceasedOperations": true
   },
   {
     "name": "Fly Jinnah",
@@ -3798,7 +4017,8 @@
     "name": "Fly Me Sweden",
     "iata": "SH",
     "icao": "FLY",
-    "country": "Sweden"
+    "country": "Sweden",
+    "ceasedOperations": true
   },
   {
     "name": "Fly Pro",
@@ -3810,7 +4030,8 @@
     "name": "Fly Wex",
     "iata": "6P",
     "icao": "IAD",
-    "country": "Italy"
+    "country": "Italy",
+    "ceasedOperations": true
   },
   {
     "name": "Fly2Sky",
@@ -3851,13 +4072,15 @@
     "icao": "FEG",
     "country": "Egypt",
     "ticketNumberCanReplacePnr": true,
-    "ticketPrefix": "171"
+    "ticketPrefix": "171",
+    "ceasedOperations": true
   },
   {
     "name": "Flyglobespan",
     "iata": "Y2",
     "icao": "GSM",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "FlyGTA Airlines",
@@ -3883,7 +4106,8 @@
     "name": "FlyNordic",
     "iata": "LF",
     "icao": "NDC",
-    "country": "Sweden"
+    "country": "Sweden",
+    "ceasedOperations": true
   },
   {
     "name": "FlyPelican",
@@ -3895,19 +4119,22 @@
     "name": "Flyr",
     "iata": "FS",
     "icao": "FOX",
-    "country": "Norway"
+    "country": "Norway",
+    "ceasedOperations": true
   },
   {
     "name": "FlyViking",
     "iata": "VK",
     "icao": "FVK",
-    "country": "Norway"
+    "country": "Norway",
+    "ceasedOperations": true
   },
   {
     "name": "Formosa Airlines",
     "iata": "VY",
     "icao": "FOS",
-    "country": "Taiwan"
+    "country": "Taiwan",
+    "ceasedOperations": true
   },
   {
     "name": "Fortunair Canada",
@@ -3919,7 +4146,8 @@
     "name": "Forward Air International Airlines",
     "iata": "BN",
     "icao": "NA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "FlyOne",
@@ -3937,7 +4165,10 @@
     "iata": "3F",
     "icao": "FIE",
     "claimNote": "PNR mandatory",
-    "country": "Armenia"
+    "country": "Armenia",
+    "trackerSearchCodes": {
+      "flightStats": "FIE"
+    }
   },
   {
     "name": "FlyOne Romania",
@@ -3959,13 +4190,15 @@
     "name": "Freedom Air",
     "iata": "SJ",
     "icao": "FOM",
-    "country": "New Zealand"
+    "country": "New Zealand",
+    "ceasedOperations": true
   },
   {
     "name": "Freedom Air",
     "iata": "FP",
     "icao": "FRE",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Frontier Airlines",
@@ -3983,7 +4216,8 @@
     "name": "Futura International Airways",
     "iata": "FH",
     "icao": "FUA",
-    "country": "Spain"
+    "country": "Spain",
+    "ceasedOperations": true
   },
   {
     "name": "Flydubai",
@@ -3996,7 +4230,8 @@
     "name": "Golden Myanmar Airlines",
     "iata": "Y5",
     "icao": "GMR",
-    "country": "Myanmar"
+    "country": "Myanmar",
+    "ceasedOperations": true
   },
   {
     "name": "GB Airways",
@@ -4014,7 +4249,8 @@
     "name": "Galaxy Air",
     "iata": "7O",
     "icao": "GAL",
-    "country": "Kyrgyzstan"
+    "country": "Kyrgyzstan",
+    "ceasedOperations": true
   },
   {
     "name": "Gambia International Airlines",
@@ -4026,7 +4262,8 @@
     "name": "Gandalf Airlines",
     "iata": "G7",
     "icao": "GNF",
-    "country": "Italy"
+    "country": "Italy",
+    "ceasedOperations": true
   },
   {
     "name": "Garuda Indonesia",
@@ -4046,7 +4283,8 @@
     "name": "Georgian National Airlines",
     "iata": "QB",
     "icao": "GFG",
-    "country": "Georgia"
+    "country": "Georgia",
+    "ceasedOperations": true
   },
   {
     "name": "Luftfahrtgesellschaft Walter",
@@ -4086,13 +4324,15 @@
     "name": "Globus Airlines",
     "iata": "GH",
     "icao": "GLP",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Ghana Airways",
     "iata": "GH",
     "icao": "GHA",
-    "country": "Ghana"
+    "country": "Ghana",
+    "ceasedOperations": true
   },
   {
     "name": "Ghana International Airlines",
@@ -4110,13 +4350,15 @@
     "name": "GoAir",
     "iata": "G8",
     "icao": "GOW",
-    "country": "India"
+    "country": "India",
+    "ceasedOperations": true
   },
   {
     "name": "Go One Airways",
     "iata": "GK",
     "icao": "NA",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "GoJet Airlines",
@@ -4141,7 +4383,8 @@
     "name": "Gonini Air Services",
     "iata": "5Z",
     "icao": "GON",
-    "country": "Suriname"
+    "country": "Suriname",
+    "ceasedOperations": true
   },
   {
     "name": "Gorkha Airlines",
@@ -4165,7 +4408,8 @@
     "name": "Great Wall Airlines",
     "iata": "IJ",
     "icao": "GWL",
-    "country": "China"
+    "country": "China",
+    "ceasedOperations": true
   },
   {
     "name": "Greater Bay Airlines",
@@ -4177,19 +4421,22 @@
     "name": "Guine Bissaur Airlines",
     "iata": "G6",
     "icao": "BSR",
-    "country": "Guinea-Bissau"
+    "country": "Guinea-Bissau",
+    "ceasedOperations": true
   },
   {
     "name": "Guinee Airlines",
     "iata": "J9",
     "icao": "GIF",
-    "country": "Guinea"
+    "country": "Guinea",
+    "ceasedOperations": true
   },
   {
     "name": "Gujarat Airways",
     "iata": "G8",
     "icao": "GUJ",
-    "country": "India"
+    "country": "India",
+    "ceasedOperations": true
   },
   {
     "name": "Gulf Air",
@@ -4202,13 +4449,15 @@
     "name": "Guyana Airways 2000",
     "iata": "GY",
     "icao": "NA",
-    "country": ""
+    "country": "",
+    "ceasedOperations": true
   },
   {
     "name": "Hewa Bora Airways",
     "iata": "EO",
     "icao": "ALX",
-    "country": "Democratic Republic of the Congo"
+    "country": "Democratic Republic of the Congo",
+    "ceasedOperations": true
   },
   {
     "name": "Hop!",
@@ -4234,19 +4483,22 @@
     "name": "Haiti Ambassador Airlines",
     "iata": "2T",
     "icao": "HAM",
-    "country": "Haiti"
+    "country": "Haiti",
+    "ceasedOperations": true
   },
   {
     "name": "Hamburg International",
     "iata": "4R",
     "icao": "HHI",
-    "country": "Germany"
+    "country": "Germany",
+    "ceasedOperations": true
   },
   {
     "name": "Hapag-Lloyd Express",
     "iata": "X3",
     "icao": "HLX",
-    "country": "Germany"
+    "country": "Germany",
+    "ceasedOperations": true
   },
   {
     "name": "Hapagfly",
@@ -4258,13 +4510,15 @@
     "name": "Harbor Airlines",
     "iata": "HB",
     "icao": "HAR",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Harmony Airways",
     "iata": "HQ",
     "icao": "HMY",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Hawaiian Airlines",
@@ -4277,7 +4531,8 @@
     "name": "Hawaiian Pacific Airlines",
     "iata": "HP",
     "icao": "NA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Hawkair",
@@ -4308,13 +4563,15 @@
     "name": "Hellas Jet",
     "iata": "HJ",
     "icao": "HEJ",
-    "country": "Greece"
+    "country": "Greece",
+    "ceasedOperations": true
   },
   {
     "name": "Hello",
     "iata": "HW",
     "icao": "FHE",
-    "country": "Switzerland"
+    "country": "Switzerland",
+    "ceasedOperations": true
   },
   {
     "name": "Helvetic Airways",
@@ -4361,13 +4618,15 @@
     "name": "Hola Airlines",
     "iata": "H5",
     "icao": "HOA",
-    "country": "Spain"
+    "country": "Spain",
+    "ceasedOperations": true
   },
   {
     "name": "Holidays Czech Airlines",
     "iata": "HC",
     "icao": "HCC",
-    "country": "Czech Republic"
+    "country": "Czech Republic",
+    "ceasedOperations": true
   },
   {
     "name": "Hong Kong Airlines",
@@ -4411,13 +4670,15 @@
     "name": "Horizon Airlines",
     "iata": "BN",
     "icao": "HZA",
-    "country": "Australia"
+    "country": "Australia",
+    "ceasedOperations": true
   },
   {
     "name": "HumoAir",
     "iata": "HJ",
     "icao": "USW",
-    "country": "Uzbekistan"
+    "country": "Uzbekistan",
+    "ceasedOperations": true
   },
   {
     "name": "FlyErbil",
@@ -4446,7 +4707,7 @@
   },
   {
     "name": "Ikar",
-    "iata": "IK",
+    "iata": "EO",
     "icao": "KAR",
     "country": "Russian Federation"
   },
@@ -4519,7 +4780,8 @@
     "name": "Iberworld",
     "iata": "TY",
     "icao": "IWD",
-    "country": "Spain"
+    "country": "Spain",
+    "ceasedOperations": true
   },
   {
     "name": "Ibex Airlines",
@@ -4558,7 +4820,8 @@
     "name": "Independence Air",
     "iata": "DH",
     "icao": "IDE",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "IndiaOne Air",
@@ -4591,7 +4854,8 @@
     "name": "Indochina Airlines",
     "iata": "VP",
     "icao": "AXC",
-    "country": "Vietnam"
+    "country": "Vietnam",
+    "ceasedOperations": true
   },
   {
     "name": "Indonesia AirAsia",
@@ -4610,7 +4874,8 @@
     "name": "Inter Island Airways",
     "iata": "H4",
     "icao": "IIN",
-    "country": "Cape Verde"
+    "country": "Cape Verde",
+    "ceasedOperations": true
   },
   {
     "name": "Interair South Africa",
@@ -4622,7 +4887,8 @@
     "name": "Interavia Airlines",
     "iata": "ZA",
     "icao": "SUW",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "InterCaribbean Airways",
@@ -4634,32 +4900,37 @@
     "name": "Intercontinental de Aviación",
     "iata": "RS",
     "icao": "ICT",
-    "country": "Colombia"
+    "country": "Colombia",
+    "ceasedOperations": true
   },
   {
     "name": "Interjet",
     "iata": "4O",
     "icao": "AIJ",
     "country": "Mexico",
-    "ticketPrefix": "837"
+    "ticketPrefix": "837",
+    "ceasedOperations": true
   },
   {
     "name": "Interlink Airlines",
     "iata": "ID",
     "icao": "ITK",
-    "country": "South Africa"
+    "country": "South Africa",
+    "ceasedOperations": true
   },
   {
     "name": "Intersky",
     "iata": "3L",
     "icao": "ISK",
-    "country": "Austria"
+    "country": "Austria",
+    "ceasedOperations": true
   },
   {
     "name": "Interstate Airlines",
     "iata": "I4",
     "icao": "FWA",
-    "country": "Netherlands"
+    "country": "Netherlands",
+    "ceasedOperations": true
   },
   {
     "name": "Iran Air",
@@ -4695,13 +4966,15 @@
     "name": "Island Express",
     "iata": "2S",
     "icao": "SDY",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Islands Nationair",
     "iata": "CN",
     "icao": "NA",
-    "country": "Papua New Guinea"
+    "country": "Papua New Guinea",
+    "ceasedOperations": true
   },
   {
     "name": "Islas Airways",
@@ -4736,19 +5009,22 @@
     "name": "Itali Airlines",
     "iata": "FS",
     "icao": "ACL",
-    "country": "Italy"
+    "country": "Italy",
+    "ceasedOperations": true
   },
   {
     "name": "Itek Air",
     "iata": "GI",
     "icao": "IKA",
-    "country": "Kyrgyzstan"
+    "country": "Kyrgyzstan",
+    "ceasedOperations": true
   },
   {
     "name": "Izair",
     "iata": "H9",
     "icao": "IZM",
-    "country": "Turkey"
+    "country": "Turkey",
+    "ceasedOperations": true
   },
   {
     "name": "J-Air",
@@ -4766,13 +5042,15 @@
     "name": "JALways",
     "iata": "JO",
     "icao": "JAZ",
-    "country": "Japan"
+    "country": "Japan",
+    "ceasedOperations": true
   },
   {
     "name": "JMC Airlines",
     "iata": "MT",
     "icao": "JMC",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Japan Air Commuter",
@@ -4797,7 +5075,8 @@
     "name": "Japan Asia Airways",
     "iata": "EG",
     "icao": "JAA",
-    "country": "Japan"
+    "country": "Japan",
+    "ceasedOperations": true
   },
   {
     "name": "Japan Transocean Air",
@@ -4827,13 +5106,15 @@
     "name": "Jat Airways",
     "iata": "JU",
     "icao": "JAT",
-    "country": "Serbia"
+    "country": "Serbia",
+    "ceasedOperations": true
   },
   {
     "name": "Jatayu Airlines",
     "iata": "VJ",
     "icao": "JTY",
-    "country": "Indonesia"
+    "country": "Indonesia",
+    "ceasedOperations": true
   },
   {
     "name": "Jazeera Airways",
@@ -4852,7 +5133,8 @@
     "name": "OLT Express",
     "iata": "O2",
     "icao": "JEA",
-    "country": "Poland"
+    "country": "Poland",
+    "ceasedOperations": true
   },
   {
     "name": "Jet Airways",
@@ -4890,7 +5172,8 @@
     "name": "Jet Asia Airways",
     "iata": "JF",
     "icao": "JAA",
-    "country": "Thailand"
+    "country": "Thailand",
+    "ceasedOperations": true
   },
   {
     "name": "Jetclub",
@@ -4902,7 +5185,8 @@
     "name": "JetsGo",
     "iata": "SG",
     "icao": "JGO",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Jetstar",
@@ -4921,11 +5205,12 @@
     "name": "Jetstar Hong Kong",
     "iata": "JM",
     "icao": "JKT",
-    "country": "China"
+    "country": "China",
+    "ceasedOperations": true
   },
   {
     "name": "Jettime",
-    "iata": "JO",
+    "iata": "JP",
     "icao": "JTD",
     "country": "Denmark"
   },
@@ -4933,7 +5218,8 @@
     "name": "JetX Airlines",
     "iata": "GX",
     "icao": "JXX",
-    "country": "Iceland"
+    "country": "Iceland",
+    "ceasedOperations": true
   },
   {
     "name": "Jin Air",
@@ -4956,7 +5242,7 @@
   },
   {
     "name": "Jubba Airways",
-    "iata": "6J",
+    "iata": "3J",
     "icao": "JUB",
     "country": "Somalia"
   },
@@ -4977,19 +5263,22 @@
     "name": "Kharkiv Airlines",
     "iata": "KW",
     "icao": "KHK",
-    "country": "Ukraine"
+    "country": "Ukraine",
+    "ceasedOperations": true
   },
   {
     "name": "Kalstar Aviation",
     "iata": "KD",
     "icao": "KLS",
-    "country": "Indonesia"
+    "country": "Indonesia",
+    "ceasedOperations": true
   },
   {
     "name": "KD Avia",
     "iata": "KD",
     "icao": "KNI",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "KLM Cityhopper",
@@ -5011,7 +5300,8 @@
     "name": "Kabo Air",
     "iata": "N2",
     "icao": "QNK",
-    "country": "Nigeria"
+    "country": "Nigeria",
+    "ceasedOperations": true
   },
   {
     "name": "Kam Air",
@@ -5023,25 +5313,29 @@
     "name": "Kampuchea Airlines",
     "iata": "E2",
     "icao": "KMP",
-    "country": "Cambodia"
+    "country": "Cambodia",
+    "ceasedOperations": true
   },
   {
     "name": "Karat",
     "iata": "V2",
     "icao": "AKT",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Kavminvodyavia",
     "iata": "KV",
     "icao": "MVD",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "KC International Airlines",
     "iata": "3Q",
     "icao": "KCH",
-    "country": "Cambodia"
+    "country": "Cambodia",
+    "ceasedOperations": true
   },
   {
     "name": "Kenmore Air",
@@ -5057,6 +5351,15 @@
     "reqs": "Ticket number",
     "claimNote": "Ticket number mandatory",
     "ticketPrefix": "706"
+  },
+  {
+    "name": "Skyward Express",
+    "iata": "OW",
+    "icao": "SEW",
+    "country": "Kenya",
+    "trackerSearchCodes": {
+      "flightStats": "OW*"
+    }
   },
   {
     "name": "Key Airlines",
@@ -5080,7 +5383,8 @@
     "name": "Khalifa Airways",
     "iata": "K6",
     "icao": "KZW",
-    "country": "Algeria"
+    "country": "Algeria",
+    "ceasedOperations": true
   },
   {
     "name": "Khors Aircompany",
@@ -5093,7 +5397,8 @@
     "name": "Kingfisher Airlines",
     "iata": "IT",
     "icao": "KFR",
-    "country": "India"
+    "country": "India",
+    "ceasedOperations": true
   },
   {
     "name": "Kish Air",
@@ -5105,7 +5410,8 @@
     "name": "Kitty Hawk Airways",
     "iata": "2K",
     "icao": "KHC",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Kiwi International Air Lines",
@@ -5149,19 +5455,22 @@
     "name": "Krylo Airlines",
     "iata": "K9",
     "icao": "KRI",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Kuban Airlines",
     "iata": "GW",
     "icao": "KIL",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Kunpeng Airlines",
     "iata": "VD",
     "icao": "KPA",
-    "country": "China"
+    "country": "China",
+    "ceasedOperations": true
   },
   {
     "name": "Kuwait Airways",
@@ -5181,7 +5490,8 @@
     "name": "Kyrgyzstan",
     "iata": "QH",
     "icao": "LYN",
-    "country": "Kyrgyzstan"
+    "country": "Kyrgyzstan",
+    "ceasedOperations": true
   },
   {
     "name": "Kyrgyzstan Airlines",
@@ -5194,12 +5504,6 @@
     "iata": "FK",
     "icao": "KEW",
     "country": "Canada"
-  },
-  {
-    "name": "Air Koryo",
-    "iata": "JS",
-    "icao": "KOR",
-    "country": "North Korea"
   },
   {
     "name": "Libyan Wings",
@@ -5217,7 +5521,8 @@
     "name": "L.A.B. Flying Service",
     "iata": "JF",
     "icao": "LAB",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "LACSA",
@@ -5230,7 +5535,8 @@
     "name": "LAI - Línea Aérea IAACA",
     "iata": "KG",
     "icao": "BNX",
-    "country": "Venezuela"
+    "country": "Venezuela",
+    "ceasedOperations": true
   },
   {
     "name": "LATAM Argentina",
@@ -5315,13 +5621,15 @@
     "name": "LANICA",
     "iata": "NI",
     "icao": "NA",
-    "country": "Nicaragua"
+    "country": "Nicaragua",
+    "ceasedOperations": true
   },
   {
     "name": "Línea Aérea Cuencana",
     "iata": "L5",
     "icao": "NA",
-    "country": "Ecuador"
+    "country": "Ecuador",
+    "ceasedOperations": true
   },
   {
     "name": "LOT Polish Airlines",
@@ -5335,7 +5643,8 @@
     "name": "LTE International Airways",
     "iata": "XO",
     "icao": "LTE",
-    "country": "Spain"
+    "country": "Spain",
+    "ceasedOperations": true
   },
   {
     "name": "LTU Austria",
@@ -5347,19 +5656,22 @@
     "name": "LTU International",
     "iata": "LT",
     "icao": "LTU",
-    "country": "Germany"
+    "country": "Germany",
+    "ceasedOperations": true
   },
   {
     "name": "Lagun Air",
     "iata": "N6",
     "icao": "JEV",
-    "country": "Spain"
+    "country": "Spain",
+    "ceasedOperations": true
   },
   {
     "name": "Lankair",
     "iata": "IK",
     "icao": "LKN",
-    "country": "Sri Lanka"
+    "country": "Sri Lanka",
+    "ceasedOperations": true
   },
   {
     "name": "Lao Airlines",
@@ -5372,7 +5684,8 @@
     "name": "Laoag International Airlines",
     "iata": "L7",
     "icao": "LPN",
-    "country": "Philippines"
+    "country": "Philippines",
+    "ceasedOperations": true
   },
   {
     "name": "Lauda Europe",
@@ -5383,9 +5696,11 @@
   },
   {
     "name": "LaudaMotion",
-    "iata": "OE[32]",
+    "iata": "OE",
     "icao": "LDM",
-    "country": "Austria"
+    "country": "Austria",
+    "ceasedOperations": true,
+    "claimNote": "Laudamotion ceased all of its operations on October 31, 2020, OE IATA code previously held by Laudamotion was subsequently reassigned to FLYONE Romania"
   },
   {
     "name": "Sky Vision Airlines",
@@ -5433,7 +5748,8 @@
     "name": "Línea Aérea SAPSA",
     "iata": "L7",
     "icao": "LNP",
-    "country": "Chile"
+    "country": "Chile",
+    "ceasedOperations": true
   },
   {
     "name": "Línea Aérea de Servicio Ejecutivo Regional",
@@ -5445,7 +5761,8 @@
     "name": "Líneas Aéreas Azteca",
     "iata": "ZE",
     "icao": "LCD",
-    "country": "Mexico"
+    "country": "Mexico",
+    "ceasedOperations": true
   },
   {
     "name": "Linhas Aéreas de Moçambique",
@@ -5464,7 +5781,8 @@
     "name": "Livingston Energy Flight",
     "iata": "LM",
     "icao": "LVG",
-    "country": "Italy"
+    "country": "Italy",
+    "ceasedOperations": true
   },
   {
     "name": "LJ Air",
@@ -5476,7 +5794,8 @@
     "name": "Lloyd Aéreo Boliviano",
     "iata": "LB",
     "icao": "LLB",
-    "country": "Bolivia"
+    "country": "Bolivia",
+    "ceasedOperations": true
   },
   {
     "name": "Loganair",
@@ -5517,9 +5836,9 @@
     "ticketPrefix": "220"
   },
   {
-    "name": "Lufthansa CityLine",
-    "iata": "CL",
-    "icao": "CLH",
+    "name": "Lufthansa city airlines",
+    "iata": "VL",
+    "icao": "LHX",
     "country": "Germany",
     "reqs": "Lufthansa POA (Ticket & Boarding pass needed later)",
      "trackerSearchCodes": {
@@ -5556,7 +5875,8 @@
     "name": "Lynx Air",
     "iata": "Y9",
     "icao": "DAT",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Lynx Aviation",
@@ -5575,7 +5895,8 @@
     "name": "Líneas Aéreas Privadas Argentinas",
     "iata": "MJ",
     "icao": "LPR",
-    "country": "Argentina"
+    "country": "Argentina",
+    "ceasedOperations": true
   },
   {
     "name": "LongJiang Airlines",
@@ -5593,7 +5914,8 @@
     "name": "MarkAir",
     "iata": "BF",
     "icao": "MRK",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Manta Air",
@@ -5617,7 +5939,8 @@
     "name": "MAT Macedonian Airlines",
     "iata": "IN",
     "icao": "MAK",
-    "country": "Macedonia"
+    "country": "Macedonia",
+    "ceasedOperations": true
   },
   {
     "name": "MIAT Mongolian Airlines",
@@ -5636,19 +5959,22 @@
     "name": "Macair Airlines",
     "iata": "CC",
     "icao": "MCK",
-    "country": "Australia"
+    "country": "Australia",
+    "ceasedOperations": true
   },
   {
     "name": "Maersk Air",
     "iata": "DM",
     "icao": "DAN",
-    "country": "Denmark"
+    "country": "Denmark",
+    "ceasedOperations": true
   },
   {
     "name": "Maersk Air UK",
     "iata": "VB",
     "icao": "MSK",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Mahan Air",
@@ -5712,13 +6038,15 @@
     "name": "Mars RK",
     "iata": "6V",
     "icao": "MRW",
-    "country": "Ukraine"
+    "country": "Ukraine",
+    "ceasedOperations": true
   },
   {
     "name": "Marsland Aviation",
     "iata": "M7",
     "icao": "MSL",
-    "country": "Sudan"
+    "country": "Sudan",
+    "ceasedOperations": true
   },
   {
     "name": "Martinair",
@@ -5731,29 +6059,33 @@
     "name": "Mastertop Linhas Aéreas",
     "iata": "Q4",
     "icao": "NA",
-    "country": "Brazil"
+    "country": "Brazil",
+    "ceasedOperations": true
   },
   {
     "name": "Mavial Magadan Airlines",
     "iata": "H5",
     "icao": "MVL",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Maxair",
     "iata": "8M",
     "icao": "MXL",
-    "country": "Sweden"
+    "country": "Sweden",
+    "ceasedOperations": true
   },
   {
     "name": "Maxjet Airways",
     "iata": "MY",
     "icao": "MXJ",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Maya Island Air",
-    "iata": "MW",
+    "iata": "2M",
     "icao": "MYD",
     "country": "Belize"
   },
@@ -5799,13 +6131,15 @@
     "name": "Mesaba Airlines",
     "iata": "XJ",
     "icao": "MES",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Miami Air International",
     "iata": "LL",
     "icao": "BSK",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Middle East Airlines",
@@ -5824,26 +6158,30 @@
     "name": "Midway Airlines (1976–1991)",
     "iata": "ML",
     "icao": "MDW",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Midwest Airlines",
     "iata": "YX",
     "icao": "MEP",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Midwest Airlines (Egypt)",
     "iata": "MY",
     "icao": "MWA",
-    "country": "Egypt"
+    "country": "Egypt",
+    "ceasedOperations": true
   },
   {
     "name": "Mihin Lanka",
     "iata": "MJ",
     "icao": "MLR",
     "country": "Sri Lanka",
-    "ticketPrefix": "817"
+    "ticketPrefix": "817",
+    "ceasedOperations": true
   },
   {
     "name": "Mississippi Valley Airlines",
@@ -5868,7 +6206,8 @@
     "name": "Moldavian Airlines",
     "iata": "2M",
     "icao": "MDV",
-    "country": "Moldova"
+    "country": "Moldova",
+    "ceasedOperations": true
   },
   {
     "name": "Monarch Airlines",
@@ -5913,13 +6252,15 @@
     "name": "Mount Cook Airline",
     "iata": "NM",
     "icao": "NZM",
-    "country": "New Zealand"
+    "country": "New Zealand",
+    "ceasedOperations": true
   },
   {
     "name": "Mountain Air Company",
     "iata": "N4",
     "icao": "MTC",
-    "country": "Sierra Leone"
+    "country": "Sierra Leone",
+    "ceasedOperations": true
   },
   {
     "name": "Mudan Airlines",
@@ -5937,7 +6278,8 @@
     "name": "MyTravel Airways",
     "iata": "VZ",
     "icao": "MYT",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Myanma Airways",
@@ -5977,31 +6319,36 @@
     "name": "Fly Easy",
     "iata": "N5",
     "icao": "FEY",
-    "country": "India"
+    "country": "India",
+    "ceasedOperations": true
   },
   {
     "name": "Nantucket Airlines",
     "iata": "DV",
     "icao": "ACK",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Nas Air",
     "iata": "P9",
     "icao": "NA",
-    "country": "Mali"
+    "country": "Mali",
+    "ceasedOperations": true
   },
   {
     "name": "Nasair",
     "iata": "UE",
     "icao": "NAS",
-    "country": "Eritrea"
+    "country": "Eritrea",
+    "ceasedOperations": true
   },
   {
     "name": "National Airlines",
     "iata": "N4",
     "icao": "NCN",
-    "country": "Chile"
+    "country": "Chile",
+    "ceasedOperations": true
   },
   {
     "name": "National Airlines",
@@ -6073,7 +6420,10 @@
     "icao": "NMA",
     "country": "Egypt",
     "ticketNumberCanReplacePnr": true,
-    "ticketPrefix": "477"
+    "ticketPrefix": "477",
+    "trackerSearchCodes": {
+      "flightStats": "NE*"
+    }
   },
   {
     "name": "New England Airlines",
@@ -6106,7 +6456,8 @@
     "iata": "XW",
     "icao": "NCT",
     "country": "Thailand",
-    "ticketPrefix": "478"
+    "ticketPrefix": "478",
+    "ceasedOperations": true
   },
   {
     "name": "Nolinor Aviation",
@@ -6125,13 +6476,15 @@
     "name": "Nordeste Linhas Aéreas Regionais",
     "iata": "JH",
     "icao": "NES",
-    "country": "Brazil"
+    "country": "Brazil",
+    "ceasedOperations": true
   },
   {
     "name": "Nordic Regional",
     "iata": "6N",
     "icao": "NRD",
-    "country": "Sweden"
+    "country": "Sweden",
+    "ceasedOperations": true
   },
   {
     "name": "NordStar",
@@ -6150,7 +6503,8 @@
     "name": "Norfolk Air",
     "iata": "N5",
     "icao": "NA",
-    "country": "Norfolk Island"
+    "country": "Norfolk Island",
+    "ceasedOperations": true
   },
   {
     "name": "Norse Atlantic Airways",
@@ -6198,19 +6552,22 @@
     "name": "Northeast Airlines",
     "iata": "NE",
     "icao": "NEE",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Northern Dene Airways",
     "iata": "U7",
     "icao": "NA",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Northern Pacific Airways",
     "iata": "7H",
     "icao": "RVF",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Northwest Airlines",
@@ -6248,13 +6605,15 @@
     "name": "Norwegian Air UK",
     "iata": "DI",
     "icao": "NRS",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Norwegian Air Argentina",
     "iata": "DN",
     "icao": "NAA",
-    "country": "Argentina"
+    "country": "Argentina",
+    "ceasedOperations": true
   },
   {
     "name": "Norwegian Long Haul",
@@ -6266,7 +6625,8 @@
     "name": "Norwegian Air Norway",
     "iata": "DH",
     "icao": "NAN",
-    "country": "Norway"
+    "country": "Norway",
+    "ceasedOperations": true
   },
   {
     "name": "Norwegian Air Sweden",
@@ -6276,6 +6636,14 @@
     "trackerSearchCodes": {
       "flightStats": "D8*"
     }
+  },
+  {
+    "name": "Djibouti Airlines",
+    "iata": "D8",
+    "icao": "DJB",
+    "country": "Djibouti",
+    "claimNote": "Djibouti Airlines ceased operations in 2009,D8 (Later used by Norwegian Air International and Norwegian Air Sweden after being returned/reassigned) ",
+    "ceasedOperations": true
   },
   {
     "name": "Nouvel Air Tunisie",
@@ -6317,13 +6685,15 @@
     "name": "Nuevo Continente",
     "iata": "N6",
     "icao": "ACQ",
-    "country": "Peru"
+    "country": "Peru",
+    "ceasedOperations": true
   },
   {
     "name": "One Airlines",
     "iata": "IP",
     "icao": "ONS",
-    "country": "Chile"
+    "country": "Chile",
+    "ceasedOperations": true
   },
   {
     "name": "O'Connor Airlines",
@@ -6335,7 +6705,8 @@
     "name": "Oasis Airlines",
     "iata": "OB",
     "icao": "AAN",
-    "country": "Spain"
+    "country": "Spain",
+    "ceasedOperations": true
   },
   {
     "name": "Oasis Hong Kong Airlines",
@@ -6347,7 +6718,8 @@
     "name": "Ocean Airlines",
     "iata": "VC",
     "icao": "VCX",
-    "country": "Italy"
+    "country": "Italy",
+    "ceasedOperations": true
   },
   {
     "name": "Linear Air",
@@ -6359,7 +6731,8 @@
     "name": "OLT Express Germany",
     "iata": "OL",
     "icao": "OLT",
-    "country": "Germany"
+    "country": "Germany",
+    "ceasedOperations": true
   },
   {
     "name": "Olympic Air",
@@ -6413,7 +6786,8 @@
     "name": "Origin Pacific Airways",
     "iata": "QO",
     "icao": "OGN",
-    "country": "New Zealand"
+    "country": "New Zealand",
+    "ceasedOperations": true
   },
   {
     "name": "Our Airline",
@@ -6423,7 +6797,7 @@
   },
   {
     "name": "Overland Airways",
-    "iata": "OJ",
+    "iata": "OF",
     "icao": "OLA",
     "country": "Nigeria"
   },
@@ -6431,7 +6805,8 @@
     "name": "Ozark Air Lines",
     "iata": "OZ",
     "icao": "OZR",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "OzJet",
@@ -6443,13 +6818,15 @@
     "name": "Olympic Airlines",
     "iata": "OA",
     "icao": "OAL",
-    "country": "Greece"
+    "country": "Greece",
+    "ceasedOperations": true
   },
   {
     "name": "Oasis International Airlines Now assigned to Boliviana de Aviacion (BoA)",
     "iata": "OB",
     "icao": "AAN",
-    "country": "Spain"
+    "country": "Spain",
+    "ceasedOperations": true
   },
   {
     "name": "PAL Airlines",
@@ -6467,7 +6844,8 @@
     "name": "PAN Air",
     "iata": "PV",
     "icao": "PNR",
-    "country": "Spain"
+    "country": "Spain",
+    "ceasedOperations": true
   },
   {
     "name": "PB Air",
@@ -6479,25 +6857,22 @@
     "name": "PLUNA",
     "iata": "PU",
     "icao": "PUA",
-    "country": "Uruguay"
+    "country": "Uruguay",
+    "ceasedOperations": true
   },
   {
     "name": "PMTair",
     "iata": "U4",
     "icao": "PMT",
-    "country": "Cambodia"
-  },
-  {
-    "name": "PSA Airlines",
-    "iata": "OH",
-    "icao": "JIA",
-    "country": "United States"
+    "country": "Cambodia",
+    "ceasedOperations": true
   },
   {
     "name": "Pace Airlines",
     "iata": "Y5",
     "icao": "PCE",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Pacific Airlines",
@@ -6509,7 +6884,8 @@
     "name": "Pacific Blue",
     "iata": "DJ",
     "icao": "PBN",
-    "country": "New Zealand"
+    "country": "New Zealand",
+    "ceasedOperations": true
   },
   {
     "name": "Pacific Coastal Airlines",
@@ -6521,7 +6897,8 @@
     "name": "Pacific Wings",
     "iata": "LW",
     "icao": "NMI",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Pacificair",
@@ -6541,7 +6918,8 @@
     "name": "Palau Trans Pacific Airlines",
     "iata": "GP",
     "icao": "PTP",
-    "country": "Palau"
+    "country": "Palau",
+    "ceasedOperations": true
   },
   {
     "name": "Palestinian Airlines",
@@ -6553,7 +6931,8 @@
     "name": "Pamir Airways",
     "iata": "NR",
     "icao": "PIR",
-    "country": "Afghanistan"
+    "country": "Afghanistan",
+    "ceasedOperations": true
   },
   {
     "name": "PAWA Dominicana",
@@ -6566,31 +6945,36 @@
     "name": "Pan American Airways",
     "iata": "PN",
     "icao": "NA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Pan American Airways",
     "iata": "PA",
     "icao": "PAA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Pan American World Airways",
     "iata": "PA",
     "icao": "PAA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Pantanal Linhas Aéreas",
     "iata": "P8",
     "icao": "PTN",
-    "country": "Brazil"
+    "country": "Brazil",
+    "ceasedOperations": true
   },
   {
     "name": "Paramount Airways",
     "iata": "I7",
     "icao": "PMW",
-    "country": "India"
+    "country": "India",
+    "ceasedOperations": true
   },
   {
     "name": "Parata Air",
@@ -6608,13 +6992,15 @@
     "name": "Passaredo Transportes Aéreos",
     "iata": "P3",
     "icao": "PTB",
-    "country": "Brazil"
+    "country": "Brazil",
+    "ceasedOperations": true
   },
   {
     "name": "Pearl Airways",
     "iata": "HP",
     "icao": "HPA",
-    "country": "Haiti"
+    "country": "Haiti",
+    "ceasedOperations": true
   },
   {
     "name": "Pegasus Airlines",
@@ -6631,12 +7017,6 @@
     "country": "Austria"
   },
   {
-    "name": "Pegasus Hava Tasimaciligi",
-    "iata": "1I",
-    "icao": "NA",
-    "country": "Turkey"
-  },
-  {
     "name": "Peninsula Airways",
     "iata": "KS",
     "icao": "PEN",
@@ -6646,14 +7026,16 @@
     "name": "Perm Airlines",
     "iata": "P9",
     "icao": "PGP",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Peruvian Airlines",
     "iata": "P9",
     "icao": "PVN",
     "country": "Peru",
-    "ticketPrefix": "602"
+    "ticketPrefix": "602",
+    "ceasedOperations": true
   },
   {
     "name": "Philippines AirAsia",
@@ -6672,7 +7054,8 @@
     "name": "Phoenix Airways",
     "iata": "HP",
     "icao": "NA",
-    "country": "Switzerland"
+    "country": "Switzerland",
+    "ceasedOperations": true
   },
   {
     "name": "Phuket Air",
@@ -6716,7 +7099,8 @@
     "name": "Polynesian Blue",
     "iata": "DJ",
     "icao": "PLB",
-    "country": "New Zealand"
+    "country": "New Zealand",
+    "ceasedOperations": true
   },
   {
     "name": "Polyot Sirena",
@@ -6753,13 +7137,15 @@
     "name": "President Airlines",
     "iata": "TO",
     "icao": "PSD",
-    "country": "Cambodia"
+    "country": "Cambodia",
+    "ceasedOperations": true
   },
   {
     "name": "Primaris Airlines",
     "iata": "FE",
     "icao": "WCP",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Princess Air",
@@ -6790,7 +7176,8 @@
     "name": "Pulkovo Aviation Enterprise",
     "iata": "FV",
     "icao": "PLK",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Qantas",
@@ -6836,13 +7223,15 @@
     "name": "Ravn Alaska",
     "iata": "7H",
     "icao": "RVF",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Really Cool Airlines",
     "iata": "XW",
     "icao": "LUV",
-    "country": "Thailand"
+    "country": "Thailand",
+    "ceasedOperations": true
   },
   {
     "name": "Reem Air",
@@ -6855,7 +7244,8 @@
     "iata": "RX",
     "icao": "RGE",
     "country": "Bangladesh",
-    "ticketPrefix": "652"
+    "ticketPrefix": "652",
+    "ceasedOperations": true
   },
   {
     "name": "Régional",
@@ -6880,25 +7270,29 @@
     "name": "Regional Paraguaya",
     "iata": "P7",
     "icao": "REP",
-    "country": "Paraguay"
+    "country": "Paraguay",
+    "ceasedOperations": true
   },
   {
     "name": "RegionsAir",
     "iata": "3C",
     "icao": "CEA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Reno Air",
     "iata": "QQ",
     "icao": "ROA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Republic Airlines",
     "iata": "RC",
     "icao": "REP",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Republic Airways",
@@ -6917,7 +7311,8 @@
     "name": "Rico Linhas Aéreas",
     "iata": "C7",
     "icao": "RLE",
-    "country": "Brazil"
+    "country": "Brazil",
+    "ceasedOperations": true
   },
   {
     "name": "Rio Grande Air",
@@ -6929,13 +7324,15 @@
     "name": "Rio Linhas Aéreas",
     "iata": "RL",
     "icao": "RIO",
-    "country": "Brazil"
+    "country": "Brazil",
+    "ceasedOperations": true
   },
   {
     "name": "Rio Sul Serviços Aéreos Regionais",
     "iata": "SL",
     "icao": "RSL",
-    "country": "Brazil"
+    "country": "Brazil",
+    "ceasedOperations": true
   },
   {
     "name": "Riyadh Air",
@@ -6947,7 +7344,8 @@
     "name": "Vision Airlines",
     "iata": "V2",
     "icao": "RBY",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Rossiya",
@@ -6988,7 +7386,8 @@
     "name": "Royal Aruban Airlines",
     "iata": "V5",
     "icao": "RYL",
-    "country": "Aruba"
+    "country": "Aruba",
+    "ceasedOperations": true
   },
   {
     "name": "Royal Brunei Airlines",
@@ -7008,19 +7407,22 @@
     "name": "Skyview Airways",
     "iata": "RK",
     "icao": "RCT",
-    "country": "THAILAND"
+    "country": "THAILAND",
+    "ceasedOperations": true
   },
   {
     "name": "Royal Khmer Airlines",
     "iata": "RK",
     "icao": "RKH",
-    "country": "Cambodia"
+    "country": "Cambodia",
+    "ceasedOperations": true
   },
   {
     "name": "Royal Phnom Penh Airways",
     "iata": "RL",
     "icao": "PPW",
-    "country": "Cambodia"
+    "country": "Cambodia",
+    "ceasedOperations": true
   },
   {
     "name": "Buzz (Polish airline)",
@@ -7032,13 +7434,15 @@
     "name": "Royal Tongan Airlines",
     "iata": "WR",
     "icao": "HRH",
-    "country": "Tonga"
+    "country": "Tonga",
+    "ceasedOperations": true
   },
   {
     "name": "Russian Sky Airlines",
     "iata": "P7",
     "icao": "ESL",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Rutaca",
@@ -7077,19 +7481,16 @@
     "iata": "RK",
     "icao": "RUK",
     "country": "United Kingdom",
-    "claimNote": "PNR mandatory"
+    "claimNote": "PNR mandatory",
+    "trackerSearchCodes": {
+      "flightStats": "RK*"
+    }
   },
   {
     "name": "UVT Aero",
     "iata": "RT",
     "icao": "BUG",
     "country": "Russia"
-  },
-  {
-    "name": "Jetsmart Argentina",
-    "iata": "WJ",
-    "icao": "JES",
-    "country": "Argentina"
   },
   {
     "name": "Scoot",
@@ -7138,7 +7539,8 @@
     "name": "Sabaidee Airways",
     "iata": "E3",
     "icao": "VGO",
-    "country": "Thailand"
+    "country": "Thailand",
+    "ceasedOperations": true
   },
   {
     "name": "Sky Alps",
@@ -7150,7 +7552,8 @@
     "name": "SkyGreece Airlines",
     "iata": "GW",
     "icao": "SGR",
-    "country": "Greece"
+    "country": "Greece",
+    "ceasedOperations": true
   },
   {
     "name": "Sharp Airlines",
@@ -7194,13 +7597,15 @@
     "name": "Sky Regional Airlines",
     "iata": "KV",
     "icao": "SKV",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Sayakhat Airlines",
     "iata": "W7",
     "icao": "SAH",
-    "country": "Kazakhstan"
+    "country": "Kazakhstan",
+    "ceasedOperations": true
   },
   {
     "name": "Shaheen Air",
@@ -7212,7 +7617,8 @@
     "name": "SAM Colombia",
     "iata": "MM",
     "icao": "SAM",
-    "country": "Colombia"
+    "country": "Colombia",
+    "ceasedOperations": true
   },
   {
     "name": "Scandinavian Airlines",
@@ -7231,7 +7637,8 @@
     "name": "Sol del Paraguay",
     "iata": "PI",
     "icao": "SGU",
-    "country": "Paraguay"
+    "country": "Paraguay",
+    "ceasedOperations": true
   },
   {
     "name": "Tunisair Express",
@@ -7333,7 +7740,8 @@
     "name": "SAETA Air Ecuador",
     "iata": "EH",
     "icao": "SET",
-    "country": "Ecuador"
+    "country": "Ecuador",
+    "ceasedOperations": true
   },
   {
     "name": "StarFlyer",
@@ -7351,13 +7759,15 @@
     "name": "Skagway Air Service",
     "iata": "N5",
     "icao": "SGY",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Sakhalinskie Aviatrassy (SAT)",
     "iata": "HZ",
     "icao": "SHU",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "SATA Air Acores",
@@ -7389,7 +7799,8 @@
     "name": "Sibaviatrans",
     "iata": "5M",
     "icao": "SIB",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Skynet Airlines",
@@ -7413,13 +7824,15 @@
     "name": "Sama Airlines",
     "iata": "ZS",
     "icao": "SMY",
-    "country": "Saudi Arabia"
+    "country": "Saudi Arabia",
+    "ceasedOperations": true
   },
   {
     "name": "Siem Reap Airways",
     "iata": "FT",
     "icao": "SRH",
-    "country": "Cambodia"
+    "country": "Cambodia",
+    "ceasedOperations": true
   },
   {
     "name": "Sky Work Airlines",
@@ -7433,7 +7846,8 @@
     "name": "Swedline Express",
     "iata": "SM",
     "icao": "SRL",
-    "country": "Sweden"
+    "country": "Sweden",
+    "ceasedOperations": true
   },
   {
     "name": "SprintAir",
@@ -7451,7 +7865,8 @@
     "name": "SwedJet Airways",
     "iata": "VD",
     "icao": "BBB",
-    "country": "Sweden"
+    "country": "Sweden",
+    "ceasedOperations": true
   },
   {
     "name": "Sunstate Airlines",
@@ -7469,13 +7884,15 @@
     "name": "Stobart Air",
     "iata": "RE",
     "icao": "STK",
-    "country": "Ireland"
+    "country": "Ireland",
+    "ceasedOperations": true
   },
   {
     "name": "Servicios de Transportes Aéreos Fueguinos",
     "iata": "FS",
     "icao": "STU",
-    "country": "Argentina"
+    "country": "Argentina",
+    "ceasedOperations": true
   },
   {
     "name": "Sudan Airways",
@@ -7487,13 +7904,15 @@
     "name": "Sun Air (Fiji)",
     "iata": "PI",
     "icao": "SUF",
-    "country": "Fiji"
+    "country": "Fiji",
+    "ceasedOperations": true
   },
   {
     "name": "Sun Air International",
     "iata": "LW",
     "icao": "FDY",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Sun-Air of Scandinavia",
@@ -7540,7 +7959,8 @@
     "name": "Swissair",
     "iata": "SR",
     "icao": "SWR",
-    "country": "Switzerland"
+    "country": "Switzerland",
+    "ceasedOperations": true
   },
   {
     "name": "Sundair",
@@ -7564,25 +7984,29 @@
     "name": "Shovkoviy Shlyah",
     "iata": "S8",
     "icao": "SWW",
-    "country": "Ukraine"
+    "country": "Ukraine",
+    "ceasedOperations": true
   },
   {
     "name": "Swazi Express Airways",
     "iata": "Q4",
     "icao": "SWX",
-    "country": "Swaziland"
+    "country": "Swaziland",
+    "ceasedOperations": true
   },
   {
     "name": "Swoop",
     "iata": "WO",
     "icao": "WSW",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Skywise Airline",
     "iata": "S8",
     "icao": "SWZ",
-    "country": "South Africa"
+    "country": "South Africa",
+    "ceasedOperations": true
   },
   {
     "name": "SunExpress",
@@ -7603,7 +8027,8 @@
     "name": "Skywalk Airlines",
     "iata": "AL",
     "icao": "SYX",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Silk Way Airlines",
@@ -7622,7 +8047,8 @@
     "name": "Samara Airlines",
     "iata": "E5",
     "icao": "BRZ",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Air Arabia Egypt",
@@ -7642,7 +8068,8 @@
     "name": "SAS Braathens",
     "iata": "SK",
     "icao": "CNO",
-    "country": "Norway"
+    "country": "Norway",
+    "ceasedOperations": true
   },
   {
     "name": "Spring Airlines",
@@ -7672,23 +8099,18 @@
     "ticketPrefix": "479"
   },
   {
-    "name": "Corendon Airlines Europe",
-    "iata": "8C",
-    "icao": "CXI",
-    "country": "Malta",
-    "reqs": "DOB"
-  },
-  {
     "name": "Sun D'Or",
     "iata": "7L",
     "icao": "ERO",
-    "country": "Israel"
+    "country": "Israel",
+    "ceasedOperations": true
   },
   {
     "name": "SkyEurope",
     "iata": "NE",
     "icao": "ESK",
-    "country": "Slovakia"
+    "country": "Slovakia",
+    "ceasedOperations": true
   },
   {
     "name": "Sunshine Express Airlines",
@@ -7706,7 +8128,8 @@
     "name": "SKS Airways",
     "iata": "KI",
     "icao": "SJB",
-    "country": "Malaysia"
+    "country": "Malaysia",
+    "ceasedOperations": true
   },
   {
     "name": "Spanair",
@@ -7730,7 +8153,8 @@
     "name": "Sierra Nevada Airlines",
     "iata": "1I",
     "icao": "NA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Siren-Travel",
@@ -7754,7 +8178,8 @@
     "name": "Star Equatorial Airlines",
     "iata": "2S",
     "icao": "NA",
-    "country": "Guinea"
+    "country": "Guinea",
+    "ceasedOperations": true
   },
   {
     "name": "Spirit Airlines",
@@ -7772,7 +8197,8 @@
     "name": "Sosoliso Airlines",
     "iata": "SO",
     "icao": "OSL",
-    "country": "Nigeria"
+    "country": "Nigeria",
+    "ceasedOperations": true
   },
   {
     "name": "Virgin Australia Regional Airlines",
@@ -7790,13 +8216,15 @@
     "name": "Sky Trek International Airlines",
     "iata": "1I",
     "icao": "PZR",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Skybus Airlines",
     "iata": "SX",
     "icao": "SKB",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "SkyKing Turks and Caicos Airways",
@@ -7816,7 +8244,8 @@
     "name": "SkyStar Airways",
     "iata": "XT",
     "icao": "SKT",
-    "country": "Thailand"
+    "country": "Thailand",
+    "ceasedOperations": true
   },
   {
     "name": "Sky Airline",
@@ -7836,7 +8265,8 @@
     "name": "Skyways Express",
     "iata": "JZ",
     "icao": "SKX",
-    "country": "Sweden"
+    "country": "Sweden",
+    "ceasedOperations": true
   },
   {
     "name": "Skymark Airlines",
@@ -7848,7 +8278,8 @@
     "name": "Sierra National Airlines",
     "iata": "LJ",
     "icao": "SLA",
-    "country": "Sierra Leone"
+    "country": "Sierra Leone",
+    "ceasedOperations": true
   },
   {
     "name": "SilkAir",
@@ -7874,13 +8305,15 @@
     "name": "Servant Air",
     "iata": "8D",
     "icao": "NA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Semeyavia",
     "iata": "E8",
     "icao": "SMK",
-    "country": "Kazakhstan"
+    "country": "Kazakhstan",
+    "ceasedOperations": true
   },
   {
     "name": "Sterling Airlines",
@@ -7898,7 +8331,8 @@
     "name": "Southeast Airlines (Sun Jet International)",
     "iata": "SL",
     "icao": "SNK",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Solomon Airlines",
@@ -7930,7 +8364,8 @@
     "iata": "HZ",
     "icao": "SOZ",
     "country": "Kazakhstan",
-    "ticketPrefix": "598"
+    "ticketPrefix": "598",
+    "ceasedOperations": true
   },
   {
     "name": "South Pacific Island Airways",
@@ -7942,13 +8377,15 @@
     "name": "Shuttle America",
     "iata": "S5",
     "icao": "TCF",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Samarkand Airways",
     "iata": "C7",
     "icao": "UZS",
-    "country": "Uzbekistan"
+    "country": "Uzbekistan",
+    "ceasedOperations": true
   },
   {
     "name": "SCAT Airlines",
@@ -7985,9 +8422,20 @@
   {
     "name": "SkyUp MT",
     "iata": "U5",
-    "icao": "NA",
+    "icao": "SEU",
     "country": "Malta",
-    "reqs": "Boarding pass, Passport"
+    "reqs": "Boarding pass, Passport",
+    "trackerSearchCodes": {
+      "flightStats": "SEU"
+    }
+  },
+  {
+    "name": "Aura Airlines",
+    "iata": "U5",
+    "icao": "GWR",
+    "country": "Spain",
+    "ceasedOperations": true,
+    "claimNote": "Following Aura Airlines shutting down, the U5 IATA designator was reassigned to SkyUp MT, a Maltese subsidiary of the Ukrainian airline SkyUp Airlines."
   },
   {
     "name": "Small Planet Airlines",
@@ -8032,7 +8480,8 @@
     "name": "Star1 Airlines",
     "iata": "V9",
     "icao": "HCW",
-    "country": "Lithuania"
+    "country": "Lithuania",
+    "ceasedOperations": true
   },
   {
     "name": "Starlink Aviation",
@@ -8045,13 +8494,15 @@
     "iata": "XG",
     "icao": "SXD",
     "country": "Germany",
-    "reqs": "ID"
+    "reqs": "ID",
+    "ceasedOperations": true
   },
   {
     "name": "Sunshine Airlines",
     "iata": "SO",
     "icao": "AAS",
-    "country": ""
+    "country": "",
+    "ceasedOperations": true
   },
   {
     "name": "TAAG Angola Airlines",
@@ -8144,25 +8595,29 @@
     "name": "Tbilaviamsheni",
     "iata": "L6",
     "icao": "VNZ",
-    "country": "Georgia"
+    "country": "Georgia",
+    "ceasedOperations": true
   },
   {
     "name": "Teamline Air",
     "iata": "L9",
     "icao": "TLW",
-    "country": "Austria"
+    "country": "Austria",
+    "ceasedOperations": true
   },
   {
     "name": "Tel Aviv Air",
     "iata": "U8",
     "icao": "CYF",
-    "country": "Germany"
+    "country": "Germany",
+    "ceasedOperations": true
   },
   {
     "name": "TezJet",
     "iata": "K9",
     "icao": "TEZ",
-    "country": "Kyrgyzstan"
+    "country": "Kyrgyzstan",
+    "ceasedOperations": true
   },
   {
     "name": "Thai AirAsia",
@@ -8200,19 +8655,22 @@
     "name": "Thai Sky Airlines",
     "iata": "9I",
     "icao": "LLR",
-    "country": "Thailand"
+    "country": "Thailand",
+    "ceasedOperations": true
   },
   {
     "name": "Thai Smile Airways",
     "iata": "WE",
     "icao": "THD",
-    "country": "Thailand"
+    "country": "Thailand",
+    "ceasedOperations": true
   },
   {
     "name": "Thai Star Airlines",
     "iata": "T9",
     "icao": "TSX",
-    "country": "Thailand"
+    "country": "Thailand",
+    "ceasedOperations": true
   },
   {
     "name": "Thai Vietjet Air",
@@ -8224,13 +8682,15 @@
     "name": "Thomas Cook Airlines",
     "iata": "HQ",
     "icao": "TCW",
-    "country": "Belgium"
+    "country": "Belgium",
+    "ceasedOperations": true
   },
   {
     "name": "Thomas Cook Airlines",
     "iata": "MT",
     "icao": "TCX",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "ceasedOperations": true
   },
   {
     "name": "Tianjin Airlines",
@@ -8250,13 +8710,15 @@
     "name": "Tigerair Australia",
     "iata": "TT",
     "icao": "TGG",
-    "country": "Australia"
+    "country": "Australia",
+    "ceasedOperations": true
   },
   {
     "name": "Tigerair Singapore",
     "iata": "TR",
     "icao": "TGW",
-    "country": "Singapore"
+    "country": "Singapore",
+    "ceasedOperations": true
   },
   {
     "name": "Tigerair Taiwan",
@@ -8274,13 +8736,15 @@
     "name": "Tobruk Air",
     "iata": "7T",
     "icao": "TOB",
-    "country": "Libya"
+    "country": "Libya",
+    "ceasedOperations": true
   },
   {
     "name": "Tol-Air Services",
     "iata": "TI",
     "icao": "TOL",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Tradewind Aviation",
@@ -8292,7 +8756,8 @@
     "name": "Trans Mediterranean Airlines",
     "iata": "TL",
     "icao": "TMA",
-    "country": "Lebanon"
+    "country": "Lebanon",
+    "ceasedOperations": true
   },
   {
     "name": "Trans States Airlines",
@@ -8305,7 +8770,8 @@
     "name": "Trans World Airlines",
     "iata": "TW",
     "icao": "TWA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Transaero Airlines",
@@ -8355,13 +8821,15 @@
     "name": "Transeuropean Airlines",
     "iata": "UE",
     "icao": "TEP",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "TransMeridian Airlines",
     "iata": "T9",
     "icao": "TRZ",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Raya Airways",
@@ -8373,31 +8841,36 @@
     "name": "Transportes Aéreos Nacionales",
     "iata": "TX",
     "icao": "TAN",
-    "country": "Honduras"
+    "country": "Honduras",
+    "ceasedOperations": true
   },
   {
     "name": "Transports et Travaux Aériens de Madagascar",
     "iata": "OF",
     "icao": "TML",
-    "country": "Madagascar"
+    "country": "Madagascar",
+    "ceasedOperations": true
   },
   {
     "name": "Transwest Air",
     "iata": "9T",
     "icao": "ABS",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Trast Aero",
     "iata": "S5",
     "icao": "TSJ",
-    "country": "Kyrgyzstan"
+    "country": "Kyrgyzstan",
+    "ceasedOperations": true
   },
   {
     "name": "Tri-MG Intra Asia Airlines",
     "iata": "GY",
     "icao": "TMG",
-    "country": "Indonesia"
+    "country": "Indonesia",
+    "ceasedOperations": true
   },
   {
     "name": "TRIP Linhas Aéreas",
@@ -8407,7 +8880,7 @@
   },
   {
     "name": "Tropic Air",
-    "iata": "PM",
+    "iata": "9N",
     "icao": "TOS",
     "country": "Belize"
   },
@@ -8415,13 +8888,15 @@
     "name": "Tropical Airways",
     "iata": "M7",
     "icao": "TBG",
-    "country": "Haiti"
+    "country": "Haiti",
+    "ceasedOperations": true
   },
   {
     "name": "Tsaradia",
     "iata": "TZ",
     "icao": "TDS",
-    "country": "Madagascar"
+    "country": "Madagascar",
+    "ceasedOperations": true
   },
   {
     "name": "TUI Airways",
@@ -8466,7 +8941,8 @@
     "name": "Tulip Air",
     "iata": "TD",
     "icao": "TLP",
-    "country": "Netherlands"
+    "country": "Netherlands",
+    "ceasedOperations": true
   },
   {
     "name": "Tuninter",
@@ -8586,7 +9062,8 @@
     "name": "Ultra Air",
     "iata": "OL",
     "icao": "ULS",
-    "country": "Colombia"
+    "country": "Colombia",
+    "ceasedOperations": true
   },
   {
     "name": "US Airways",
@@ -8637,7 +9114,8 @@
     "name": "Vanilla Air",
     "iata": "JW",
     "icao": "VNL",
-    "country": "Japan"
+    "country": "Japan",
+    "ceasedOperations": true
   },
   {
     "name": "Vietravel Airlines",
@@ -8662,19 +9140,23 @@
     "name": "Valuair",
     "iata": "VF",
     "icao": "VLU",
-    "country": "Singapore"
+    "country": "Singapore",
+    "ceasedOperations": true,
+    "claimNote": "Valuair merged with Jetstar Asia Airways in 2005, The VF IATA code is now used by AJet, the Turkish low-cost airline (formerly known as AnadoluJet)"
   },
   {
     "name": "AnadoluJet",
     "iata": "VF",
     "icao": "NA",
-    "country": "Turkiye"
+    "country": "Turkiye",
+    "claimNote": " AnadoluJet legally and commercially became AJet on March 31, 2024"
   },
   {
     "name": "ValuJet Airlines",
     "iata": "J7",
     "icao": "VJA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Vietnam Air Services Company (VASCO)",
@@ -8707,7 +9189,8 @@
     "name": "Viasa",
     "iata": "VA",
     "icao": "NA",
-    "country": "Venezuela"
+    "country": "Venezuela",
+    "ceasedOperations": true
   },
   {
     "name": "Volaris",
@@ -8726,7 +9209,8 @@
     "iata": "VX",
     "icao": "VRD",
     "country": "United States",
-    "ticketPrefix": "984"
+    "ticketPrefix": "984",
+    "ceasedOperations": true
   },
   {
     "name": "Vietjet Air",
@@ -8751,7 +9235,8 @@
     "name": "Virgin Nigeria Airways",
     "iata": "VK",
     "icao": "VGN",
-    "country": "Nigeria"
+    "country": "Nigeria",
+    "ceasedOperations": true
   },
   {
     "name": "Virgin Atlantic",
@@ -8765,7 +9250,8 @@
     "name": "Viva Macau",
     "iata": "ZG",
     "icao": "VVM",
-    "country": "Macao"
+    "country": "Macao",
+    "ceasedOperations": true
   },
   {
     "name": "Vueling Airlines",
@@ -8812,13 +9298,15 @@
     "name": "Viva Air Colombia",
     "iata": "VH",
     "icao": "VVC",
-    "country": "Colombia"
+    "country": "Colombia",
+    "ceasedOperations": true
   },
   {
     "name": "VASP",
     "iata": "VP",
     "icao": "VSP",
-    "country": "Brazil"
+    "country": "Brazil",
+    "ceasedOperations": true
   },
   {
     "name": "Volotea",
@@ -8843,7 +9331,8 @@
     "name": "Air Volga",
     "iata": "G6",
     "icao": "WLG",
-    "country": "Russia"
+    "country": "Russia",
+    "ceasedOperations": true
   },
   {
     "name": "Vistara",
@@ -8866,25 +9355,22 @@
     "name": "WebJet Linhas Aéreas",
     "iata": "WH",
     "icao": "WEB",
-    "country": "Brazil"
+    "country": "Brazil",
+    "ceasedOperations": true
   },
   {
     "name": "Welcome Air",
     "iata": "2W",
     "icao": "WLC",
-    "country": "Austria"
+    "country": "Austria",
+    "ceasedOperations": true,
+    "claimNote": "Welcome Air ceased operations in 2017. 2W later reassigned to the Spanish airline World2Fly "
   },
   {
     "name": "West African Airlines",
     "iata": "WZ",
     "icao": "WSF",
     "country": "Benin"
-  },
-  {
-    "name": "West Air (China)",
-    "iata": "PN",
-    "icao": "CHB",
-    "country": "China"
   },
   {
     "name": "West Atlantic Sweden",
@@ -8915,19 +9401,22 @@
     "name": "Western Airlines",
     "iata": "WA",
     "icao": "WAL",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Western Pacific Airlines",
     "iata": "W7",
     "icao": "KMR",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Westward Airways",
     "iata": "CN",
     "icao": "WWD",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Widerøe",
@@ -8940,13 +9429,15 @@
     "name": "Wien Air Alaska",
     "iata": "WC",
     "icao": "WAA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Wind Jet",
     "iata": "IV",
     "icao": "JET",
-    "country": "Italy"
+    "country": "Italy",
+    "ceasedOperations": true
   },
   {
     "name": "Windrose Air",
@@ -9014,13 +9505,15 @@
     "name": "World Airways",
     "iata": "WO",
     "icao": "WOA",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "WOW air",
     "iata": "WW",
     "icao": "WOW",
-    "country": "Iceland"
+    "country": "Iceland",
+    "ceasedOperations": true
   },
   {
     "name": "Wright Air Service",
@@ -9032,7 +9525,8 @@
     "name": "Wataniya Airways",
     "iata": "KW",
     "icao": "WAN",
-    "country": "Kuwait"
+    "country": "Kuwait",
+    "ceasedOperations": true
   },
   {
     "name": "Wan Air",
@@ -9045,12 +9539,6 @@
     "iata": "WR",
     "icao": "WEN",
     "country": "Canada"
-  },
-  {
-    "name": "JetSmart Argentina",
-    "iata": "WJ",
-    "icao": "JES",
-    "country": "Argentina"
   },
   {
     "name": "Xiamen Airlines",
@@ -9075,7 +9563,7 @@
   },
   {
     "name": "Yamal Airlines",
-    "iata": "YL",
+    "iata": "YC",
     "icao": "LLM",
     "country": "Russia"
   },
@@ -9107,7 +9595,8 @@
     "name": "Yute Air Alaska",
     "iata": "4Y",
     "icao": "TUD",
-    "country": "United States"
+    "country": "United States",
+    "ceasedOperations": true
   },
   {
     "name": "Yuzhmashavia",
@@ -9137,7 +9626,8 @@
     "name": "Zip",
     "iata": "3J",
     "icao": "WZP",
-    "country": "Canada"
+    "country": "Canada",
+    "ceasedOperations": true
   },
   {
     "name": "Zipair Tokyo",

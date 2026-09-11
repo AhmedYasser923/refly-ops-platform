@@ -1,0 +1,967 @@
+/* Claim Intake — passenger-facing preview.
+   This is the only surface in the app that a customer would see, so it
+   deliberately breaks from the ops dark theme and paints its own light canvas.
+   Spacing, radii and type still come from styles/tokens.css so it stays in
+   family. To fold it back into the dark theme, delete the palette block in
+   .ci-root — nothing else depends on the light values. */
+
+.ci-root {
+  --ci-bg: #f1f5f9;
+  --ci-surface: #ffffff;
+  --ci-surface-muted: #f8fafc;
+  --ci-border: #e2e8f0;
+  --ci-border-strong: #cbd5e1;
+  --ci-text: #0f2748;
+  --ci-text-muted: #64748b;
+  --ci-accent: #1d63f5;
+  --ci-accent-hover: #1750ce;
+  --ci-attention: #b45309;
+  --ci-attention-bg: #fef6e7;
+  --ci-attention-border: #fcd9a0;
+  --ci-danger: #b91c1c;
+  --ci-danger-bg: #fef2f2;
+  --ci-danger-border: #fecaca;
+
+  padding: var(--space-6) var(--space-4) var(--space-10);
+  background: var(--ci-bg);
+  border-radius: var(--radius-xl);
+  color: var(--ci-text);
+  font-family: var(--font-sans);
+}
+
+/* Mobile-first: the tool is capped at phone width even on a desktop, so what
+   is tested in the ops shell is exactly what a passenger sees. */
+.ci-shell {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* --- step frame ---------------------------------------------------------- */
+
+.ci-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.ci-step__header {
+  text-align: center;
+  padding: var(--space-4) 0 var(--space-2);
+}
+
+.ci-step__title {
+  margin: 0 0 var(--space-2);
+  font-size: 1.65rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--ci-text);
+}
+
+.ci-step__lead {
+  margin: 0 auto;
+  max-width: 46ch;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ci-text-muted);
+}
+
+/* --- dropzone ------------------------------------------------------------ */
+
+.ci-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 220px;
+  padding: var(--space-8) var(--space-5);
+  background: var(--ci-surface);
+  border: 2px dashed var(--ci-border-strong);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.ci-dropzone:hover,
+.ci-dropzone:focus-visible {
+  border-color: var(--ci-accent);
+  background: #fbfdff;
+  outline: none;
+}
+
+.ci-dropzone.is-dragging {
+  border-color: var(--ci-accent);
+  background: #eef4ff;
+}
+
+.ci-dropzone.is-full {
+  cursor: default;
+  border-style: solid;
+  border-color: var(--ci-border);
+  background: var(--ci-surface-muted);
+}
+
+.ci-dropzone__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: var(--space-1);
+  border-radius: 50%;
+  background: #e8f0ff;
+  color: var(--ci-accent);
+}
+
+.ci-dropzone__title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ci-dropzone__hint {
+  font-size: 0.85rem;
+  color: var(--ci-text-muted);
+}
+
+.ci-dropzone__input {
+  display: none;
+}
+
+/* --- file list ----------------------------------------------------------- */
+
+.ci-filelist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ci-filelist__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--ci-surface);
+  border: 1px solid var(--ci-border);
+  border-radius: var(--radius-md);
+}
+
+.ci-filelist__icon {
+  display: flex;
+  color: var(--ci-accent);
+}
+
+.ci-filelist__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.ci-filelist__size {
+  font-size: 0.8rem;
+  color: var(--ci-text-muted);
+}
+
+.ci-filelist__remove {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--ci-surface-muted);
+  color: var(--ci-text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+
+.ci-filelist__remove:hover {
+  background: var(--ci-danger-bg);
+  color: var(--ci-danger);
+}
+
+/* --- cards --------------------------------------------------------------- */
+
+.ci-card {
+  padding: var(--space-6);
+  background: var(--ci-surface);
+  border: 1px solid var(--ci-border);
+  border-radius: var(--radius-lg);
+}
+
+.ci-card__header {
+  margin-bottom: var(--space-5);
+}
+
+.ci-card__title {
+  margin: 0 0 var(--space-1);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.ci-card__lead,
+.ci-card__empty {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--ci-text-muted);
+}
+
+.ci-card__empty {
+  margin-bottom: var(--space-4);
+}
+
+/* --- passengers ---------------------------------------------------------- */
+
+.ci-passengers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+
+.ci-passenger {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--ci-surface-muted);
+  border: 1px solid var(--ci-border);
+  border-radius: var(--radius-md);
+}
+
+.ci-passenger__index {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e8f0ff;
+  color: var(--ci-accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.ci-passenger__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ci-passenger__name {
+  margin: 0 0 var(--space-3);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* --- fields -------------------------------------------------------------- */
+
+.ci-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.ci-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.ci-field__label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--ci-text-muted);
+}
+
+.ci-field__optional {
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+.ci-field__input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--ci-surface);
+  border: 1px solid var(--ci-border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--ci-text);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.ci-field__input:focus {
+  border-color: var(--ci-accent);
+  box-shadow: 0 0 0 3px rgba(29, 99, 245, 0.15);
+  outline: none;
+}
+
+.ci-field.is-empty .ci-field__input {
+  background: var(--ci-attention-bg);
+  border-color: var(--ci-attention-border);
+}
+
+/* --- flight groups -------------------------------------------------------- */
+/* One booking, grouped by journey. Outbound / Return sits above the route. */
+
+.ci-group {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--ci-border);
+}
+
+.ci-group:first-of-type {
+  margin-top: var(--space-2);
+  padding-top: 0;
+  border-top: none;
+}
+
+.ci-group__header {
+  margin-bottom: var(--space-3);
+}
+
+.ci-group__role {
+  margin: 0 0 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ci-accent);
+}
+
+.ci-group__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ci-group__meta {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--ci-text-muted);
+}
+
+/* --- a flight ------------------------------------------------------------- */
+/* Read as a card, corrected as a form. Three fields and no clock. */
+
+.ci-flight {
+  margin-bottom: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--ci-border);
+  border-radius: var(--radius-md);
+  background: var(--ci-surface);
+}
+
+.ci-flight.is-not-flown {
+  background: var(--ci-surface-muted);
+  border-style: dashed;
+}
+
+.ci-flight__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.ci-flight__number {
+  flex: 0 0 1.6rem;
+  height: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--ci-accent);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.ci-flight.is-not-flown .ci-flight__number {
+  background: var(--ci-border-strong);
+  color: var(--ci-text-muted);
+}
+
+.ci-flight__title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ci-flight__route {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ci-text);
+}
+
+.ci-flight.is-not-flown .ci-flight__route {
+  text-decoration: line-through;
+  text-decoration-color: var(--ci-border-strong);
+  color: var(--ci-text-muted);
+}
+
+.ci-flight__date {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--ci-text-muted);
+}
+
+.ci-flight__remove {
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: -0.6rem -0.6rem 0 0;
+  border: none;
+  background: none;
+  color: var(--ci-text-muted);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.ci-flight__remove:hover {
+  background: var(--ci-danger-bg);
+  color: var(--ci-danger);
+}
+
+
+/* The chip row lost its layout when the timeline was removed, which let a chip
+   sit flush against the first field label below it. */
+.ci-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+}
+
+.ci-chip {
+  display: inline-block;
+  max-width: 100%;
+  padding: 3px var(--space-3);
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: #eef2f7;
+  color: var(--ci-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+  /* "Instead of JU0261, after it was missed" is wider than a phone column, so
+     a long chip wraps rather than pushing the card sideways. */
+  white-space: normal;
+}
+
+/* "Not flown" — a statement about the flight, so it reads as a label rather
+   than a warning. Solid and quiet, never a dashed outline. */
+.ci-chip--muted {
+  background: #e8ebef;
+  border-color: var(--ci-border-strong);
+  color: #52606d;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.68rem;
+}
+
+.ci-chip--attention {
+  background: var(--ci-attention-bg);
+  border: 1px solid var(--ci-attention-border);
+  color: var(--ci-attention);
+}
+
+/* --- references ---------------------------------------------------------- */
+
+.ci-refs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ci-ref {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--ci-surface-muted);
+  border: 1px solid var(--ci-border);
+  border-radius: var(--radius-sm);
+}
+
+.ci-ref__value {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+}
+
+.ci-ref__carrier {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ci-text-muted);
+}
+
+/* --- errors, actions ------------------------------------------------------ */
+
+.ci-error {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--ci-danger-bg);
+  border: 1px solid var(--ci-danger-border);
+  border-radius: var(--radius-md);
+  font-size: 0.87rem;
+  color: var(--ci-danger);
+}
+
+.ci-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.ci-actions--split {
+  justify-content: space-between;
+}
+
+.ci-button {
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.ci-button--primary {
+  border: 1px solid var(--ci-accent);
+  background: var(--ci-accent);
+  color: #ffffff;
+}
+
+.ci-button--primary:hover:not(:disabled) {
+  background: var(--ci-accent-hover);
+  border-color: var(--ci-accent-hover);
+}
+
+.ci-button--ghost {
+  border: 1px solid var(--ci-border-strong);
+  background: var(--ci-surface);
+  color: var(--ci-text);
+}
+
+.ci-button--ghost:hover:not(:disabled) {
+  border-color: var(--ci-accent);
+  color: var(--ci-accent);
+}
+
+.ci-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ci-footnote {
+  margin: 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--ci-text-muted);
+}
+
+@media (max-width: 640px) {
+  .ci-root {
+    padding: var(--space-4) var(--space-3) var(--space-8);
+  }
+
+  .ci-card {
+    padding: var(--space-4);
+  }
+
+  .ci-actions--split {
+    flex-direction: column-reverse;
+  }
+
+  .ci-actions--split .ci-button {
+    width: 100%;
+  }
+}
+
+/* --- What happened -------------------------------------------------------- */
+/* A plain description above the two lists: the route as booked against the
+   route as flown, then what changed. Only rendered when the route changed. */
+
+.ci-story {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--ci-border);
+  border-left: 3px solid var(--ci-accent);
+  border-radius: var(--radius-md);
+  background: var(--ci-surface-muted);
+}
+
+.ci-story__title {
+  margin: 0 0 var(--space-3);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ci-accent);
+}
+
+.ci-story__routes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
+
+.ci-story__route {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+}
+
+.ci-story__route-label {
+  flex: 0 0 3.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ci-text-muted);
+}
+
+.ci-story__route-value {
+  color: var(--ci-text-muted);
+}
+
+.ci-story__route--actual .ci-story__route-value {
+  font-weight: 600;
+  color: var(--ci-text);
+}
+
+.ci-story__arrow {
+  color: var(--ci-text-muted);
+}
+
+.ci-story__stop.is-added {
+  padding: 0 0.3rem;
+  border-radius: var(--radius-sm);
+  background: var(--ci-attention-bg);
+  color: var(--ci-attention);
+}
+
+.ci-story__plan {
+  margin: 0 0 var(--space-3);
+  font-size: 0.92rem;
+  color: var(--ci-text-muted);
+}
+
+.ci-story__events {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.ci-story__event {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ci-text);
+}
+
+.ci-story__step {
+  flex: 0 0 1.35rem;
+  height: 1.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--ci-attention-bg);
+  border: 1px solid var(--ci-attention-border);
+  color: var(--ci-attention);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+
+/* --- a replacement itinerary ---------------------------------------------- */
+/* One missed flight can be replaced by a whole new routing. Grouping those legs
+   under the flight they stand in for shows it as one decision the airline made,
+   not three unrelated flights. */
+
+.ci-replacement {
+  margin-bottom: var(--space-5);
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--ci-attention-border);
+}
+
+.ci-replacement:last-of-type {
+  margin-bottom: var(--space-2);
+}
+
+.ci-replacement__header {
+  margin-bottom: var(--space-3);
+}
+
+.ci-replacement__label {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ci-attention);
+}
+
+.ci-replacement__origin {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: var(--ci-text-muted);
+}
+
+.ci-replacement__route {
+  margin: var(--space-2) 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--ci-text);
+}
+
+/* --- read first, edit on request ------------------------------------------ */
+/* A screen full of open inputs reads as a form to fill in. Collapsed to plain
+   text with an Edit button, it reads as something to confirm — which is what it
+   actually is. Rows we could not read fully open themselves. */
+
+.ci-edit {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 2.25rem;
+  padding: 0 0.85rem 0 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  /* A tint rather than an outline: present enough to find, quiet enough that a
+     row of them does not compete with the trip itself. */
+  background: rgba(29, 99, 245, 0.09);
+  color: var(--ci-accent);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition),
+    box-shadow var(--transition), transform var(--transition);
+}
+
+.ci-edit:hover {
+  background: rgba(29, 99, 245, 0.16);
+}
+
+.ci-edit:active {
+  transform: scale(0.97);
+}
+
+.ci-edit:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(29, 99, 245, 0.3);
+}
+
+/* Open for editing: solid, so the row you are working in is unmistakable. */
+.ci-edit.is-editing {
+  background: var(--ci-accent);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(15, 39, 72, 0.2);
+}
+
+.ci-edit.is-editing:hover {
+  background: var(--ci-accent-hover);
+}
+
+.ci-edit__icon {
+  display: inline-flex;
+  /* Optical centring: the pencil reads low against a capital E. */
+  margin-top: -1px;
+}
+
+/* On a flight that was not flown the whole card is muted, so the button steps
+   back with it rather than becoming the brightest thing in a greyed row. */
+.ci-flight.is-not-flown .ci-edit:not(.is-editing) {
+  background: rgba(15, 39, 72, 0.07);
+  color: #52606d;
+}
+
+.ci-flight.is-not-flown .ci-edit:not(.is-editing):hover {
+  background: rgba(15, 39, 72, 0.12);
+}
+
+.ci-flight__summary {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ci-text);
+}
+
+.ci-flight.is-not-flown .ci-flight__summary {
+  color: var(--ci-text-muted);
+}
+
+.ci-passenger__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+/* --- the entry point ------------------------------------------------------ */
+/* Two questions before any data: what shape was the trip, and would you rather
+   upload or type. Big tap targets, one decision per screen. */
+
+.ci-choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ci-choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--ci-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--ci-surface);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition), box-shadow var(--transition),
+    transform var(--transition);
+}
+
+.ci-choice:hover {
+  border-color: var(--ci-accent);
+  box-shadow: 0 2px 10px rgba(15, 39, 72, 0.08);
+}
+
+.ci-choice:active {
+  transform: scale(0.995);
+}
+
+.ci-choice:focus-visible {
+  outline: none;
+  border-color: var(--ci-accent);
+  box-shadow: 0 0 0 3px rgba(29, 99, 245, 0.25);
+}
+
+.ci-choice__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-sm);
+  background: rgba(29, 99, 245, 0.09);
+  color: var(--ci-accent);
+}
+
+.ci-choice__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ci-choice__title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--ci-text);
+}
+
+.ci-choice__badge {
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  background: rgba(29, 99, 245, 0.09);
+  color: var(--ci-accent);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ci-choice__lead {
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--ci-text-muted);
+}
+
+.ci-choice__chevron {
+  flex: 0 0 auto;
+  color: var(--ci-border-strong);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.ci-choice:hover .ci-choice__chevron {
+  color: var(--ci-accent);
+}
+
+.ci-back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 2.5rem;
+  margin-bottom: calc(var(--space-2) * -1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ci-text-muted);
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ci-back:hover {
+  color: var(--ci-accent);
+}
+
+/* The one notice that survived: not a restatement of the data, but the single
+   place where what the passenger told us and what the documents show disagree. */
+.ci-notice {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--ci-attention-bg);
+  border: 1px solid var(--ci-attention-border);
+  border-radius: var(--radius-md);
+  font-size: 0.87rem;
+  line-height: 1.5;
+  color: var(--ci-attention);
+}

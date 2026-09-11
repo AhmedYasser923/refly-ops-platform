@@ -10,9 +10,18 @@
   display: none !important;
 }
 
-.content__inner:has(.tools-keepalive[data-active-tool="ticket-analyzer"]) {
+.content__inner:has(.tools-keepalive[data-active-tool="ticket-analyzer"]),
+.content__inner:has(.tools-keepalive[data-active-tool="analyzer-v2"]) {
   width: 100%;
   max-width: 1080px;
+}
+
+/* Claim intake is a passenger-facing, mobile-first screen. Capping it at phone
+   width inside the ops shell means what is tested here is what a passenger
+   actually sees, rather than a wide layout that breaks when it narrows. */
+.content__inner:has(.tools-keepalive[data-active-tool="claim-intake"]) {
+  width: 100%;
+  max-width: 460px;
 }
 
 .content__inner:has(.tools-keepalive[data-active-tool="email"]) {

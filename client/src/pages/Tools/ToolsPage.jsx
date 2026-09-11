@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import AnalyzerV2Page from '../AnalyzerV2/AnalyzerV2Page.jsx';
 import AnnouncementsPage from '../Announcements/AnnouncementsPage.jsx';
 import BarcodeDecoderPage from '../BarcodeDecoder/BarcodeDecoderPage.jsx';
+import ClaimIntakePage from '../ClaimIntake/ClaimIntakePage.jsx';
 import DocumentCheckPage from '../DocumentCheck/DocumentCheckPage.jsx';
 import Ec261CalculatorPage from '../Ec261Calculator/Ec261CalculatorPage.jsx';
 import EocRadarPage from '../EocRadar/EocRadarPage.jsx';
@@ -17,6 +19,8 @@ import './ToolsPage.css';
 const TOOLS = [
   { key: 'announcements', render: () => <AnnouncementsPage /> },
   { key: 'ticket-analyzer', render: (isActive) => <TicketAnalyzerPage isActive={isActive} /> },
+  { key: 'analyzer-v2', render: (isActive) => <AnalyzerV2Page isActive={isActive} /> },
+  { key: 'claim-intake', render: (isActive) => <ClaimIntakePage isActive={isActive} /> },
   { key: 'barcode-decoder', render: (isActive) => <BarcodeDecoderPage isActive={isActive} /> },
   { key: 'poa', render: (isActive) => <PoaGeneratorPage isActive={isActive} /> },
   { key: 'flight-search', render: () => <FlightSearchPage /> },

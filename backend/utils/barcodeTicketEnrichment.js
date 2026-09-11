@@ -364,8 +364,31 @@ function enrichBarcodeResult(result) {
   return result;
 }
 
+/**
+ * The airline that issued a ticket, from its three-digit prefix.
+ * "7245528980584" -> Swiss, because 724 is Swiss's ticketing prefix.
+ *
+ * Returns null for an unknown prefix, and for the handful of prefixes that map
+ * to more than one carrier - a guess there is worse than saying nothing.
+ */
+function airlineForTicketPrefix(ticketNumber) {
+  const digits = normalizeTicketNumber(ticketNumber);
+  if (digits.length < 3) return null;
+
+  const airlines = airlinesByTicketPrefix.get(digits.slice(0, 3));
+  if (!airlines || airlines.length !== 1) return null;
+
+  return { iata: airlines[0].iata || '', name: airlines[0].name || '' };
+}
+
 module.exports = {
   buildDateCandidates,
   collectTicketCandidates,
   enrichBarcodeResult,
+  // Exported for the analyzer v2 controller, which validates the ticket numbers
+  // read off a document rather than decoded from a barcode. Same rules, so the
+  // definition of "a real ticket number" stays in one place.
+  isPlausibleTicketNumber,
+  normalizeTicketNumber,
+  airlineForTicketPrefix,
 };

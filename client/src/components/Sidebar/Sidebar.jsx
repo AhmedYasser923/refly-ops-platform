@@ -6,6 +6,8 @@ import './Sidebar.css';
 const toolItems = [
   { href: '/tools#announcements', panel: 'announcements', icon: '\uD83D\uDCE2', label: 'Announcements' },
   { href: '/tools#ticket-analyzer', panel: 'ticket-analyzer', icon: '\uD83C\uDFAB', label: 'Ticket Analyzer' },
+  { href: '/tools#analyzer-v2', panel: 'analyzer-v2', icon: '\u25C8', label: 'Ticket Analyzer v2' },
+  { href: '/tools#claim-intake', panel: 'claim-intake', icon: '\uD83E\uDDFE', label: 'Claim Intake' },
   { href: '/tools#barcode-decoder', panel: 'barcode-decoder', icon: <BarcodeIcon />, label: 'Barcode Decoder' },
   { href: '/tools#poa', panel: 'poa', icon: '\uD83D\uDCC4', label: 'POA Generator' },
   { href: '/tools#flight-search', panel: 'flight-search', icon: '\u2708', label: 'External Trackers' },

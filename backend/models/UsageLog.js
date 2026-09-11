@@ -32,7 +32,8 @@ const usageLogSchema = new mongoose.Schema({
       'doc_check',
       'iata_lookup',
       'jurisdiction_check',
-      'ec261_calc'
+      'ec261_calc',
+      'claim_intake_extract'
     ]
   },
   model: {
