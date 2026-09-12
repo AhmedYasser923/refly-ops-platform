@@ -606,6 +606,84 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
   assert.deepEqual(dates, ['2025-12-28', '2026-01-04'], 'the year rolls forward, not backward');
 }
 
+// --- an October date survives the pipeline ------------------------------------------------
+{
+  // The real Garuda e-ticket. Every date is printed on the document — "07Sep",
+  // "08Sep", "01Oct", "01Oct" — and the model read all four correctly, but the
+  // strip that removes an ISO "T" separator carried an /i flag and ate the "t"
+  // in "Oct". Both return legs lost their dates, neither could chain to
+  // anything, and the return came back as two "No date" journeys with the first
+  // half mislabelled ONWARD.
+  const ga = (flightNumber, from, to, printedDate) => leg({
+    flightNumber,
+    marketingAirline: 'Garuda Indonesia', marketingAirlineIata: 'GA',
+    operatingAirline: 'Garuda Indonesia', operatingAirlineIata: 'GA',
+    pnr: 'FID46K',
+    passengerNames: ['Miekke Maytria Tjahjono'],
+    departureIata: from, departureCity: from,
+    arrivalIata: to, arrivalCity: to,
+    rawExtractedDate: printedDate, departureDate: printedDate, arrivalDate: ''
+  });
+
+  const { journeys, warnings } = buildItinerary([
+    ga('GA0089', 'AMS', 'CGK', '07Sep'),
+    ga('GA0238', 'CGK', 'SRG', '08Sep'),
+    ga('GA0237', 'SRG', 'CGK', '01Oct'),
+    ga('GA0088', 'CGK', 'AMS', '01Oct')
+  ]);
+
+  assert.equal(journeys.length, 2, 'a return trip, not three journeys');
+  assert.deepEqual(flightNumbers(journeys[0].legs), ['GA0089', 'GA0238']);
+  assert.deepEqual(flightNumbers(journeys[1].legs), ['GA0237', 'GA0088'],
+    'the return connects through Jakarta rather than splitting in two');
+  assert.deepEqual(journeys.map((journey) => journey.role), ['OUTBOUND', 'RETURN']);
+
+  const octoberLegs = journeys[1].legs;
+  octoberLegs.forEach((entry) => {
+    assert.equal(entry.departureDate.slice(5), '10-01', 'October reads as October');
+  });
+  assert.ok(journeys.every((journey) => journey.datesComplete), 'every leg is dated');
+  assert.ok(!warnings.some((entry) => entry.code === 'TIMELINE_INCOMPLETE'));
+  assert.ok(!warnings.some((entry) => entry.code === 'UNREADABLE_VALUE'));
+}
+
+// --- a date that really cannot be read says so, rather than going quiet ---------------------
+{
+  // The safety net, tested independently of the bug that prompted it: whatever
+  // the parser fails on next, the loss is on the row and in the warnings instead
+  // of being an undated leg the engine treats as unrelated to everything.
+  const { journeys, warnings } = buildItinerary([
+    leg({ rawExtractedDate: '2026-08-24', departureDate: '2026-08-24' }),
+    onward({ rawExtractedDate: 'Terminal 3', departureDate: 'Terminal 3', arrivalDate: '' })
+  ], { ignorePnr: true });
+
+  const undated = journeys.flatMap((journey) => journey.legs)
+    .find((entry) => entry.flightNumber === 'BF657');
+
+  assert.equal(undated.departureDate, '', 'nothing was invented to fill the gap');
+  assert.ok(undated.flags.includes(FLAGS.UNREADABLE_DATE), 'and the loss is flagged');
+  assert.deepEqual(undated.unreadable, [
+    { field: 'date', printed: 'Terminal 3', flag: FLAGS.UNREADABLE_DATE }
+  ], 'carrying what the document printed, so it can be shown and corrected');
+
+  assert.ok(warnings.some((entry) => entry.code === 'UNREADABLE_VALUE'));
+  assert.ok(warnings.some((entry) => entry.code === 'TIMELINE_INCOMPLETE'),
+    'and the trip says its shape cannot be trusted');
+  assert.ok(journeys.some((journey) => journey.datesComplete === false));
+}
+
+// --- a leg that never printed a date is not the same as one we could not read ----------------
+{
+  const { journeys } = buildItinerary([
+    leg({ rawExtractedDate: '', departureDate: '', arrivalDate: '' })
+  ]);
+
+  const [only] = journeys[0].legs;
+  assert.ok(only.flags.includes(FLAGS.MISSING_DATE), 'the document said nothing');
+  assert.ok(!only.flags.includes(FLAGS.UNREADABLE_DATE), 'so nothing was lost');
+  assert.deepEqual(only.unreadable, []);
+}
+
 // =================================================================================
 // Journey roles
 // =================================================================================
@@ -846,13 +924,54 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
 
   assert.deepEqual(withTicket('1P1SJF', '1P1SJF'), [], 'the PNR repeated is rejected');
   assert.deepEqual(withTicket('12345', 'ABC123'), [], 'too short is rejected');
-  assert.deepEqual(withTicket('724552898058412', 'ABC123'), [], 'too long is rejected');
+  assert.deepEqual(withTicket('72455289805841234', 'ABC123'), [], 'too long is rejected');
   assert.deepEqual(withTicket('0000000000000', 'ABC123'), [], 'all zeroes is rejected');
   assert.equal(withTicket('7245528980584', 'ABC123').length, 1, 'a real one is kept');
   assert.equal(
     withTicket('724 5528 980584', 'ABC123')[0].number, '7245528980584',
     'printed spacing is normalised away'
   );
+
+  // Royal Air Maroc prints the coupon glued on with no hyphen: "147273742828401"
+  // and "147273742828402" are coupons 01 and 02 of ticket 1472737428284. Reading
+  // only the hyphenated form failed both, and the screen then said "No ticket
+  // number on these documents" about a document that prints it twice. The prefix
+  // is what says where the number ends - see utils/ticketNumber.js.
+  assert.equal(withTicket('147273742828401', 'XRMUK8')[0].number, '1472737428284',
+    'a glued coupon comes off, because 147 is a prefix we know');
+  assert.equal(withTicket('7242339474582-5', 'ABC123')[0].number, '7242339474582',
+    'and the hyphenated form still does');
+  assert.deepEqual(withTicket('900273742828401', 'ABC123'), [],
+    'but never without a known prefix, because then we cannot know where it ends');
+}
+
+// --- one ticket, several coupons, still one ticket ---------------------------
+// The reason the coupon has to come off at all: identity. Two legs of one
+// journey print the same ticket with different coupon numbers, and if the suffix
+// stays they look like two separate tickets in the passenger panel.
+{
+  const at = (flightNumber, from, to, date, ticketNumber) => leg({
+    flightNumber,
+    marketingAirline: 'Royal Air Maroc', marketingAirlineIata: 'AT',
+    operatingAirline: 'Royal Air Maroc', operatingAirlineIata: 'AT',
+    pnr: 'XRMUK8',
+    passengerNames: ['Gwen Foquet'],
+    departureIata: from, departureCity: from,
+    arrivalIata: to, arrivalCity: to,
+    departureDate: date, arrivalDate: date,
+    passengerTickets: [{ passengerName: 'Gwen Foquet', ticketNumber, pnr: 'XRMUK8' }]
+  });
+
+  const { tickets } = buildItinerary([
+    at('AT431', 'AGA', 'CMN', '2025-10-09', '147273742828402'),
+    at('AT733', 'CMN', 'MRS', '2025-10-09', '147273742828401')
+  ]);
+
+  assert.equal(tickets.length, 1, 'two coupons of one ticket are one ticket');
+  assert.equal(tickets[0].number, '1472737428284');
+  assert.deepEqual(tickets[0].flightNumbers, ['AT431', 'AT733']);
+  assert.equal(tickets[0].issuedBy.name, 'Royal Air Maroc',
+    'and prefix 147 confirms the thirteen digits are the right thirteen');
 }
 
 // --- two travellers, different booking references, same flight ----------------
@@ -1009,7 +1128,13 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
     'airportName', 'country', 'distanceKm',
     // Where the airline's name came from, and what the model said when it was
     // replaced. The record of a decision, not a change to the trip logic.
-    'airlineSource', 'airlineAsExtracted'
+    'airlineSource', 'airlineAsExtracted',
+    // Step 8b's audit: what the document printed where the pipeline kept
+    // nothing, and whether the journey's shape can be trusted. Both are v2
+    // telling you how solid its own answer is, which the passenger tool does
+    // not do. Neither can move a flight.
+    'unreadable', 'datesComplete',
+    'pnrAsPrinted', 'departureIataAsPrinted', 'arrivalIataAsPrinted'
   ];
 
   const withoutSpecialistFields = (value) => JSON.parse(JSON.stringify(

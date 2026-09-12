@@ -385,10 +385,12 @@ module.exports = {
   buildDateCandidates,
   collectTicketCandidates,
   enrichBarcodeResult,
-  // Exported for the analyzer v2 controller, which validates the ticket numbers
-  // read off a document rather than decoded from a barcode. Same rules, so the
-  // definition of "a real ticket number" stays in one place.
+  // Exported for utils/ticketNumber.js, which reads the ticket numbers printed
+  // on a document rather than decoded from a barcode. Same rules, so the
+  // definition of "a real ticket number" - and the prefix table it is checked
+  // against - stays in one place.
   isPlausibleTicketNumber,
   normalizeTicketNumber,
   airlineForTicketPrefix,
+  ticketPrefixKnown,
 };

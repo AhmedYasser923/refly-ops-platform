@@ -74,6 +74,7 @@
 //   Step  6  normaliseExtractedLeg ........ clean each flight
 //   Step  7  resolveMissingYears .......... "05MAR" -> a real date
 //   Step  8  mergeDuplicateLegs ........... one flight listed twice
+//   Step 8b  auditPrintedValues ........... what the document printed and we lost
 //   Step  9  sortLegsChronologically ...... put them in order
 //   Step 10  detectReplacementFlights ..... which flight replaced which
 //   Step 11  buildOriginalBookingChains ... the trip as it was sold
@@ -93,12 +94,15 @@ const MODELS = require('../config/models');
 const { buildTicketDocumentParts } = require('../utils/ticketDocumentParts');
 const ANALYZER_V2_SCHEMA = require('../schemas/analyzerV2Schema');
 const { buildAnalyzerV2Prompt, buildAirlineLookupPrompt } = require('../prompts/analyzerV2Prompt');
-const { parseDateParts } = require('../utils/dateYearResolver');
-const {
-  isPlausibleTicketNumber,
-  normalizeTicketNumber,
-  airlineForTicketPrefix
-} = require('../utils/barcodeTicketEnrichment');
+// Step 7's date reading. The ONE place a printed date becomes structured data -
+// see the header of that file for the October bug that made it one place.
+const { readPrintedDate } = require('../utils/printedDate');
+// Step 6's ticket reading. The ONE place a printed e-ticket number is split into
+// its prefix and serial - see that file for why the structure is read rather
+// than the length checked.
+const { readPrintedTicketNumber } = require('../utils/ticketNumber');
+// Step 15 names the issuing airline from a finished number's prefix.
+const { airlineForTicketPrefix } = require('../utils/barcodeTicketEnrichment');
 const {
   normaliseBookingCode,
   correctFlightNumberPrefix,
@@ -158,6 +162,14 @@ const FLAGS = {
   MISSING_DATE: 'MISSING_DATE',
   MISSING_AIRPORT: 'MISSING_AIRPORT',
   AMBIGUOUS_FLIGHT_NUMBER: 'AMBIGUOUS_FLIGHT_NUMBER',
+  // "The document did not say" and "the document said it and we could not read
+  // it" are different facts, and only the second one is our fault. Step 7b
+  // raises these; MISSING_* above stay for a field the document never printed.
+  UNREADABLE_DATE: 'UNREADABLE_DATE',
+  UNREADABLE_AIRPORT: 'UNREADABLE_AIRPORT',
+  UNREADABLE_PNR: 'UNREADABLE_PNR',
+  UNREADABLE_TICKET_NUMBER: 'UNREADABLE_TICKET_NUMBER',
+  ARRIVAL_DATE_IMPLAUSIBLE: 'ARRIVAL_DATE_IMPLAUSIBLE',
   REPLACED: 'REPLACED',
   REPLACEMENT: 'REPLACEMENT',
   REPORTED_NOT_FLOWN: 'REPORTED_NOT_FLOWN',
@@ -166,6 +178,11 @@ const FLAGS = {
   // but real: some agents issue a PNR per person on the same segment.
   SPLIT_PASSENGER_PNR: 'SPLIT_PASSENGER_PNR'
 };
+
+// Warning codes that are not leg flags: these are about the trip as a whole
+// rather than about any one field on any one flight.
+const TIMELINE_INCOMPLETE = 'TIMELINE_INCOMPLETE';
+const UNREADABLE_VALUE = 'UNREADABLE_VALUE';
 
 // Statuses the model may report for a leg. The timeline decides the itinerary,
 // never these — but a leg the model independently read as unused is
@@ -1268,11 +1285,15 @@ function buildItineraryFromLegs(extractedLegs, options = {}) {
     };
   }
 
+  // The audit sits after the merge on purpose: two printings of one flight are
+  // one flight, and a value one copy lost may be present on the other.
   const legs = sortLegsChronologically(
-    mergeDuplicateLegs(
-      resolveMissingYears(extractedLegs.map(
-        (extractedLeg, index) => normaliseExtractedLeg(extractedLeg, index, options)
-      ))
+    auditPrintedValues(
+      mergeDuplicateLegs(
+        resolveMissingYears(extractedLegs.map(
+          (extractedLeg, index) => normaliseExtractedLeg(extractedLeg, index, options)
+        ))
+      )
     )
   );
 
@@ -1398,39 +1419,30 @@ function asBookingCode(value, airlines = {}) {
  *   Turns a printed e-ticket number into a bare 13-digit string, or nothing.
  *
  * WHY IT IS BUILT THIS WAY
- *   Two real failure modes, both seen on actual documents:
+ *   The structure is read by utils/ticketNumber.js: three digits of airline
+ *   ticketing prefix plus ten of serial, with any coupon past digit thirteen.
+ *   That file has the reasoning; everything left here is the one thing it cannot
+ *   know, because it needs the rest of the row.
  *
- *   1. A trailing coupon suffix. A boarding pass prints "7242339474582-5".
- *      The "-5" identifies the coupon, not the ticket, so it is stripped for
- *      identity - otherwise the same ticket looks like a different one on every
- *      leg it covers.
- *
- *   2. A booking reference sitting in a ticket-number field. Kiwi.com e-tickets
- *      print "E-ticket number 1P1SJF" where 1P1SJF is the PNR. Accepting that
- *      would show a record locator in a ticket column, which is worse than
- *      showing nothing. A real ticket number is exactly 13 digits, so the
- *      length check alone rejects it; comparing against the PNR on the same row
- *      catches the case where an agent pads one to look right.
+ *   A booking reference sitting in a ticket-number field. Kiwi.com e-tickets
+ *   print "E-ticket number 1P1SJF" where 1P1SJF is the PNR. Accepting that would
+ *   show a record locator in a ticket column, which is worse than showing
+ *   nothing. The digit rules reject it on their own; comparing against the PNR
+ *   printed beside it catches the case where an agent pads one to look right.
  *
  * @param {string} printedValue What the document showed.
  * @param {string} pnrOnSameRow The booking reference printed beside it.
  * @returns {string} The 13-digit number, or '' when it is not one.
  */
 function asTicketNumber(printedValue, pnrOnSameRow) {
-  const printed = asTrimmedText(printedValue);
-  if (!printed) return '';
-
-  // Strip a coupon suffix before anything else: "7242339474582-5".
-  const withoutCouponSuffix = printed.replace(/-\s*\d{1,2}$/, '');
-  const digits = normalizeTicketNumber(withoutCouponSuffix);
-
-  if (!isPlausibleTicketNumber(digits)) return '';
+  const ticket = readPrintedTicketNumber(printedValue);
+  if (!ticket) return '';
 
   // A value that merely repeats the booking reference is not a ticket number,
   // however plausible its digits look.
-  if (pnrOnSameRow && digits === asUpperCase(pnrOnSameRow)) return '';
+  if (pnrOnSameRow && ticket.number === asUpperCase(pnrOnSameRow)) return '';
 
-  return digits;
+  return ticket.number;
 }
 
 /**
@@ -1469,11 +1481,15 @@ function buildTravellerRecords(extractedLeg, passengerNames, legPnr, airlines) {
     seenNames.add(nameKey);
 
     const pnr = asBookingCode(row?.pnr, airlines) || legPnr;
+    const ticketNumber = asTicketNumber(row?.ticketNumber, pnr);
 
     records.push({
       passengerName,
       pnr,
-      ticketNumber: asTicketNumber(row?.ticketNumber, pnr)
+      ticketNumber,
+      // Only when the printed value was rejected — Step 8b reports it rather
+      // than letting the screen say the document carried no ticket number.
+      ticketNumberAsPrinted: ticketNumber ? '' : asMeaningfulText(row?.ticketNumber)
     });
   });
 
@@ -1484,7 +1500,7 @@ function buildTravellerRecords(extractedLeg, passengerNames, legPnr, airlines) {
     if (seenNames.has(nameKey)) return;
     seenNames.add(nameKey);
 
-    records.push({ passengerName, pnr: legPnr, ticketNumber: '' });
+    records.push({ passengerName, pnr: legPnr, ticketNumber: '', ticketNumberAsPrinted: '' });
   });
 
   return records;
@@ -1622,6 +1638,17 @@ function normaliseExtractedLeg(extractedLeg, index, options = {}) {
     ? resolveAirline({ nameFromModel: operatingAirlineFromModel, flightNumber, airlinesFoundOnline })
     : { name: '', iata: '', source: '' };
 
+  // Each cleaner returns '' for a value it will not vouch for, which is right,
+  // but it leaves "the document said nothing" and "the document said something
+  // we could not read" looking the same. So where a printed value was rejected,
+  // the printed text is kept beside the empty field for Step 8b to report. It is
+  // held ONLY on rejection: a field that came through fine has nothing to say.
+  const pnr = asBookingCode(extractedLeg?.pnr, airlines);
+  const departureIata = asAirportCode(extractedLeg?.departureIata);
+  const arrivalIata = asAirportCode(extractedLeg?.arrivalIata);
+  const printedOriginal = (printedValue, keptValue) =>
+    (keptValue ? '' : asMeaningfulText(printedValue));
+
   const leg = {
     id: `leg-${index + 1}`,
     documentOrderIndex: index,
@@ -1639,11 +1666,14 @@ function normaliseExtractedLeg(extractedLeg, index, options = {}) {
     // replaced, what the model had said. Kept for the record; not shown.
     airlineSource: marketingAirline.source,
     airlineAsExtracted: marketingAirline.name === marketingAirlineFromModel ? '' : marketingAirlineFromModel,
-    pnr: asBookingCode(extractedLeg?.pnr, airlines),
+    pnr,
+    pnrAsPrinted: printedOriginal(extractedLeg?.pnr, pnr),
 
-    departureIata: asAirportCode(extractedLeg?.departureIata),
+    departureIata,
+    departureIataAsPrinted: printedOriginal(extractedLeg?.departureIata, departureIata),
     departureCity: asMeaningfulText(extractedLeg?.departureCity),
-    arrivalIata: asAirportCode(extractedLeg?.arrivalIata),
+    arrivalIata,
+    arrivalIataAsPrinted: printedOriginal(extractedLeg?.arrivalIata, arrivalIata),
     arrivalCity: asMeaningfulText(extractedLeg?.arrivalCity),
 
     // Display only: the route blocks print them the way the old analyzer's
@@ -1679,7 +1709,9 @@ function normaliseExtractedLeg(extractedLeg, index, options = {}) {
     travellers: [],
     documentIndex: Number.isInteger(extractedLeg?.documentIndex) ? extractedLeg.documentIndex : 0,
 
-    flags: []
+    flags: [],
+    // Filled in by Step 8b: one entry per printed value the pipeline lost.
+    unreadable: []
   };
 
   leg.travellers = buildTravellerRecords(
@@ -1773,53 +1805,6 @@ function departureDayMillis(leg) {
 
 const currentUtcYear = () => new Date().getUTCFullYear();
 
-/**
- * WHAT IT DOES
- *   Inserts separators into a glued boarding-pass date and expands a two-digit
- *   year: "05MAR26" becomes "05 MAR 2026".
- *
- * WHY IT IS BUILT THIS WAY
- *   The shared date parser expects separators and cannot read the glued form.
- *   Loosening the string here rather than changing the parser keeps the ticket
- *   analyzer, which depends on that parser, untouched.
- */
-function addSeparatorsToGluedDate(value) {
-  const trimmed = String(value || '').trim();
-  if (!trimmed) return '';
-
-  return trimmed
-    .replace(/(\d)([A-Za-z])/g, '$1 $2')
-    .replace(/([A-Za-z])(\d)/g, '$1 $2')
-    .replace(/(^|[^\d])(\d{2})$/, (match, before, twoDigitYear) =>
-      before + (Number(twoDigitYear) <= 68 ? '20' : '19') + twoDigitYear);
-}
-
-/**
- * WHAT IT DOES
- *   Removes any clock time from a string that is supposed to be a date.
- *
- * WHY IT IS BUILT THIS WAY
- *   This is scar tissue. Boarding passes print the date and departure time as
- *   one run of characters — "IB 0550 A 05MAR20:40" — and the model sometimes
- *   carried part of the clock into a date field as "05MAR20". The two-digit
- *   year rule above then read the HOUR as a year: 05MAR20 became 2020 and
- *   06MAR11 became 2011. An arrival six years after its departure fails every
- *   connection test, so one connecting trip tore into two "direct" journeys.
- *
- *   A date field must never contain a colon. This is the guard.
- */
-function removeClockTimeFromDate(value) {
-  return String(value || '')
-    .replace(/(\d{1,2})\s*:\s*(\d{2})(\s*:\s*\d{2})?/g, ' ')
-    .replace(/[T\s.,;:/-]+$/i, '')
-    .trim();
-}
-
-function parsePrintedDate(value) {
-  const withoutClock = removeClockTimeFromDate(value);
-  return parseDateParts(withoutClock) || parseDateParts(addSeparatorsToGluedDate(withoutClock));
-}
-
 function toIsoDate(month, day, year) {
   return [
     String(year).padStart(4, '0'),
@@ -1858,8 +1843,8 @@ function monthDayOrderKey(dateParts) {
 function resolveMissingYears(legs) {
   const parsedLegs = legs.map((leg) => ({
     leg,
-    departureParts: parsePrintedDate(leg.departureDateRaw),
-    arrivalParts: parsePrintedDate(leg.arrivalDateRaw)
+    departureParts: readPrintedDate(leg.departureDateRaw),
+    arrivalParts: readPrintedDate(leg.arrivalDateRaw)
   }));
 
   const anchorYear = parsedLegs
@@ -1906,10 +1891,15 @@ function resolveMissingYears(legs) {
       // days later. An arrival outside that window came from a misread field,
       // so fall back to the departure date rather than trust it — a bad arrival
       // date silently breaks connection detection.
+      //
+      // Substituting a value is a decision, so it is never made in silence: the
+      // flag says the arrival on screen is the departure day, not what the
+      // document printed.
       const daysAloft = wholeDaysBetween(resolvedDepartureDate, resolvedArrivalDate);
       const isBelievable = daysAloft !== null && daysAloft >= 0 && daysAloft <= 2;
 
       leg.arrivalDateISO = isBelievable ? resolvedArrivalDate : resolvedDepartureDate;
+      if (!isBelievable) leg.flags.push(FLAGS.ARRIVAL_DATE_IMPLAUSIBLE);
     } else {
       leg.arrivalDateISO = resolvedDepartureDate;
     }
@@ -1956,6 +1946,9 @@ function mergeDuplicateLegInto(keptLeg, duplicateLeg) {
   const FIELDS_TO_BACKFILL = [
     'marketingAirline', 'marketingAirlineIata', 'operatingAirline', 'operatingAirlineIata',
     'pnr', 'departureCity', 'arrivalCity', 'rawExtractedDate', 'reportedStatus',
+    // The printed originals travel with their fields, so a loss recorded on only
+    // one printing of a flight is still reported after the two are folded.
+    'pnrAsPrinted', 'departureIataAsPrinted', 'arrivalIataAsPrinted',
     // Display only, but a confirmation that names the airports on one copy of
     // a segment and not the other must not lose them in the merge.
     'departureAirportName', 'departureCountry', 'arrivalAirportName', 'arrivalCountry'
@@ -2004,6 +1997,82 @@ function mergeDuplicateLegs(legs) {
     legByFlightKey.set(flightKey, leg);
     return true;
   });
+}
+
+// =============================================================================
+// STEP 8b — Audit what the document printed and we lost
+// =============================================================================
+//
+// THE RULE THIS STEP EXISTS TO ENFORCE: nothing printed on a document may
+// disappear without a record.
+//
+// Every cleaner above returns '' for a value it cannot use. That is the right
+// shape — it means one bad field can never poison the engine — but it makes two
+// completely different facts look identical downstream:
+//
+//     the document did not print a date        -> ''
+//     the document printed one and we broke it -> ''
+//
+// A Garuda e-ticket printed "01Oct" on two legs. A regex ate the "t", the date
+// parser returned null, resolveMissingYears skipped the leg without comment, and
+// the chaining rule then treated an undated leg exactly like an unrelated one.
+// The return journey came back torn in two and labelled "No date", with nothing
+// anywhere saying a value had been lost. The same upload's ticket numbers were
+// destroyed the same way, and the screen said "No ticket number on these
+// documents" — the opposite of what the paper says.
+//
+// So the guarantee cannot live in any one parser. It is structural: state what
+// each printed field was supposed to become, then check. A parser bug written
+// tomorrow surfaces on the row as a flag instead of becoming a wrong timeline.
+//
+// A field joins the guarantee by adding a row to the table below and keeping its
+// printed original in Step 6 — the way `flightNumberAsPrinted` already does.
+
+const PRINTED_VALUE_AUDIT = [
+  { field: 'date', printedOn: 'departureDateRaw', keptIn: 'departureDateISO', flag: FLAGS.UNREADABLE_DATE },
+  { field: 'departure airport', printedOn: 'departureIataAsPrinted', keptIn: 'departureIata', flag: FLAGS.UNREADABLE_AIRPORT },
+  { field: 'arrival airport', printedOn: 'arrivalIataAsPrinted', keptIn: 'arrivalIata', flag: FLAGS.UNREADABLE_AIRPORT },
+  { field: 'booking reference', printedOn: 'pnrAsPrinted', keptIn: 'pnr', flag: FLAGS.UNREADABLE_PNR }
+];
+
+/**
+ * WHAT IT DOES
+ *   Records every field the document printed that the pipeline failed to keep,
+ *   on `leg.unreadable`, and raises the matching flag.
+ *
+ * WHY IT IS BUILT THIS WAY
+ *   It reads the leg only — it never re-parses anything. A checker that redid
+ *   the parsing would share the parser's bug and agree with it, which is how you
+ *   build a safety net that catches nothing. Comparing "was there input" against
+ *   "was there output" is the one question no parser can answer wrongly.
+ *
+ *   The printed text is carried with each entry so the row can show it. Being
+ *   told a date could not be read is useful; being shown that the paper says
+ *   "01Oct" is what lets a specialist fix it in seconds.
+ */
+function auditPrintedValues(legs) {
+  legs.forEach((leg) => {
+    leg.unreadable = [];
+
+    const recordLoss = (field, printed, flag) => {
+      leg.unreadable.push({ field, printed, flag });
+      if (!leg.flags.includes(flag)) leg.flags.push(flag);
+    };
+
+    PRINTED_VALUE_AUDIT.forEach(({ field, printedOn, keptIn, flag }) => {
+      if (leg[printedOn] && !leg[keptIn]) recordLoss(field, leg[printedOn], flag);
+    });
+
+    // Ticket numbers belong to a traveller, not to the flight, so they are
+    // audited where they live.
+    leg.travellers.forEach((traveller) => {
+      if (traveller.ticketNumberAsPrinted && !traveller.ticketNumber) {
+        recordLoss('ticket number', traveller.ticketNumberAsPrinted, FLAGS.UNREADABLE_TICKET_NUMBER);
+      }
+    });
+  });
+
+  return legs;
 }
 
 // =============================================================================
@@ -2734,6 +2803,11 @@ function finaliseJourney(bookedChain, chainIndex, allLegs, replacements, ignoreP
     replacements: journeyReplacements,
     isDirect: bookedChain.length === 1,
     stopCount: bookedChain.length - 1,
+    // Whether this shape can be trusted. Connections are decided on dates, so a
+    // chain containing an undated leg could not have been chained even if it
+    // should have been, and "Direct" may just mean "we lost a date". The screen
+    // must not present that as a finding.
+    datesComplete: bookedChain.every((leg) => Boolean(leg.departureDateISO)),
     origin: departureAirportOf(firstBookedLeg),
     finalDestination: arrivalAirportOf(lastBookedLeg),
     // End to end, as the crow flies - the figure EC261 measures a journey by,
@@ -2962,10 +3036,11 @@ function buildReplacementItineraries(legs, bookedLegIds, replacements) {
  *
  * WHY IT IS BUILT THIS WAY
  *   Deduplicated by code, so the same problem is stated once rather than once
- *   per leg. Nothing renders these on the review screen today — each warning's
- *   job turned out to be better done in place, next to the field it concerns —
- *   but they are derived for the disruption questions and the assessment
- *   summary.
+ *   per leg. ResultsPanel prints them above the results, and marks
+ *   TIMELINE_INCOMPLETE and UNREADABLE_VALUE as the severe pair: those two do
+ *   not say "check a field", they say the itinerary below may be the wrong
+ *   shape. Everything else here is better answered in place, next to the field
+ *   it concerns, and the row does that.
  */
 function collectWarnings(journeys, replacementFlights) {
   const warnings = [];
@@ -2980,6 +3055,13 @@ function collectWarnings(journeys, replacementFlights) {
   const everyLeg = [...journeys.flatMap((journey) => journey.legs), ...replacementFlights];
 
   journeys.forEach((journey) => {
+    // Said at the top as well as on the row, because this one is not about a
+    // single field: it means the itinerary on screen may be the wrong shape.
+    if (!journey.datesComplete) {
+      addWarning(TIMELINE_INCOMPLETE,
+        'A flight is missing its date, so the trip may be split into the wrong journeys. Check the dates before relying on this timeline.');
+    }
+
     if (journey.flags.includes(FLAGS.AIRPORT_CHANGE)) {
       addWarning(FLAGS.AIRPORT_CHANGE,
         'One part of this trip departs from a different airport than the previous flight arrived at.');
@@ -3004,6 +3086,14 @@ function collectWarnings(journeys, replacementFlights) {
   });
 
   everyLeg.forEach((leg) => {
+    // The document printed something and we have nothing to show for it. Stated
+    // once here and in full on the row, where the printed text is: a banner
+    // quoting every lost value would bury the one thing it needs to say.
+    if ((leg.unreadable || []).length > 0) {
+      addWarning(UNREADABLE_VALUE,
+        'Some values printed on your documents could not be read. They are marked on the flights below.');
+    }
+
     if (leg.flags.includes(FLAGS.MISSING_DATE)) {
       addWarning(FLAGS.MISSING_DATE,
         'Some flight dates could not be read and need to be confirmed.');

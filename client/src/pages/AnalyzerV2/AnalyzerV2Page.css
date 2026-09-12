@@ -218,6 +218,15 @@
   border-radius: var(--radius-md);
 }
 
+/* "A value could not be read" and "the timeline may be the wrong shape" are not
+   the same kind of message as "we assumed the year". These say the analysis
+   below may be wrong, so they are sorted to the top and coloured for it. */
+.av2-warning--severe {
+  color: var(--danger);
+  background: var(--danger-dim);
+  border-color: var(--danger-border);
+}
+
 .av2-empty {
   padding: var(--space-8);
   text-align: center;
@@ -1101,6 +1110,12 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* The document printed a date here and we could not read it. That is a
+   different fact from "no date", and it must not be dressed as one. */
+.av2-flight__date--unreadable {
+  color: var(--danger);
+}
+
 .av2-flight__pnr {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -1136,6 +1151,49 @@
   font-family: var(--font-mono);
   letter-spacing: 0.04em;
   color: var(--text-primary);
+}
+
+/* --- What the document printed and we lost ------------------------------- */
+/* Step 8b's record, on the row rather than behind a hover. Everything else on
+   this screen is a finding; this is the one line admitting the tool failed to
+   read something, so it is stated openly and the printed text is shown. */
+
+.av2-flight__unreadable {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  grid-column: 1 / -1;
+  margin: var(--space-1) 0 0;
+  padding: var(--space-2) var(--space-3);
+  list-style: none;
+  background: var(--danger-dim);
+  border: 1px solid var(--danger-border);
+  border-left: 3px solid var(--danger);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+}
+
+.av2-flight__unreadable li {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.av2-flight__unreadable-field {
+  color: var(--danger);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.av2-flight__unreadable-printed {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.av2-flight__unreadable-note {
+  color: var(--text-secondary);
 }
 
 /* --- Chips --------------------------------------------------------------- */

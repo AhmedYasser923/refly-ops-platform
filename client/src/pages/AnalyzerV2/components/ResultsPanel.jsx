@@ -11,6 +11,12 @@ import ReplacementGroup from './ReplacementGroup.jsx';
  * engine, because two places deciding the same thing is how the old tool ended
  * up telling a specialist one story and the EC261 calculator another.
  */
+// Two of the engine's warnings are not about a field needing a check - they say
+// the analysis below may be the wrong SHAPE, because something printed on the
+// document did not survive being read. They are a different kind of statement
+// from "we assumed the year", and must not look like one.
+const SEVERE_WARNINGS = new Set(['TIMELINE_INCOMPLETE', 'UNREADABLE_VALUE']);
+
 export default function ResultsPanel({ result }) {
   const journeys = result.booking?.journeys || [];
   const replacementItineraries = result.replacementItineraries || [];
@@ -35,11 +41,17 @@ export default function ResultsPanel({ result }) {
     <div className="av2-results">
       {warnings.length > 0 && (
         <ul className="av2-warnings" aria-label="Warnings">
-          {warnings.map((warning) => (
-            <li key={warning.code} className="av2-warning">
-              {warning.message}
-            </li>
-          ))}
+          {[...warnings]
+            .sort((first, second) =>
+              Number(SEVERE_WARNINGS.has(second.code)) - Number(SEVERE_WARNINGS.has(first.code)))
+            .map((warning) => (
+              <li
+                key={warning.code}
+                className={`av2-warning${SEVERE_WARNINGS.has(warning.code) ? ' av2-warning--severe' : ''}`}
+              >
+                {warning.message}
+              </li>
+            ))}
         </ul>
       )}
 

@@ -17,6 +17,13 @@
 //     detection downstream.
 //   * "Unused / Missed Connection" is DEDUCED from the timeline, not from any
 //     word printed on the page. That deduction is what surfaces a rebooking.
+//   * A PRINTED VALUE IS NEVER BLANKED FOR FAILING A VALIDATION RULE. The model
+//     reports what the page says; the server decides whether it is usable, and
+//     says so when it is not. A rule telling the model to blank anything that is
+//     not exactly thirteen digits threw away every Royal Air Maroc ticket
+//     number, because that airline glues the coupon on: "147273742828401". The
+//     server holds the ticketing prefixes, so it can read the structure and take
+//     the coupon off. It cannot recover a field the model emptied.
 //
 // The AIRPORT NAMES section comes straight from ticketAnalysisPrompt.js -
 // claim intake never had it. Names and countries are display-only: flights are
@@ -108,12 +115,12 @@ PER-PASSENGER TICKETS AND PNRs (passengerTickets):
 For EVERY leg, output one passengerTickets entry per passenger travelling on it, even when you only found a name.
 
 TICKET NUMBERS:
-- An e-ticket number is exactly 13 digits, e.g. "7245528980584". Output digits only.
+- An e-ticket number is 13 digits: a 3-digit airline ticketing prefix followed by a 10-digit serial, e.g. "724" + "5528980584". Output digits only.
 - It is usually labelled ETKT, E-TICKET, ETICKET, TKT or "Ticket number", and on a boarding pass often sits in a corner away from the flight details.
-- Strip a trailing coupon suffix: "7242339474582-5" -> "7242339474582".
+- OUTPUT THE DIGITS AS PRINTED, EVEN IF THERE ARE MORE THAN 13. Many airlines print the coupon number after the serial, with a hyphen ("7242339474582-5") or with nothing at all (Royal Air Maroc prints "147273742828401" and "147273742828402" for coupons 01 and 02 of ticket 1472737428284). The server knows the prefixes, so it knows where the number ends and can take the coupon off. Blanking a longer value here destroys a number that is printed on the document, and the screen then says the document carried no ticket number.
 - THE SAME TICKET NUMBER APPEARS ON SEVERAL FLIGHTS. One ticket covers several coupons, so a passenger's ZRH->AMS and AMS->BEG passes can both print "7242347956916". That is correct and expected — repeat it on every leg where it is printed. Do NOT assume a repeat means you have mixed two flights up.
 - Each passenger has their OWN ticket number. Two travellers on the same flight normally have consecutive numbers ("...584" and "...585"). Map each number to the passenger printed beside it, never to both.
-- CRITICAL — a booking reference in a ticket-number field is NOT a ticket number. Some agents print "E-ticket number 1P1SJF" where 1P1SJF is the PNR. If the value is not 13 digits, output an empty string for ticketNumber.
+- CRITICAL — a booking reference in a ticket-number field is NOT a ticket number. Some agents print "E-ticket number 1P1SJF" where 1P1SJF is the PNR. A ticket number is digits: if the printed value contains a letter, output an empty string. Length is the server's decision, not yours — never blank a value just because you counted the digits and the total surprised you.
 - Never invent, pad or reconstruct a ticket number. If it is not printed, output an empty string.
 
 PER-PASSENGER PNRs:

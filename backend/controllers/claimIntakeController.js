@@ -66,7 +66,11 @@ const MODELS = require('../config/models');
 const { buildTicketDocumentParts } = require('../utils/ticketDocumentParts');
 const CLAIM_INTAKE_SCHEMA = require('../schemas/claimIntakeSchema');
 const { buildClaimIntakePrompt } = require('../prompts/claimIntakePrompt');
-const { parseDateParts } = require('../utils/dateYearResolver');
+// The one place a printed date becomes structured data. This file used to carry
+// its own copy of it; the copy had drifted and was destroying every partial
+// October date ("01Oct" -> "01Oc"), which cost a real trip its return journey in
+// the specialist tool before it was found. Two copies of one parser is the bug.
+const { readPrintedDate } = require('../utils/printedDate');
 
 // -----------------------------------------------------------------------------
 // Configuration
@@ -685,53 +689,6 @@ function departureDayMillis(leg) {
 
 const currentUtcYear = () => new Date().getUTCFullYear();
 
-/**
- * WHAT IT DOES
- *   Inserts separators into a glued boarding-pass date and expands a two-digit
- *   year: "05MAR26" becomes "05 MAR 2026".
- *
- * WHY IT IS BUILT THIS WAY
- *   The shared date parser expects separators and cannot read the glued form.
- *   Loosening the string here rather than changing the parser keeps the ticket
- *   analyzer, which depends on that parser, untouched.
- */
-function addSeparatorsToGluedDate(value) {
-  const trimmed = String(value || '').trim();
-  if (!trimmed) return '';
-
-  return trimmed
-    .replace(/(\d)([A-Za-z])/g, '$1 $2')
-    .replace(/([A-Za-z])(\d)/g, '$1 $2')
-    .replace(/(^|[^\d])(\d{2})$/, (match, before, twoDigitYear) =>
-      before + (Number(twoDigitYear) <= 68 ? '20' : '19') + twoDigitYear);
-}
-
-/**
- * WHAT IT DOES
- *   Removes any clock time from a string that is supposed to be a date.
- *
- * WHY IT IS BUILT THIS WAY
- *   This is scar tissue. Boarding passes print the date and departure time as
- *   one run of characters — "IB 0550 A 05MAR20:40" — and the model sometimes
- *   carried part of the clock into a date field as "05MAR20". The two-digit
- *   year rule above then read the HOUR as a year: 05MAR20 became 2020 and
- *   06MAR11 became 2011. An arrival six years after its departure fails every
- *   connection test, so one connecting trip tore into two "direct" journeys.
- *
- *   A date field must never contain a colon. This is the guard.
- */
-function removeClockTimeFromDate(value) {
-  return String(value || '')
-    .replace(/(\d{1,2})\s*:\s*(\d{2})(\s*:\s*\d{2})?/g, ' ')
-    .replace(/[T\s.,;:/-]+$/i, '')
-    .trim();
-}
-
-function parsePrintedDate(value) {
-  const withoutClock = removeClockTimeFromDate(value);
-  return parseDateParts(withoutClock) || parseDateParts(addSeparatorsToGluedDate(withoutClock));
-}
-
 function toIsoDate(month, day, year) {
   return [
     String(year).padStart(4, '0'),
@@ -770,8 +727,8 @@ function monthDayOrderKey(dateParts) {
 function resolveMissingYears(legs) {
   const parsedLegs = legs.map((leg) => ({
     leg,
-    departureParts: parsePrintedDate(leg.departureDateRaw),
-    arrivalParts: parsePrintedDate(leg.arrivalDateRaw)
+    departureParts: readPrintedDate(leg.departureDateRaw),
+    arrivalParts: readPrintedDate(leg.arrivalDateRaw)
   }));
 
   const anchorYear = parsedLegs

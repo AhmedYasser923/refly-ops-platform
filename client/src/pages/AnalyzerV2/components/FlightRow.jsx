@@ -33,6 +33,13 @@ const NEVER_CHIPPED = ['REPLACED', 'ASSUMED_YEAR'];
 export default function FlightRow({ leg, muted = false, suppressFlags = [], showRoute = true }) {
   const notFlown = leg.flown === false;
 
+  // What the document printed where the pipeline kept nothing - see Step 8b.
+  // Listed in full on the row rather than hidden behind a hover: this is the one
+  // thing on the screen that says the tool got something wrong, and a specialist
+  // cannot correct what they are not shown.
+  const unreadable = Array.isArray(leg.unreadable) ? leg.unreadable : [];
+  const dateWasUnreadable = unreadable.some((entry) => entry.field === 'date');
+
   // `suppressFlags` handles the contextual case: inside a replacement group the
   // heading has already said these are replacements, so the chip is noise.
   const hiddenFlags = new Set([...NEVER_CHIPPED, ...suppressFlags]);
@@ -73,8 +80,11 @@ export default function FlightRow({ leg, muted = false, suppressFlags = [], show
         </div>
 
         <div className="av2-flight__meta">
-          <span className="av2-flight__date">
-            {formatDate(leg.departureDate) || 'No date'}
+          {/* "No date" is only true when the document printed none. When it
+              printed one we could not read, saying "No date" states the
+              opposite of what the paper says. */}
+          <span className={`av2-flight__date${dateWasUnreadable ? ' av2-flight__date--unreadable' : ''}`}>
+            {formatDate(leg.departureDate) || (dateWasUnreadable ? 'Date unreadable' : 'No date')}
           </span>
           {leg.pnr && <span className="av2-flight__pnr">{leg.pnr}</span>}
         </div>
@@ -119,6 +129,21 @@ export default function FlightRow({ leg, muted = false, suppressFlags = [], show
             <li key={traveller.passengerName}>
               <span className="av2-flight__split-name">{traveller.passengerName}</span>
               <span className="av2-flight__split-code">{traveller.pnr || '—'}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Each line names the field, quotes what the document printed, and says
+          plainly that we could not read it. The printed text is the whole point:
+          "01Oct" on the screen turns a mystery into a two-second fix. */}
+      {unreadable.length > 0 && (
+        <ul className="av2-flight__unreadable">
+          {unreadable.map((entry) => (
+            <li key={`${entry.field}-${entry.printed}`}>
+              <span className="av2-flight__unreadable-field">{entry.field}</span>
+              <span className="av2-flight__unreadable-printed">{entry.printed}</span>
+              <span className="av2-flight__unreadable-note">printed here, but we could not read it</span>
             </li>
           ))}
         </ul>
