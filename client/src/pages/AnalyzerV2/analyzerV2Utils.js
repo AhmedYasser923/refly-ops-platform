@@ -152,6 +152,27 @@ export function flagTone(flag) {
   return ATTENTION_FLAGS.has(flag) ? 'warning' : 'neutral';
 }
 
+// Why a flight cannot be looked up on the trackers, as the dimmed buttons say
+// it. The server decides which of these applies - see buildTrackerLinks.
+const TRACKER_UNAVAILABLE_LABELS = {
+  NO_FULL_DATE: 'no full date on this flight, and a tracker needs one',
+  FLIGHT_NUMBER_UNCLEAR: 'no single flight number on this flight'
+};
+
+export function formatTrackerUnavailable(reason) {
+  return TRACKER_UNAVAILABLE_LABELS[reason] || 'cannot be looked up';
+}
+
+const CURRENCY_SYMBOLS = { EUR: '€' };
+
+/** { amount: 600, currency: 'EUR' } -> "€600". */
+export function formatCompensation(compensation) {
+  if (!compensation) return '';
+
+  const symbol = CURRENCY_SYMBOLS[compensation.currency];
+  return symbol ? `${symbol}${compensation.amount}` : `${compensation.currency} ${compensation.amount}`;
+}
+
 /**
  * Turns one story event into the sentence a specialist reads.
  *

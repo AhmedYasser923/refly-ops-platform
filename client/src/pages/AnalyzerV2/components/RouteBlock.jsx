@@ -1,4 +1,7 @@
-import { formatCityAndCountry, formatDistance, withAirportSuffix } from '../analyzerV2Utils.js';
+import AirportCode from './AirportCode.jsx';
+import RouteDistance from './RouteDistance.jsx';
+import TrackerCircles from './TrackerCircles.jsx';
+import { formatCityAndCountry, withAirportSuffix } from '../analyzerV2Utils.js';
 
 /**
  * The route between two airports, laid out exactly as the old analyzer's
@@ -16,18 +19,31 @@ import { formatCityAndCountry, formatDistance, withAirportSuffix } from '../anal
  * end, on a tinted panel, so it reads as the summary and not as one more flight.
  * The flights keep the plain block - the old analyzer's look, unchanged.
  *
+ * A place may carry `eoc`, the extraordinary circumstances at that airport;
+ * its code then turns red and pulses (see AirportCode).
+ *
+ * The distance carries `compensation`, what EC261 pays for it - see
+ * RouteDistance, which opens it on hover.
+ *
+ * When the block stands for ONE flight, `flight` carries it - its number, its
+ * date and its tracker links - and the buttons for those trackers sit under the
+ * AIR line (see TrackerCircles). A heading over several flights passes nothing,
+ * because a tracker is asked about one flight.
+ *
  * Built from spans so the journey heading can hold it inside its <h3>.
  */
-export default function RouteBlock({ from, to, distanceKm, variant = 'flight' }) {
-  const distance = formatDistance(distanceKm);
+export default function RouteBlock({
+  from, to, distanceKm, compensation = null, flight = null, variant = 'flight'
+}) {
   const className = variant === 'journey' ? 'av2-route av2-route--journey' : 'av2-route';
 
   return (
     <span className={className}>
       <RoutePoint place={from} />
       <span className="av2-route__line">
-        {distance && <span className="av2-route__distance">{distance}</span>}
+        <RouteDistance distanceKm={distanceKm} compensation={compensation} />
         <span className="av2-route__air" aria-hidden="true">AIR</span>
+        <TrackerCircles flight={flight} />
       </span>
       <RoutePoint place={to} />
     </span>
@@ -41,7 +57,7 @@ export default function RouteBlock({ from, to, distanceKm, variant = 'flight' })
 function RoutePoint({ place }) {
   return (
     <span className="av2-route__point">
-      <strong className="av2-route__code">{place?.iata || '???'}</strong>
+      <AirportCode iata={place?.iata} events={place?.eoc} />
       <span className="av2-route__name">{withAirportSuffix(place?.airportName || place?.city)}</span>
       <small className="av2-route__place">{formatCityAndCountry(place)}</small>
     </span>

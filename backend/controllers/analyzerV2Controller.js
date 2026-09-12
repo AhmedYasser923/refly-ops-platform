@@ -66,6 +66,10 @@
 //   Step 2b  lookUpAirlinesOnline ......... ask the web about unnamed airlines
 //   Step  3  normalisePassengers .......... clean the people
 //   Step  4  buildAnalysisResponse ........ assemble the reply
+//   Step 4a  attachAirlineDetails ......... describe each airline from the list
+//   Step 4b  checkAirportsForEoc .......... mark airports hit by an EOC
+//   Step 4c  attachTrackerLinks ........... where to look each flight up
+//   Step 4d  attachCompensation ........... what Article 7 pays for a distance
 //   Step  5  buildItineraryFromLegs ....... the deterministic engine
 //   Step  6  normaliseExtractedLeg ........ clean each flight
 //   Step  7  resolveMissingYears .......... "05MAR" -> a real date
@@ -101,8 +105,17 @@ const {
   resolveAirline,
   airlinesHoldingCode,
   carrierCodeOf,
-  findAirlineNamed
+  findAirlineNamed,
+  findAirlineRecord
 } = require('../utils/airlineBookingRules');
+// Step 4a's claim limit: the one the old analyzer's claim-document list shows.
+const { getJurisdictionLimit } = require('../utils/dataLoader');
+// Step 4c's tracker links, with each airline's own search codes.
+const { buildTrackerLinks } = require('../utils/flightTrackerLinks');
+// Step 4d's Article 7 bands.
+const { compensationFor } = require('../utils/ec261Compensation');
+// Step 4b's matching: the same lookup the old analyzer's EOC check makes.
+const eocService = require('../services/eocService');
 // Coordinates only, for distances - see distanceBetweenAirportsKm.
 const AIRPORTS_DATA = require('../airports_data.json');
 
@@ -310,18 +323,24 @@ exports.analyzeDocuments = catchAsync(async (request, response, next) => {
   // requires it because asking for it measurably improves the extraction, but
   // it is never copied into the reply below - the old analyzer ships it to the
   // browser inside every journey, where nothing reads it.
+  const analysis = buildAnalysisResponse({
+    documentType,
+    evidenceMode: isBoardingPassUpload ? 'boarding_passes' : 'documents',
+    passengers: normalisePassengers(extractedPayload?.passengers),
+    bookingReferences: normaliseBookingReferences(extractedPayload?.bookingReferences),
+    legs: extractedLegs,
+    options: {
+      ignorePnr: isBoardingPassUpload,
+      airlinesFoundOnline: airlineLookup.airlinesFoundOnline
+    }
+  });
+
+  // Step 4b. It reads the EOC records from the database, so it runs out here
+  // on the finished reply rather than inside the engine.
+  await checkAirportsForEoc(analysis);
+
   response.json({
-    ...buildAnalysisResponse({
-      documentType,
-      evidenceMode: isBoardingPassUpload ? 'boarding_passes' : 'documents',
-      passengers: normalisePassengers(extractedPayload?.passengers),
-      bookingReferences: normaliseBookingReferences(extractedPayload?.bookingReferences),
-      legs: extractedLegs,
-      options: {
-        ignorePnr: isBoardingPassUpload,
-        airlinesFoundOnline: airlineLookup.airlinesFoundOnline
-      }
-    }),
+    ...analysis,
     processingTimeMs,
     costUSD: cost.costUSD + airlineLookup.costUSD,
     model: modelName
@@ -873,6 +892,15 @@ function buildAnalysisResponse({ documentType, evidenceMode, passengers, booking
 
   const allLegs = everyLegIn(journeys, replacementItineraries);
 
+  // Step 4a. Pure, so it runs here, and every way into the feature gets it.
+  attachAirlineDetails(allLegs);
+
+  // Step 4c. Pure too, and built from the flight number the engine settled on.
+  attachTrackerLinks(allLegs);
+
+  // Step 4d. The journeys as well, for the end-to-end figure in each heading.
+  attachCompensation(allLegs, journeys);
+
   return {
     success: true,
     documentType,
@@ -892,6 +920,305 @@ function buildAnalysisResponse({ documentType, evidenceMode, passengers, booking
     replacementFlights,
     replacements,
     warnings
+  };
+}
+
+
+// =============================================================================
+// STEP 4a — Describe each airline from the airline list
+// =============================================================================
+
+/**
+ * WHAT IT DOES
+ *   Gives each flight the airlines_codes.json entry behind each airline name
+ *   it shows: `marketingAirlineDetails`, and `operatingAirlineDetails` for the
+ *   operating airline. That is the airline's codes, its ticket prefix, the
+ *   documents it asks for with a claim, and the country it is registered in
+ *   with that country's claim limit. The screen opens it as a card when the
+ *   name is hovered. null when the file does not have the airline.
+ *
+ * WHY IT IS BUILT THIS WAY
+ *   It is what the old analyzer's "Claim documents" list shows, from the same
+ *   file. The entry is found with findAirlineRecord, the lookup Step 6 uses to
+ *   confirm a name, so the card describes the airline the row names.
+ *
+ *   It is not the old analyzer's buildClaimDocuments. That takes the
+ *   airline's country from the model, and says "No documents required" for
+ *   an airline it cannot find. Here the country is the one the file records -
+ *   the file's own notes say limits are derived from it - and an airline the
+ *   file does not have gets no card rather than a guess.
+ *
+ *   Pure, so it runs inside buildAnalysisResponse, and every way into the
+ *   feature gets it. It runs after the engine because it describes the names
+ *   the engine settled on, and nothing in the engine reads it.
+ *
+ * @param {Object[]} legs Every leg in the reply. Changed in place.
+ */
+function attachAirlineDetails(legs) {
+  legs.forEach((leg) => {
+    leg.marketingAirlineDetails = airlineDetailsFor(leg.marketingAirline, leg.flightNumber);
+    leg.operatingAirlineDetails = airlineDetailsFor(leg.operatingAirline, leg.flightNumber);
+  });
+}
+
+/**
+ * One airline's card, or null when the file does not have the airline.
+ * `requiredDocuments` is '' when the airline asks for nothing extra: the file
+ * leaves `reqs` out for those.
+ */
+function airlineDetailsFor(airlineName, flightNumber) {
+  const record = findAirlineRecord(airlineName, flightNumber);
+  if (!record) return null;
+
+  return {
+    name: record.name,
+    iata: asAirlineListCode(record.iata),
+    icao: asAirlineListCode(record.icao),
+    ticketPrefix: record.ticketPrefix || '',
+    requiredDocuments: record.reqs || '',
+    claimNote: record.claimNote || '',
+    ticketNumberCanReplacePnr: Boolean(record.ticketNumberCanReplacePnr),
+    oneTimeSubmission: Boolean(record.oneTimeSubmission),
+    ceasedOperations: Boolean(record.ceasedOperations),
+    country: record.country || '',
+    claimLimit: claimLimitLabel(record.country)
+  };
+}
+
+/** The file writes 'NA' for an airline with no code of that kind. */
+function asAirlineListCode(code) {
+  const listed = String(code || '').trim().toUpperCase();
+  return listed === 'NA' ? '' : listed;
+}
+
+/**
+ * The claim limit of an airline's country, as the old analyzer's card prints
+ * it beside the country: "6 years", "No Limit" (Malta), "2 Months - 10 years"
+ * (Sweden), or "N/A" when jurisdiction_data.json does not have the country.
+ * A label only: expiry arithmetic must use getJurisdictionYears.
+ */
+function claimLimitLabel(country) {
+  const limit = getJurisdictionLimit(country);
+  if (typeof limit === 'number') return limit === 1 ? '1 year' : `${limit} years`;
+  // The notes: "2 Months - 10" ends in the years, "No Limit" stands alone.
+  return /\d$/.test(limit) ? `${limit} years` : limit;
+}
+
+
+// =============================================================================
+// STEP 4c — Where to look each flight up
+// =============================================================================
+
+/**
+ * WHAT IT DOES
+ *   Gives each flight `trackers`: the links to the three flight trackers a
+ *   specialist checks a claim against - AirportInfo, FlightStats and Flightera.
+ *   A flight that cannot be looked up carries the reason in the same field
+ *   instead, and the screen dims the buttons rather than dropping them.
+ *
+ * WHY IT IS BUILT THIS WAY
+ *   The links are the Flight Search tool's, so both tools open the same page
+ *   for the same flight, and an airline whose IATA code does not resolve on a
+ *   tracker is searched under the code airlines_codes.json records for it.
+ *
+ *   Built on the server because that file is the server's, and because the
+ *   number searched is then the CORRECTED one: the old analyzer sends a tracker
+ *   the misread NO379, this sends Norse Atlantic's actual N0379.
+ *
+ *   Pure, so it runs inside buildAnalysisResponse alongside Step 4a, and every
+ *   way into the feature gets it. The URL shapes are in flightTrackerLinks.js.
+ *
+ * @param {Object[]} legs Every leg in the reply. Changed in place.
+ */
+function attachTrackerLinks(legs) {
+  legs.forEach((leg) => {
+    leg.trackers = buildTrackerLinks(leg.flightNumber, leg.departureDate);
+  });
+}
+
+
+// =============================================================================
+// STEP 4d — What Article 7 pays for a distance
+// =============================================================================
+
+/**
+ * WHAT IT DOES
+ *   Gives each flight and each journey `compensation`: what EC261 Article 7
+ *   pays for the distance printed beside it - EUR 250, 400 or 600 - so hovering
+ *   a distance shows the amount. null when there is no distance, which is also
+ *   when the screen prints none to hover.
+ *
+ * WHY IT IS BUILT THIS WAY
+ *   The amount is the old analyzer's own rule (ticketController.js, where it is
+ *   one line), so both tools put the same figure on the same flight.
+ *
+ *   The countries behind the intra-EU part of that rule come from
+ *   airports_data.json by airport code, never from the model, so the amount
+ *   rests on a value that cannot change between runs. `isEUCountry` is the
+ *   shared list in ec261Service - the one the old analyzer's own evaluation
+ *   uses, so v2 adds no third list to the two that already disagree.
+ *
+ *   It is the amount and nothing else. Whether EC261 applies to the flight at
+ *   all is backlog item 2, and is not decided here.
+ *
+ *   Pure, so it runs inside buildAnalysisResponse alongside Steps 4a and 4c.
+ *
+ * @param {Object[]} legs Every leg in the reply. Changed in place.
+ * @param {Object[]} journeys Each journey, for its end-to-end figure. Changed in place.
+ */
+function attachCompensation(legs, journeys) {
+  legs.forEach((leg) => {
+    leg.compensation = compensationBetween(leg.distanceKm, leg.departureIata, leg.arrivalIata);
+  });
+
+  journeys.forEach((journey) => {
+    journey.compensation = compensationBetween(
+      journey.distanceKm, journey.origin?.iata, journey.finalDestination?.iata
+    );
+  });
+}
+
+function compensationBetween(distanceKm, fromIata, toIata) {
+  return compensationFor({
+    distanceKm,
+    fromCountry: countryOfAirport(fromIata),
+    toCountry: countryOfAirport(toIata)
+  });
+}
+
+
+// =============================================================================
+// STEP 4b — Mark the airports hit by an extraordinary circumstance
+// =============================================================================
+
+// The warning a reply carries when the EOC records could not be read.
+const EOC_CHECK_FAILED = 'EOC_CHECK_FAILED';
+
+/**
+ * WHAT IT DOES
+ *   Looks every airport in the reply up in the EOC records (strikes, storms,
+ *   airspace closures) on the day of its flight. Each flight gets
+ *   `departureEoc` and `arrivalEoc`, the events at each end, and each
+ *   journey's `origin` and `finalDestination` get `eoc`. An empty list means
+ *   nothing was found, or that the flight has no full date to look up.
+ *
+ * WHY IT IS BUILT THIS WAY
+ *   The matching is eocService.findEOCEvents, the old analyzer's own, so the
+ *   two tools find the same events. The old analyzer asks once per flight and
+ *   shows one list for the whole card. This asks once per airport: an event is
+ *   recorded against an airport code, a country or "World Wide", and the
+ *   screen marks the airport it hit rather than the flight.
+ *
+ *   Both ends are checked against the flight's departure date, as in the old
+ *   analyzer.
+ *
+ *   It runs HERE, after the engine, because it reads the database and the
+ *   engine must stay pure. Nothing in the engine reads what it adds.
+ *
+ *   It never fails a case. If the records cannot be read, no airport is marked
+ *   and the reply carries a warning saying so, because an unmarked airport
+ *   must not be mistaken for a clear one.
+ *
+ * @param {Object} reply What buildAnalysisResponse returned. Changed in place.
+ * @param {Function} [findEvents] eocService.findEOCEvents; the tests pass a fake.
+ */
+async function checkAirportsForEoc(reply, findEvents = eocService.findEOCEvents) {
+  const lookups = eocLookupsFor(reply);
+
+  try {
+    const answers = await Promise.all(lookups.map((airport) => findEvents({
+      date: airport.date,
+      originIata: airport.iata,
+      originCountry: airport.country
+    })));
+
+    const eventsByAirport = new Map(lookups.map((airport, index) => [
+      airport.key,
+      (answers[index]?.events || []).map(asEocEvent)
+    ]));
+
+    return attachEocEvents(reply, eventsByAirport);
+  } catch (lookupError) {
+    console.error('[AnalyzerV2] EOC check failed:', lookupError.message);
+    reply.warnings.push({
+      code: EOC_CHECK_FAILED,
+      message: 'The EOC check could not run, so no airport is marked. Check the EOC Radar before relying on this.'
+    });
+    return attachEocEvents(reply, new Map());
+  }
+}
+
+/**
+ * Every airport in the reply that can be looked up, once per airport and day.
+ * A connection airport is one flight's arrival and the next one's departure,
+ * usually on the same day, and needs asking only once.
+ */
+function eocLookupsFor(reply) {
+  const lookups = new Map();
+
+  everyLegIn(reply.booking.journeys, reply.replacementItineraries).forEach((leg) => {
+    [eocAirportOf(leg, 'departure'), eocAirportOf(leg, 'arrival')].forEach((airport) => {
+      if (airport.key && !lookups.has(airport.key)) lookups.set(airport.key, airport);
+    });
+  });
+
+  return [...lookups.values()];
+}
+
+/**
+ * One end of a flight as the EOC lookup needs it. The key is empty when there
+ * is nothing to look up: no airport code, or no full date, since the records
+ * are kept by day.
+ */
+function eocAirportOf(leg, end) {
+  const iata = end === 'departure' ? leg.departureIata : leg.arrivalIata;
+  const country = (end === 'departure' ? leg.departureCountry : leg.arrivalCountry) || '';
+  const date = leg.departureDate || '';
+
+  if (!iata || !ISO_DATE_PATTERN.test(date)) return { key: '' };
+
+  return { key: [date, iata, country.toLowerCase()].join('|'), date, iata, country };
+}
+
+/**
+ * Hands each flight the events at its two ends, and each journey's heading
+ * the events of the flights its two codes come from: the first flight's
+ * departure and the last flight's arrival.
+ */
+function attachEocEvents(reply, eventsByAirport) {
+  const eventsAt = (airport) => eventsByAirport.get(airport.key) || [];
+
+  everyLegIn(reply.booking.journeys, reply.replacementItineraries).forEach((leg) => {
+    leg.departureEoc = eventsAt(eocAirportOf(leg, 'departure'));
+    leg.arrivalEoc = eventsAt(eocAirportOf(leg, 'arrival'));
+  });
+
+  reply.booking.journeys.forEach((journey) => {
+    journey.origin.eoc = journey.legs[0]?.departureEoc || [];
+    journey.finalDestination.eoc = journey.legs[journey.legs.length - 1]?.arrivalEoc || [];
+  });
+
+  return reply;
+}
+
+/**
+ * An EOC record as the screen shows it. Only an ongoing issue carries dates:
+ * it runs from its start until an admin closes it, while a one-off event is
+ * on the flight's own day.
+ */
+function asEocEvent(record) {
+  const ongoing = /ongoing/i.test(String(record.category || ''));
+
+  return {
+    id: String(record._id || ''),
+    category: record.category || '',
+    event: record.event || '',
+    location: record.location || '',
+    decision: record.decision || '',
+    ongoing,
+    startDate: ongoing ? (record.lifecycle?.startDate || record.date || '') : '',
+    endDate: ongoing ? (record.lifecycle?.endDate || '') : '',
+    closureNote: ongoing ? (record.lifecycle?.note || '') : ''
   };
 }
 
@@ -1178,17 +1505,32 @@ function bookingCodesOn(leg) {
   return [...new Set(codes)].sort();
 }
 
-// Every airport's coordinates by IATA code, built once when the module loads.
-// The FIRST entry for a code wins, because that is what the old analyzer's
-// `airportsDatabase.find(...)` returns - so both tools measure from the same
-// point. A Map rather than a find() per leg, since there are 10,000 airports.
-const AIRPORT_COORDINATES_BY_IATA = AIRPORTS_DATA.reduce((index, airport) => {
+// Every airport's coordinates and country by IATA code, built once when the
+// module loads. The FIRST entry for a code wins, because that is what the old
+// analyzer's `airportsDatabase.find(...)` returns - so both tools measure from
+// the same point. A Map rather than a find() per leg, since there are 10,000
+// airports.
+//
+// The country is here for Step 4d, which needs to know whether a flight stayed
+// inside the EU. It is deliberately this file's country and not the model's:
+// the file says "Spain" for Tenerife and "United Kingdom" for Edinburgh every
+// single time, which is what a decision needs.
+const AIRPORTS_BY_IATA = AIRPORTS_DATA.reduce((index, airport) => {
   const code = String(airport.iata || '').toUpperCase();
   if (code && !index.has(code)) {
-    index.set(code, { lat: Number(airport.lat), lon: Number(airport.lon) });
+    index.set(code, {
+      lat: Number(airport.lat),
+      lon: Number(airport.lon),
+      country: String(airport.country || '')
+    });
   }
   return index;
 }, new Map());
+
+/** An airport's country as the coordinates file records it. '' when unknown. */
+function countryOfAirport(iata) {
+  return AIRPORTS_BY_IATA.get(iata)?.country || '';
+}
 
 /**
  * WHAT IT DOES
@@ -1208,8 +1550,8 @@ const AIRPORT_COORDINATES_BY_IATA = AIRPORTS_DATA.reduce((index, airport) => {
  *   nothing in the itinerary logic does.
  */
 function distanceBetweenAirportsKm(fromIata, toIata) {
-  const from = AIRPORT_COORDINATES_BY_IATA.get(fromIata);
-  const to = AIRPORT_COORDINATES_BY_IATA.get(toIata);
+  const from = AIRPORTS_BY_IATA.get(fromIata);
+  const to = AIRPORTS_BY_IATA.get(toIata);
   if (!from || !to) return null;
 
   const EARTH_RADIUS_KM = 6371;
@@ -2074,10 +2416,40 @@ const wasActuallyFlown = (leg) => !leg.isSuperseded;
  *
  *   The general move: when a rule fails on a real document, resist
  *   special-casing that document. Find the PROPERTY that distinguishes it.
+ *
+ *   A second real case then narrowed that clause — an Air Canada return trip,
+ *   Lisbon to Orlando and back:
+ *
+ *     AC813   LIS -> YUL   booked, flown
+ *     AC1096  YUL -> MCO   booked, NOT flown
+ *     AC1098  YUL -> MCO   replacement for AC1096
+ *     AC1637  MCO -> YUL   booked, the return's first leg, twelve days later
+ *     AC812   YUL -> LIS   booked, the return's second leg
+ *
+ *   MCO is an airport a replacement delivered the passenger to, so the clause
+ *   as first written refused to start a chain there and the entire return trip
+ *   fell out of the booking: AC1637 dropped into the replacement list standing
+ *   in for nothing, and the return read "Direct, YUL -> LIS".
+ *
+ *   What separates the two is not the airline or the twelve-day gap. AMS is an
+ *   airport the booking NEVER REACHES; MCO is the arrival of a booked leg. The
+ *   replacement took her exactly where she had always been going, so of course
+ *   the return starts there. Only an airport reached ONLY by a replacement is
+ *   somewhere the passenger never meant to be.
  */
 function buildOriginalBookingChains(legs) {
-  const airportsReachedByReplacements = new Set(
-    legs.filter((leg) => leg.isReplacement && leg.arrivalIata).map((leg) => leg.arrivalIata)
+  const airportsTheBookingReaches = new Set(
+    legs.filter((leg) => !leg.isReplacement && leg.arrivalIata).map((leg) => leg.arrivalIata)
+  );
+
+  // Somewhere the passenger only ended up because something fell through — as
+  // opposed to a booked destination that a replacement happened to deliver them
+  // to, which is still a perfectly good place for the next journey to begin.
+  const airportsReachedOnlyByReplacements = new Set(
+    legs
+      .filter((leg) => leg.isReplacement && leg.arrivalIata)
+      .map((leg) => leg.arrivalIata)
+      .filter((iata) => !airportsTheBookingReaches.has(iata))
   );
 
   const chains = [];
@@ -2086,7 +2458,7 @@ function buildOriginalBookingChains(legs) {
   legs.forEach((leg) => {
     if (claimedLegIds.has(leg.id)) return;
     if (leg.isReplacement) return;
-    if (airportsReachedByReplacements.has(leg.departureIata)) return;
+    if (airportsReachedOnlyByReplacements.has(leg.departureIata)) return;
 
     const chain = walkChainForward(legs, leg, (candidateLeg) =>
       wasPartOfOriginalBooking(candidateLeg) && !claimedLegIds.has(candidateLeg.id));
@@ -2736,6 +3108,9 @@ exports.buildAnalysisResponse = buildAnalysisResponse;
 exports.normalizeLeg = normaliseExtractedLeg;
 exports.codesTheFileCannotSettle = codesTheFileCannotSettle;
 exports.readAirlineLookupAnswer = readAirlineLookupAnswer;
+exports.claimLimitLabel = claimLimitLabel;
+exports.checkAirportsForEoc = checkAirportsForEoc;
+exports.eocLookupsFor = eocLookupsFor;
 exports.normalisePassengers = normalisePassengers;
 exports.resolveLegDates = resolveMissingYears;
 exports.FLAGS = FLAGS;

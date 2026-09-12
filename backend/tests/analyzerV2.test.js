@@ -383,6 +383,47 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
   assert.equal(replacementLegs[2].pnr, 'LJMEND', 'and LJMEND is a real one');
 }
 
+// --- a return that starts where a replacement landed --------------------------------
+// The Swiss case above forbids a chain from starting at an airport a replacement
+// delivered the passenger to. This is the case that narrowed that ban: an Air
+// Canada return where the replacement landed at the BOOKED destination, so the
+// return trip genuinely begins there.
+{
+  const ac = (flightNumber, from, to, date) => leg({
+    flightNumber,
+    marketingAirline: 'Air Canada', marketingAirlineIata: 'AC',
+    operatingAirline: 'Air Canada', operatingAirlineIata: 'AC',
+    pnr: 'A6RFKW',
+    departureIata: from, arrivalIata: to, departureCity: from, arrivalCity: to,
+    departureDate: date, arrivalDate: date
+  });
+
+  const { journeys, replacementItineraries } = buildItinerary([
+    ac('AC813', 'LIS', 'YUL', '2026-08-13'),
+    ac('AC1096', 'YUL', 'MCO', '2026-08-13'),
+    ac('AC1098', 'YUL', 'MCO', '2026-08-13'),
+    ac('AC1637', 'MCO', 'YUL', '2026-08-25'),
+    ac('AC812', 'YUL', 'LIS', '2026-08-25')
+  ]);
+
+  assert.equal(journeys.length, 2, 'an outbound and a return');
+  assert.deepEqual(flightNumbers(journeys[0].legs), ['AC813', 'AC1096'], 'the outbound as it was sold');
+
+  // The bug this exists for: AC1637 was refused as the head of a chain because
+  // AC1098, the replacement, had landed at MCO. The whole return then fell out
+  // of the booking and surfaced as an orphan in the replacement list, leaving
+  // the return itself reading "Direct, YUL -> LIS".
+  assert.deepEqual(
+    flightNumbers(journeys[1].legs), ['AC1637', 'AC812'],
+    'the return keeps its first leg, though a replacement had delivered her to MCO'
+  );
+  assert.equal(journeys[1].isDirect, false, 'so it is a connection, not a direct flight');
+
+  assert.equal(replacementItineraries.length, 1, 'the only rerouting is the one standing in for AC1096');
+  assert.deepEqual(flightNumbers(replacementItineraries[0].legs), ['AC1098']);
+  assert.equal(replacementItineraries[0].insteadOf.flightNumber, 'AC1096');
+}
+
 // --- a rebooking that reroutes: MAD->GRU becomes MAD->LIS->GRU -----------------------
 {
   const p = (overrides) => leg({ passengerNames: ['SOLO/TRAVELLER'], ...overrides });
@@ -954,11 +995,11 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
   // adding a key to this list, you are changing the shared engine, and that
   // needs to be a decision rather than a way to get the suite green.
   //
-  // Two divergences are about VALUES rather than keys, so no amount of stripping
-  // would surface them here - the fixtures below simply do not contain the
-  // inputs that trigger them. They are asserted explicitly in the block after
-  // this one instead, so they are recorded as tested facts rather than as
-  // something a future reader has to rediscover.
+  // Three divergences are about VALUES rather than keys, so no amount of
+  // stripping would surface them here - the fixtures below simply do not
+  // contain the inputs that trigger them. They are asserted explicitly in the
+  // block after this one instead, so they are recorded as tested facts rather
+  // than as something a future reader has to rediscover.
   const SPECIALIST_ONLY_FIELDS = [
     'tickets', 'travellers', 'pnrIsSplit', 'flightNumberAsPrinted',
     // Each airport's full name and country - on a leg, and on a journey's two
@@ -1116,13 +1157,13 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
 }
 
 // --- the divergences that are about values, not keys --------------------------
-// v2 applies airline-specific rules the passenger tool does not have. These
-// assertions exist so the difference is DOCUMENTED AND DELIBERATE: if someone
-// later ports these rules into the claim-intake engine, these two assertions
-// fail and tell them to delete this block, rather than the difference quietly
-// persisting or quietly vanishing.
+// v2 applies rules the passenger tool does not have. These assertions exist so
+// the difference is DOCUMENTED AND DELIBERATE: if someone later ports these
+// rules into the claim-intake engine, these assertions fail and tell them to
+// delete this block, rather than the difference quietly persisting or quietly
+// vanishing.
 //
-// Both are bugs in the passenger tool, not features. Worth fixing there too.
+// All are bugs in the passenger tool, not features. Worth fixing there too.
 {
   const claimIntakeEngine = require('../controllers/claimIntakeController').buildItinerary;
 
@@ -1154,6 +1195,38 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
   assert.equal(
     claimIntakeEngine(norse()).journeys[0].legs[0].flightNumber, 'NO379',
     'the passenger tool carries the misread forward'
+  );
+
+  // A return trip that starts where a replacement landed. v2 refuses to seed a
+  // chain only at an airport the booking NEVER reaches; the passenger tool
+  // refuses at any airport a replacement touched, which costs it the entire
+  // return of this Lisbon - Orlando trip. See buildOriginalBookingChains.
+  const returnAfterReplacement = () => {
+    const ac = (flightNumber, from, to, date) => leg({
+      flightNumber,
+      marketingAirline: 'Air Canada', marketingAirlineIata: 'AC',
+      operatingAirline: 'Air Canada', operatingAirlineIata: 'AC',
+      pnr: 'A6RFKW',
+      departureIata: from, arrivalIata: to, departureCity: from, arrivalCity: to,
+      departureDate: date, arrivalDate: date
+    });
+
+    return [
+      ac('AC813', 'LIS', 'YUL', '2026-08-13'),
+      ac('AC1096', 'YUL', 'MCO', '2026-08-13'),
+      ac('AC1098', 'YUL', 'MCO', '2026-08-13'),
+      ac('AC1637', 'MCO', 'YUL', '2026-08-25'),
+      ac('AC812', 'YUL', 'LIS', '2026-08-25')
+    ];
+  };
+
+  assert.deepEqual(
+    flightNumbers(buildItinerary(returnAfterReplacement()).journeys[1].legs), ['AC1637', 'AC812'],
+    'v2 keeps the return whole, because MCO was the booked destination'
+  );
+  assert.deepEqual(
+    flightNumbers(claimIntakeEngine(returnAfterReplacement()).journeys[1].legs), ['AC812'],
+    'the passenger tool loses the return leg to the replacement list - a bug there'
   );
 }
 
@@ -1462,4 +1535,261 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
   assert.equal(flight.pnrIsSplit, false, 'so no false "separate PNRs"');
 }
 
-console.log('analyzerV2: all assertions passed');
+// --- the airline-list card behind each airline name ---------------------------
+// Step 4a. Hovering an airline's name opens what airlines_codes.json says about
+// it - what the old analyzer's claim-document list shows.
+{
+  const { claimLimitLabel } = require('../controllers/analyzerV2Controller');
+  const flightIn = (legs) => buildAnalysisResponse({
+    documentType: 'e_ticket', evidenceMode: 'documents', passengers: [], bookingReferences: [], legs
+  }).booking.journeys[0].legs[0];
+
+  // "Saudi Arabian Airlines" is not a name the file has, and Saudia is the
+  // only airline flying SV, so the row says Saudia and the card is Saudia's.
+  const saudia = flightIn([leg({
+    flightNumber: 'SV1234', marketingAirline: 'Saudi Arabian Airlines', marketingAirlineIata: 'SV',
+    operatingAirline: '', operatingAirlineIata: ''
+  })]);
+  assert.equal(saudia.marketingAirline, 'Saudia');
+  assert.deepEqual(
+    saudia.marketingAirlineDetails,
+    {
+      name: 'Saudia', iata: 'SV', icao: 'SVA', ticketPrefix: '065',
+      requiredDocuments: 'Ticket number, Passport / ID', claimNote: '',
+      ticketNumberCanReplacePnr: false, oneTimeSubmission: false, ceasedOperations: false,
+      country: 'Saudi Arabia', claimLimit: 'N/A'
+    },
+    'the card carries what the old analyzer shows, from the same file'
+  );
+  assert.equal(saudia.operatingAirlineDetails, null, 'no operating airline, no second card');
+
+  // A codeshare: each name opens its own airline.
+  const codeshare = flightIn([leg({
+    flightNumber: 'BA7061', operatingAirline: 'Iberia Airlines', operatingAirlineIata: 'IB'
+  })]);
+  assert.equal(codeshare.marketingAirlineDetails.name, 'British Airways');
+  assert.equal(codeshare.marketingAirlineDetails.requiredDocuments, '', 'British Airways asks for nothing extra');
+  assert.equal(codeshare.marketingAirlineDetails.claimLimit, '6 years', 'and is registered in the United Kingdom');
+  assert.equal(codeshare.operatingAirlineDetails.icao, 'IBE', 'Iberia is found, though BA7061 is not its code');
+  assert.equal(
+    codeshare.operatingAirlineDetails.claimNote,
+    'can proceed without ticket number / Not without passport number'
+  );
+
+  // An airline that has stopped flying still has its entry, and it says so.
+  const ceased = flightIn([leg({ flightNumber: 'VX900', marketingAirline: 'Virgin America', operatingAirline: '' })]);
+  assert.equal(ceased.marketingAirlineDetails.ceasedOperations, true);
+
+  // A name the file does not have gets no card: "No documents required", which
+  // the old analyzer shows for it, would be a guess.
+  const unknown = flightIn([leg({ flightNumber: '7Q123', marketingAirline: 'Coral Travel', operatingAirline: '' })]);
+  assert.equal(unknown.marketingAirline, 'Coral Travel');
+  assert.equal(unknown.marketingAirlineDetails, null);
+
+  assert.equal(claimLimitLabel('Germany'), '3 years');
+  assert.equal(claimLimitLabel('Malta'), 'No Limit', 'a note that is not a number of years is shown as it is');
+  assert.equal(claimLimitLabel('Sweden'), '2 Months - 10 years');
+  assert.equal(claimLimitLabel(''), 'N/A');
+}
+
+// --- the trackers behind each flight ------------------------------------------
+// Step 4c. Every flight carries the three tracker links, built from the flight
+// number the engine settled on and the search codes the airline needs.
+{
+  const { buildTrackerLinks } = require('../utils/flightTrackerLinks');
+  const flightIn = (legs) => buildAnalysisResponse({
+    documentType: 'e_ticket', evidenceMode: 'documents', passengers: [], bookingReferences: [], legs
+  }).booking.journeys[0].legs[0];
+
+  const british = flightIn([leg({ flightNumber: 'BA0568' })]);
+  assert.deepEqual(
+    british.trackers,
+    {
+      airportInfo: 'https://airportinfo.live/flight/ba0568?d=2026-08-24',
+      flightStats: 'https://www.flightstats.com/v2/historical-flight/BA/568/2026/8/24',
+      flightera: 'https://www.flightera.net/en/flight/BA568/Aug-2026#flight_list',
+      unavailable: ''
+    },
+    'AirportInfo takes the number as printed, the other two without its leading zero'
+  );
+
+  // French bee does not resolve on FlightStats under BF - the file says to
+  // search B2F there - and the other two keep the code.
+  const frenchBee = buildTrackerLinks('BF711', '2026-03-08');
+  assert.match(frenchBee.flightStats, /historical-flight\/B2F\/711\//);
+  assert.match(frenchBee.airportInfo, /flight\/bf711\?/);
+  assert.match(frenchBee.flightera, /flight\/BF711\//);
+
+  // Iberojet is one of the two airlines the file overrides on all three.
+  const iberojet = buildTrackerLinks('E9101', '2026-03-08');
+  assert.match(iberojet.airportInfo, /flight\/eve101\?/);
+  assert.match(iberojet.flightStats, /historical-flight\/EVE\/101\//);
+  assert.match(iberojet.flightera, /flight\/EVE101\//);
+
+  // A flight with no date cannot be looked up, and says so rather than
+  // carrying a link to the wrong day.
+  const undated = flightIn([leg({ departureDate: '', arrivalDate: '' })]);
+  assert.deepEqual(
+    undated.trackers,
+    { airportInfo: '', flightStats: '', flightera: '', unavailable: 'NO_FULL_DATE' }
+  );
+
+  // Nor can a partial the engine kept alive, or a row that printed two flight
+  // numbers, or a flight the document never numbered.
+  assert.equal(buildTrackerLinks('BA568', '05MAR').unavailable, 'NO_FULL_DATE');
+  assert.equal(buildTrackerLinks('BA494/AA7041', '2026-08-24').unavailable, 'FLIGHT_NUMBER_UNCLEAR');
+  assert.equal(buildTrackerLinks('', '2026-08-24').unavailable, 'FLIGHT_NUMBER_UNCLEAR');
+}
+
+// --- what a distance is worth -------------------------------------------------
+// Step 4d. Hovering a distance shows EC261 Article 7's amount for it - and, on
+// one flight of a connection, the journey figure that is the actual claim.
+{
+  const { compensationFor } = require('../utils/ec261Compensation');
+
+  // The three bands, on their boundaries.
+  assert.equal(compensationFor({ distanceKm: 1500, fromCountry: 'Spain', toCountry: 'Spain' }).amount, 250);
+  assert.equal(compensationFor({ distanceKm: 1501, fromCountry: 'Spain', toCountry: 'Spain' }).amount, 400);
+  assert.equal(compensationFor({ distanceKm: 3500, fromCountry: 'Brazil', toCountry: 'Chile' }).amount, 400);
+  assert.equal(compensationFor({ distanceKm: 3501, fromCountry: 'Brazil', toCountry: 'Chile' }).amount, 600);
+
+  // Article 7 caps a flight that stays inside the Community: Paris to Réunion
+  // is more than 9000 km and is still 400.
+  const reunion = compensationFor({ distanceKm: 9346, fromCountry: 'France', toCountry: 'Reunion' });
+  assert.equal(reunion.amount, 400);
+  assert.equal(reunion.band, 'INTRA_EU_LONG_HAUL');
+  assert.equal(reunion.intraEu, true);
+
+  // No distance, no amount - and no distance on the screen to hover either.
+  assert.equal(compensationFor({ distanceKm: null, fromCountry: 'Spain', toCountry: 'Spain' }), null);
+
+  // Every distance the screen prints carries its own amount: each flight's,
+  // and the journey's end to end.
+  const iberia = (from, to, flightNumber) => leg({
+    flightNumber,
+    marketingAirline: 'Iberia Airlines', marketingAirlineIata: 'IB',
+    operatingAirline: 'Iberia Airlines', operatingAirlineIata: 'IB',
+    departureIata: from, arrivalIata: to, departureCity: from, arrivalCity: to
+  });
+
+  const connecting = buildAnalysisResponse({
+    documentType: 'e_ticket', evidenceMode: 'documents', passengers: [], bookingReferences: [],
+    legs: [iberia('OPO', 'MAD', 'IB0550'), iberia('MAD', 'GRU', 'IB0267')]
+  }).booking.journeys[0];
+
+  assert.equal(connecting.compensation.amount, 600, 'Porto to Sao Paulo, end to end');
+  assert.equal(connecting.compensation.band, 'LONG_HAUL');
+  assert.equal(connecting.legs[0].compensation.amount, 250, 'Porto to Madrid, on its own');
+  assert.equal(connecting.legs[1].compensation.amount, 600, 'Madrid to Sao Paulo');
+  assert.equal(connecting.legs[0].compensation.currency, 'EUR');
+
+  const direct = buildAnalysisResponse({
+    documentType: 'e_ticket', evidenceMode: 'documents', passengers: [], bookingReferences: [], legs: [leg()]
+  }).booking.journeys[0];
+  assert.equal(direct.compensation.amount, 250, 'London to Lyon, and both ends are in the EU');
+}
+
+// --- extraordinary circumstances, marked on the airport they hit --------------
+// Step 4b reads the EOC records from the database, so it runs outside the
+// engine and takes the lookup as an argument. The fake below answers the way
+// eocService.findEOCEvents does: an event is recorded against an airport code
+// or a country, on one day - or from its start, for an ongoing issue.
+async function eocCheckAssertions() {
+  const { checkAirportsForEoc, eocLookupsFor } = require('../controllers/analyzerV2Controller');
+
+  const strikeInRome = {
+    _id: 'strike', category: 'Strike', date: '2026-08-07',
+    event: 'Air traffic control strike', location: 'FCO', decision: 'REJECT'
+  };
+  const italianAirspace = {
+    _id: 'airspace', category: 'Ongoing issue', date: '2026-07-01',
+    event: 'Airspace restrictions', location: 'Italy', decision: 'REJECT',
+    lifecycle: { startDate: '2026-07-01', endDate: '', note: '' }
+  };
+
+  const airportsAsked = [];
+  const findEvents = async ({ date, originIata, originCountry }) => {
+    airportsAsked.push(`${originIata} ${date}`);
+    const events = [strikeInRome, italianAirspace].filter((record) =>
+      [originIata, originCountry].includes(record.location)
+      && (/ongoing/i.test(record.category) ? record.date <= date : record.date === date));
+    return { eocFound: events.length > 0, events };
+  };
+
+  const tripReply = (legs) => buildAnalysisResponse({
+    documentType: 'e_ticket', evidenceMode: 'documents', passengers: [], bookingReferences: [], legs
+  });
+  const ita = {
+    marketingAirline: 'ITA Airways', marketingAirlineIata: 'AZ',
+    operatingAirline: 'ITA Airways', operatingAirlineIata: 'AZ'
+  };
+
+  // Toronto to Rome on the day of the strike, landing the next morning, then
+  // on to Catania that day.
+  const reply = tripReply([
+    leg({
+      ...ita, flightNumber: 'AZ651',
+      departureIata: 'YYZ', departureCity: 'Toronto', departureCountry: 'Canada',
+      arrivalIata: 'FCO', arrivalCity: 'Rome', arrivalCountry: 'Italy',
+      departureDate: '2026-08-07', arrivalDate: '2026-08-08'
+    }),
+    leg({
+      ...ita, flightNumber: 'AZ1731',
+      departureIata: 'FCO', departureCity: 'Rome', departureCountry: 'Italy',
+      arrivalIata: 'CTA', arrivalCity: 'Catania', arrivalCountry: 'Italy',
+      departureDate: '2026-08-08', arrivalDate: '2026-08-08'
+    })
+  ]);
+
+  assert.equal(eocLookupsFor(reply).length, 4, 'Rome is looked up twice, once for each day');
+  await checkAirportsForEoc(reply, findEvents);
+  assert.equal(airportsAsked.length, 4, 'and each airport and day only once');
+
+  const [journey] = reply.booking.journeys;
+  const [toRome, toCatania] = journey.legs;
+  const ids = (events) => events.map((event) => event.id);
+
+  assert.deepEqual(ids(toRome.departureEoc), [], 'nothing in Toronto');
+  assert.deepEqual(ids(toRome.arrivalEoc), ['strike', 'airspace'], 'Rome, on the day of the strike');
+  assert.deepEqual(ids(toCatania.departureEoc), ['airspace'], 'the next day the strike is over');
+  assert.deepEqual(ids(toCatania.arrivalEoc), ['airspace'], 'an event recorded for a country marks each of its airports');
+  assert.deepEqual(ids(journey.origin.eoc), [], 'the heading marks Toronto as the first flight does');
+  assert.deepEqual(ids(journey.finalDestination.eoc), ['airspace'], 'and Catania as the last flight does');
+
+  assert.deepEqual(
+    toRome.arrivalEoc[1],
+    {
+      id: 'airspace', category: 'Ongoing issue', event: 'Airspace restrictions', location: 'Italy',
+      decision: 'REJECT', ongoing: true, startDate: '2026-07-01', endDate: '', closureNote: ''
+    },
+    'an ongoing issue carries when it started'
+  );
+  assert.equal(toRome.arrivalEoc[0].startDate, '', 'a one-off event does not');
+
+  // The records are kept by day, so a flight with no full date has nothing to
+  // be matched against.
+  const undated = tripReply([leg({ departureDate: '', arrivalDate: '' })]);
+  assert.deepEqual(eocLookupsFor(undated), [], 'a flight with no date is not looked up');
+  await checkAirportsForEoc(undated, findEvents);
+  assert.deepEqual(undated.booking.journeys[0].legs[0].departureEoc, [], 'and nothing is marked');
+
+  // If the records cannot be read, nothing is marked and the reply says so, so
+  // a specialist does not take an unmarked airport for a clear one.
+  const unreadable = tripReply([leg()]);
+  const realConsoleError = console.error;
+  console.error = () => {};
+  try {
+    await checkAirportsForEoc(unreadable, async () => { throw new Error('database unreachable'); });
+  } finally {
+    console.error = realConsoleError;
+  }
+  assert.deepEqual(unreadable.booking.journeys[0].legs[0].arrivalEoc, []);
+  assert.ok(
+    unreadable.warnings.some((warning) => warning.code === 'EOC_CHECK_FAILED'),
+    'a check that could not run is a warning, not a clear result'
+  );
+}
+
+eocCheckAssertions().then(() => {
+  console.log('analyzerV2: all assertions passed');
+});

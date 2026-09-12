@@ -1,3 +1,4 @@
+import AirlineName from './AirlineName.jsx';
 import RouteBlock from './RouteBlock.jsx';
 import {
   flagTone,
@@ -57,12 +58,16 @@ export default function FlightRow({ leg, muted = false, suppressFlags = [], show
       <div className="av2-flight__header">
         <div className="av2-flight__id">
           <span className="av2-flight__number">{leg.flightNumber || '—'}</span>
-          <span className="av2-flight__airline">
-            {leg.marketingAirline || 'Unknown airline'}
-          </span>
+          {/* Each name opens its airline's card on hover - see AirlineName. */}
+          <AirlineName
+            className="av2-flight__airline"
+            name={leg.marketingAirline || 'Unknown airline'}
+            details={leg.marketingAirlineDetails}
+          />
           {operatedByOther && (
             <span className="av2-flight__operated">
-              operated by {leg.operatingAirline}
+              operated by{' '}
+              <AirlineName name={leg.operatingAirline} details={leg.operatingAirlineDetails} />
             </span>
           )}
         </div>
@@ -85,15 +90,19 @@ export default function FlightRow({ leg, muted = false, suppressFlags = [], show
             iata: leg.departureIata,
             airportName: leg.departureAirportName,
             city: leg.departureCity,
-            country: leg.departureCountry
+            country: leg.departureCountry,
+            eoc: leg.departureEoc
           }}
           to={{
             iata: leg.arrivalIata,
             airportName: leg.arrivalAirportName,
             city: leg.arrivalCity,
-            country: leg.arrivalCountry
+            country: leg.arrivalCountry,
+            eoc: leg.arrivalEoc
           }}
           distanceKm={leg.distanceKm}
+          compensation={leg.compensation}
+          flight={{ flightNumber: leg.flightNumber, date: leg.departureDate, trackers: leg.trackers }}
         />
       )}
 

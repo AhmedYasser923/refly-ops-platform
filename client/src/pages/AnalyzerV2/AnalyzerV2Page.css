@@ -403,7 +403,7 @@
 
 .av2-route {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(56px, 88px) minmax(0, 2fr);
+  grid-template-columns: minmax(0, 2fr) minmax(64px, 96px) minmax(0, 2fr);
   align-items: start;
   gap: 10px;
   padding: 2px 0 6px;
@@ -507,6 +507,438 @@
 .av2-route--journey .av2-route__air::before,
 .av2-route--journey .av2-route__air::after {
   border-top-color: var(--accent-border);
+}
+
+/* --- Tracker circles ------------------------------------------------------ */
+
+/* The flight trackers for one flight, under its AIR line: one button that opens
+   all three, then AirportInfo, FlightStats and Flightera. Round and icon-only
+   because the column between the two airports is narrow - each button carries
+   its name for a pointer and for a screen reader. Four fit on one line at the
+   column's full width and wrap two-by-two below it. */
+
+.av2-trackers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-1);
+  padding-top: 2px;
+}
+
+.av2-tracker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: var(--bg-chip);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.av2-tracker:hover:not(.av2-tracker--off) {
+  background: var(--bg-hover);
+  border-color: var(--accent-border);
+}
+
+.av2-tracker:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* Clipped round as well: two of the three brand icons carry their own square
+   background - Flightera's is white - which reads as a block in a round button
+   otherwise. */
+.av2-tracker img {
+  width: 14px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 999px;
+}
+
+/* The one that opens all three, in the accent so it reads as the action among
+   the three brands rather than as a fourth tracker. */
+.av2-tracker--all {
+  color: var(--accent-hover);
+  background: var(--accent-dim);
+  border-color: var(--accent-border);
+}
+
+.av2-tracker--all svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* No full date, or two flight numbers printed in one row. The buttons stay,
+   greyed, and say why on hover: dropping them would read as "this flight has
+   no trackers" rather than "this flight cannot be looked up yet". */
+.av2-tracker--off {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+/* --- What a distance is worth ---------------------------------------------- */
+/* Hovering or focusing the distance opens EC261 Article 7's amount for it (see
+   RouteDistance.jsx). Only a distance the server priced gets the wrapper, so an
+   unpriced one lays out exactly as it did before. */
+
+.av2-route__measure {
+  position: relative;
+  display: block;
+}
+
+.av2-route__distance--payable {
+  cursor: help;
+  text-decoration: underline dotted var(--text-ghost);
+  text-underline-offset: 3px;
+}
+
+.av2-route__measure:hover .av2-route__distance--payable {
+  text-decoration-color: currentColor;
+}
+
+.av2-route__distance--payable:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* Centred on the distance, which sits in the narrow middle column, so the card
+   opens evenly into the space either side of it. Upwards, because everything
+   below the distance in that column - the AIR line, the tracker buttons - is
+   the part a specialist is reaching for next. */
+.av2-comp-card {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  z-index: 20;
+  width: max-content;
+  max-width: min(280px, 72vw);
+  padding-bottom: var(--space-2);
+  transform: translateX(-50%);
+}
+
+.av2-comp-card[hidden] {
+  display: none;
+}
+
+.av2-comp-card__amount {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--success);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--success);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* --- Airport code marked with an EOC --------------------------------------- */
+/* An extraordinary circumstance hit this airport on the day of the flight
+   (see AirportCode.jsx). The code turns red and pulses, and hovering or
+   focusing it opens a card with the events. Only a marked code gets the
+   wrapper, so an unmarked one lays out exactly as before. */
+
+.av2-route__eoc {
+  position: relative;
+  display: block;
+  width: fit-content;
+}
+
+/* The destination end is right-aligned, so its code sits against the right
+   edge, and its card opens from there. */
+.av2-route__point:last-child .av2-route__eoc {
+  margin-left: auto;
+}
+
+.av2-route__code--eoc {
+  color: var(--danger);
+  cursor: help;
+  border-radius: var(--radius-sm);
+  animation: av2-eoc-pulse 1.6s ease-in-out infinite;
+}
+
+.av2-route__code--eoc:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--danger-border);
+}
+
+@keyframes av2-eoc-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 0 transparent;
+  }
+
+  50% {
+    opacity: 0.7;
+    text-shadow: 0 0 14px var(--danger);
+  }
+}
+
+/* Still red for anyone who has asked for less motion, just not moving. */
+@media (prefers-reduced-motion: reduce) {
+  .av2-route__code--eoc {
+    animation: none;
+    text-shadow: 0 0 10px var(--danger-border);
+  }
+}
+
+/* The card hangs under the code. Its top padding is transparent and bridges
+   the gap, so the pointer can move from the code onto the card without the
+   card closing. */
+.av2-eoc-card {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  display: block;
+  width: max-content;
+  max-width: min(320px, 80vw);
+  padding-top: var(--space-2);
+  text-align: left;
+}
+
+.av2-eoc-card[hidden] {
+  display: none;
+}
+
+.av2-route__point:last-child .av2-eoc-card {
+  left: auto;
+  right: 0;
+}
+
+/* Solid, so the flights underneath do not show through: the danger tint laid
+   over the card colour. The type is set in full because the card can sit
+   inside the journey heading's <h3>. */
+.av2-eoc-card__body {
+  display: block;
+  padding: var(--space-3) var(--space-4);
+  background: linear-gradient(var(--danger-dim), var(--danger-dim)), var(--bg-card);
+  border: 1px solid var(--danger-border);
+  border-left: 3px solid var(--danger);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--text-primary);
+}
+
+.av2-eoc-card__title {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--danger);
+}
+
+.av2-eoc-card__event {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 2px var(--space-3);
+  padding: var(--space-2) 0;
+  border-top: 1px dashed var(--danger-border);
+}
+
+.av2-eoc-card__label {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.av2-eoc-card__value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* --- Airline name with its airline-list card ----------------------------- */
+/* The airline's entry in airlines_codes.json (see AirlineName.jsx): its codes,
+   ticket prefix and claim documents, and the country it is registered in with
+   that country's claim limit. The dotted underline says the name opens a card.
+   An airline the file does not have is plain text, with no wrapper. */
+
+.av2-airline {
+  position: relative;
+  display: inline-block;
+}
+
+.av2-airline__name {
+  cursor: help;
+  border-radius: var(--radius-sm);
+  text-decoration: underline dotted;
+  text-decoration-color: var(--text-muted);
+  text-underline-offset: 3px;
+}
+
+.av2-airline:hover .av2-airline__name {
+  text-decoration-color: currentColor;
+}
+
+.av2-airline__name:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+/* Hangs under the name, like the EOC card under an airport code: the
+   transparent top padding bridges the gap, so the pointer can reach it. */
+.av2-airline-card {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  display: block;
+  width: max-content;
+  max-width: min(360px, 80vw);
+  padding-top: var(--space-2);
+  text-align: left;
+}
+
+.av2-airline-card[hidden] {
+  display: none;
+}
+
+/* Solid, and the type set in full, so the row's small grey or purple text
+   does not carry into the card. */
+.av2-airline-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--text-primary);
+}
+
+.av2-airline-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.av2-airline-card__name {
+  font-weight: 700;
+}
+
+/* "Saudi Arabia (N/A)": where the airline is registered, and that country's
+   claim limit - the pill the old analyzer puts beside each airline. */
+.av2-airline-card__country {
+  flex-shrink: 0;
+  padding: 2px var(--space-2);
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: var(--bg-chip);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.av2-airline-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* An airline with no codes, prefix or flags on file. */
+.av2-airline-card__chips:empty {
+  display: none;
+}
+
+.av2-airline-chip {
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: var(--bg-chip);
+  border-radius: var(--radius-sm);
+}
+
+.av2-airline-chip--code {
+  font-family: var(--font-mono);
+  font-variant-numeric: slashed-zero;
+  letter-spacing: 0.04em;
+}
+
+.av2-airline-chip--iata {
+  color: var(--accent-hover);
+  background: var(--accent-dim);
+}
+
+.av2-airline-chip--icao {
+  color: var(--purple);
+  background: var(--purple-dim);
+}
+
+.av2-airline-chip--warning {
+  color: var(--warning);
+  background: var(--warning-dim);
+}
+
+.av2-airline-chip--success {
+  color: var(--success);
+  background: var(--success-dim);
+}
+
+.av2-airline-chip--muted {
+  color: var(--text-muted);
+}
+
+.av2-airline-card__documents {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--border);
+}
+
+.av2-airline-card__label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.av2-airline-card__requirements {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.av2-airline-card__requirements--none {
+  color: var(--success);
+}
+
+/* A free-form note from the file: "PNR mandatory", "Either PNR or ticket
+   number". */
+.av2-airline-card__note {
+  padding: var(--space-1) var(--space-2);
+  color: var(--warning);
+  background: var(--warning-dim);
+  border-left: 3px solid var(--warning-border);
+  border-radius: var(--radius-sm);
+  overflow-wrap: anywhere;
 }
 
 /* --- Journey ------------------------------------------------------------- */
@@ -618,6 +1050,18 @@
 
 .av2-flight--muted {
   opacity: 0.58;
+}
+
+/* Dimming a row dims everything in it, an open card included, and the rows
+   underneath would show through the card. While any of the cards is open the
+   row is shown at full strength. A flight that was not flown is the likeliest
+   place to find an EOC. */
+.av2-flight--muted:has(
+  .av2-eoc-card:not([hidden]),
+  .av2-airline-card:not([hidden]),
+  .av2-comp-card:not([hidden])
+) {
+  opacity: 1;
 }
 
 .av2-flight__id {

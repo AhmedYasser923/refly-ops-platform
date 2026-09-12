@@ -29,6 +29,14 @@ export default function JourneyCard({ journey }) {
     (connection) => (connection.flags || []).length > 0
   );
 
+  // A direct journey IS one flight - `isDirect` is set when the booked chain has
+  // a single leg - and that flight's row prints no route block of its own, so
+  // the heading's block carries its tracker buttons. A journey with connections
+  // is not one flight, and its heading gets none; every row below has its own.
+  const directFlight = journey.isDirect && legs[0]
+    ? { flightNumber: legs[0].flightNumber, date: legs[0].departureDate, trackers: legs[0].trackers }
+    : null;
+
   return (
     <article className="av2-journey">
       <header className="av2-journey__header">
@@ -64,6 +72,8 @@ export default function JourneyCard({ journey }) {
             from={journey.origin}
             to={journey.finalDestination}
             distanceKm={journey.distanceKm}
+            compensation={journey.compensation}
+            flight={directFlight}
           />
         </h3>
       </header>

@@ -313,6 +313,17 @@ function findAirlineNamed(name, airlines) {
 }
 
 /**
+ * The file's entry for an airline name on a flight. The airlines holding the
+ * flight number's code are searched first, so a name two airlines share means
+ * the one on this code; then the whole file, for an airline flying under
+ * another's code - a codeshare's operating airline. null when it is not there.
+ */
+function findAirlineRecord(name, flightNumber) {
+  return findAirlineNamed(name, airlinesHoldingCode(carrierCodeOf(flightNumber)))
+    || findAirlineNamed(name, airlinesCodesData);
+}
+
+/**
  * Names the airline that flew one flight.
  *
  * In this order, stopping at the first that answers:
@@ -338,8 +349,7 @@ function resolveAirline({ nameFromModel, flightNumber, airlinesFoundOnline = {} 
   const name = String(nameFromModel || '').trim();
   const code = carrierCodeOf(flightNumber);
 
-  const namedAirline = findAirlineNamed(name, airlinesHoldingCode(code))
-    || findAirlineNamed(name, airlinesCodesData);
+  const namedAirline = findAirlineRecord(name, flightNumber);
   if (namedAirline && !namedAirline.ceasedOperations) {
     return { name, iata: '', source: 'document', unsettledCode: '' };
   }
@@ -367,6 +377,7 @@ module.exports = {
   airlinesHoldingCode,
   activeAirlinesForCode,
   findAirlineNamed,
+  findAirlineRecord,
   resolveAirline,
   STANDARD_BOOKING_CODE
 };
