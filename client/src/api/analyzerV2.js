@@ -30,3 +30,22 @@ export const analyzeDocuments = async ({ files, signal }) => {
 
   return parseJsonResponse(response);
 };
+
+// Re-runs the analysis with a year the specialist chose for one flight.
+//
+// `extraction` is the field the previous reply carried - the facts the model
+// read - so no document is uploaded and no model is called. The server rebuilds
+// the whole trip, because a year decides the order of the flights and not only
+// the label on a row. The reply has the same shape as analyzeDocuments', without
+// cost or model.
+export const rebuildWithYear = async ({ extraction, yearPin, signal }) => {
+  const response = await fetch('/api/analyzer-v2/rebuild', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ extraction, yearPin }),
+    signal
+  });
+
+  return parseJsonResponse(response);
+};

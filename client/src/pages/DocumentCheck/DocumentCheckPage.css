@@ -220,6 +220,18 @@
   color: #5eead4;
 }
 
+.document-check-badge--direct-operator {
+  border-color: rgba(99, 102, 241, 0.45);
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+}
+
+.document-check-badge--fast-track {
+  border-color: rgba(34, 197, 94, 0.45);
+  background: rgba(34, 197, 94, 0.12);
+  color: #86efac;
+}
+
 .document-check-badge--ceased {
   border-color: rgba(148, 163, 184, 0.45);
   background: rgba(148, 163, 184, 0.12);
@@ -245,6 +257,12 @@
   gap: 14px;
   padding: 10px 0;
   border-top: 1px solid var(--border-inner);
+}
+
+/* A row that follows a note rather than the badges, so it needs the gap the
+   note would otherwise have given it. */
+.document-check-row--spaced {
+  margin-top: 12px;
 }
 
 .document-check-row span {

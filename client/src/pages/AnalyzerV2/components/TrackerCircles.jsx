@@ -17,7 +17,8 @@ import { formatDate, formatTrackerUnavailable } from '../analyzerV2Utils.js';
  * A flight with no full date, or with two flight numbers printed in one row,
  * cannot be looked up: the same row renders dimmed, saying why.
  */
-const TRACKERS = [
+// Shared with JourneyTrackers, so a journey's buttons are the same three.
+export const TRACKERS = [
   { key: 'airportInfo', label: 'AirportInfo', icon: '/images/tracker-airportinfo.ico' },
   { key: 'flightStats', label: 'FlightStats', icon: '/images/tracker-flightstats.png' },
   { key: 'flightera', label: 'Flightera', icon: '/images/tracker-flightera.png' }

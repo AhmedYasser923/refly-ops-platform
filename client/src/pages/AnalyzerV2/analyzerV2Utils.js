@@ -31,6 +31,24 @@ export function formatDate(value) {
   return `${WEEKDAYS[date.getUTCDay()]}, ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
 }
 
+/**
+ * "2026-03-26" -> "Thu, 26 Mar", for a row that prints the year on its own so a
+ * specialist can correct it (see YearPicker). '' for anything but a full date.
+ */
+export function formatDayAndMonth(value) {
+  if (!value || !ISO_DATE.test(value)) return '';
+
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return '';
+
+  return `${WEEKDAYS[date.getUTCDay()]}, ${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]}`;
+}
+
+/** "2026-03-26" -> 2026, or null for anything but a full date. */
+export function yearOfDate(value) {
+  return value && ISO_DATE.test(value) ? Number(value.slice(0, 4)) : null;
+}
+
 /** "2026-03-26" -> "26 Mar". For dense rows where the year is already obvious. */
 export function formatDateShort(value) {
   if (!value || !ISO_DATE.test(value)) return value || '';

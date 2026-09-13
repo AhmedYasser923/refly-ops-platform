@@ -31,4 +31,12 @@ router.post(
   analyzerV2Controller.analyzeDocuments
 );
 
+// A year correction re-runs the engine on the facts the first run extracted.
+// JSON only, no model call - so no upload parsing and no per-user AI rate
+// limit, since a specialist may try more than one year on a case.
+router.post(
+  '/api/analyzer-v2/rebuild',
+  analyzerV2Controller.rebuildWithYear
+);
+
 module.exports = router;

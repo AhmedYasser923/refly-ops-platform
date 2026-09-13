@@ -17,7 +17,9 @@ import ReplacementGroup from './ReplacementGroup.jsx';
 // from "we assumed the year", and must not look like one.
 const SEVERE_WARNINGS = new Set(['TIMELINE_INCOMPLETE', 'UNREADABLE_VALUE']);
 
-export default function ResultsPanel({ result }) {
+// `onChangeYear` and `rebuilding` are only passed down to the flight rows, where
+// an assumed year can be corrected - see YearPicker.
+export default function ResultsPanel({ result, onChangeYear, rebuilding = false }) {
   const journeys = result.booking?.journeys || [];
   const replacementItineraries = result.replacementItineraries || [];
   const passengers = result.passengers || [];
@@ -38,7 +40,7 @@ export default function ResultsPanel({ result }) {
   }
 
   return (
-    <div className="av2-results">
+    <div className={`av2-results${rebuilding ? ' av2-results--rebuilding' : ''}`} aria-busy={rebuilding}>
       {warnings.length > 0 && (
         <ul className="av2-warnings" aria-label="Warnings">
           {[...warnings]
@@ -120,7 +122,12 @@ export default function ResultsPanel({ result }) {
         <h2 className="av2-section-title">Original booking</h2>
         {journeys.length > 0 ? (
           journeys.map((journey) => (
-            <JourneyCard key={journey.id} journey={journey} />
+            <JourneyCard
+              key={journey.id}
+              journey={journey}
+              onChangeYear={onChangeYear}
+              rebuilding={rebuilding}
+            />
           ))
         ) : (
           <p className="av2-summary__none">No booked journey could be reconstructed.</p>
@@ -131,7 +138,12 @@ export default function ResultsPanel({ result }) {
         <section aria-label="Replacement flights">
           <h2 className="av2-section-title">Replacement flights</h2>
           {replacementItineraries.map((itinerary) => (
-            <ReplacementGroup key={itinerary.id} itinerary={itinerary} />
+            <ReplacementGroup
+              key={itinerary.id}
+              itinerary={itinerary}
+              onChangeYear={onChangeYear}
+              rebuilding={rebuilding}
+            />
           ))}
         </section>
       )}

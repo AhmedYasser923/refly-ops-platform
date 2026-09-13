@@ -252,6 +252,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+  transition: opacity var(--transition);
+}
+
+/* A year correction is being rebuilt on the server. Dimmed rather than hidden,
+   so the specialist keeps their place on the page. */
+.av2-results--rebuilding {
+  opacity: 0.55;
+  pointer-events: none;
 }
 
 .av2-section-title {
@@ -913,6 +921,20 @@
   color: var(--text-muted);
 }
 
+/* Purple like the ICAO chip, but in the sans face, so it reads as a label and
+   not as a code - and not as another green "One-time submission". */
+.av2-airline-chip--fast-track {
+  color: var(--purple);
+  background: var(--purple-dim);
+}
+
+/* Outlined rather than filled, so it does not read as a second IATA chip. */
+.av2-airline-chip--operator {
+  color: var(--accent-hover);
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--accent-border);
+}
+
 .av2-airline-card__documents {
   display: flex;
   flex-direction: column;
@@ -1114,6 +1136,83 @@
    different fact from "no date", and it must not be dressed as one. */
 .av2-flight__date--unreadable {
   color: var(--danger);
+}
+
+/* An assumed year, which a specialist can change (YearPicker). Underlined the
+   way a hoverable airline name is, so it reads as something to click without
+   shouting on every row of a boarding-pass upload. */
+.av2-year {
+  position: relative;
+  display: inline-block;
+}
+
+.av2-year__button {
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--text-muted);
+  text-underline-offset: 3px;
+}
+
+.av2-year__button:hover {
+  color: var(--accent-hover);
+  text-decoration-color: currentColor;
+}
+
+.av2-year__button:focus-visible {
+  outline: none;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-focus);
+}
+
+.av2-year__button:disabled {
+  cursor: progress;
+}
+
+.av2-year__list {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  z-index: 20;
+  max-height: 240px;
+  margin: 0;
+  padding: var(--space-1);
+  overflow-y: auto;
+  list-style: none;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.av2-year__option {
+  display: block;
+  width: 100%;
+  padding: var(--space-1) var(--space-4);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  text-align: right;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.av2-year__option:hover,
+.av2-year__option:focus-visible {
+  outline: none;
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.av2-year__option--current {
+  color: var(--accent-hover);
+  background: var(--accent-dim);
 }
 
 .av2-flight__pnr {

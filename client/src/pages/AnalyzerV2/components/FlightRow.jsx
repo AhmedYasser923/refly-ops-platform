@@ -1,9 +1,12 @@
 import AirlineName from './AirlineName.jsx';
 import RouteBlock from './RouteBlock.jsx';
+import YearPicker from './YearPicker.jsx';
 import {
   flagTone,
   formatDate,
-  formatFlag
+  formatDayAndMonth,
+  formatFlag,
+  yearOfDate
 } from '../analyzerV2Utils.js';
 
 /**
@@ -30,8 +33,21 @@ import {
 // Both still exist on the leg data; they are just not worth a badge.
 const NEVER_CHIPPED = ['REPLACED', 'ASSUMED_YEAR'];
 
-export default function FlightRow({ leg, muted = false, suppressFlags = [], showRoute = true }) {
+// Where Step 7 filled the year in rather than reading it: borrowed from another
+// document, today's, or one a specialist already chose. Only these years can be
+// changed - a year the document printed ('document') is what the paper says.
+const ASSUMED_YEAR_SOURCES = new Set(['sibling', 'current', 'specialist']);
+
+export default function FlightRow({
+  leg, muted = false, suppressFlags = [], showRoute = true, onChangeYear, rebuilding = false
+}) {
   const notFlown = leg.flown === false;
+
+  const yearCanBeChanged = Boolean(
+    onChangeYear
+    && ASSUMED_YEAR_SOURCES.has(leg.yearSource)
+    && yearOfDate(leg.departureDate)
+  );
 
   // What the document printed where the pipeline kept nothing - see Step 8b.
   // Listed in full on the row rather than hidden behind a hover: this is the one
@@ -84,7 +100,19 @@ export default function FlightRow({ leg, muted = false, suppressFlags = [], show
               printed one we could not read, saying "No date" states the
               opposite of what the paper says. */}
           <span className={`av2-flight__date${dateWasUnreadable ? ' av2-flight__date--unreadable' : ''}`}>
-            {formatDate(leg.departureDate) || (dateWasUnreadable ? 'Date unreadable' : 'No date')}
+            {yearCanBeChanged ? (
+              <>
+                {formatDayAndMonth(leg.departureDate)}{' '}
+                <YearPicker
+                  year={yearOfDate(leg.departureDate)}
+                  flightLabel={leg.flightNumber || 'this flight'}
+                  onChange={(year) => onChangeYear(leg.id, year)}
+                  disabled={rebuilding}
+                />
+              </>
+            ) : (
+              formatDate(leg.departureDate) || (dateWasUnreadable ? 'Date unreadable' : 'No date')
+            )}
           </span>
           {leg.pnr && <span className="av2-flight__pnr">{leg.pnr}</span>}
         </div>

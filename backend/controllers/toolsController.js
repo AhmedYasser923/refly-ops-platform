@@ -392,6 +392,11 @@ exports.checkDocs = catchAsync(async (req, res, next) => {
     claimNote: docInfo.claimNote,
     oneTimeSubmission: docInfo.oneTimeSubmission,
     ceasedOperations: docInfo.ceasedOperations,
+    // Read from the matched entry directly rather than added to
+    // getAirlineDocInfo, which also feeds the old ticket analyzer.
+    directFlightOperator: Boolean(dbMatch?.directFlightOperator),
+    fastTrack: Boolean(dbMatch?.fastTrack),
+    pnrFormat: String(dbMatch?.pnrFormat || ''),
     iata:    dbMatch?.iata    || 'N/A',
     icao:    dbMatch?.icao    || 'N/A',
     country: dbMatch?.country || 'N/A',

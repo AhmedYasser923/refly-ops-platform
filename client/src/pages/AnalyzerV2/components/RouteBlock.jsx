@@ -1,4 +1,5 @@
 import AirportCode from './AirportCode.jsx';
+import JourneyTrackers from './JourneyTrackers.jsx';
 import RouteDistance from './RouteDistance.jsx';
 import TrackerCircles from './TrackerCircles.jsx';
 import { formatCityAndCountry, withAirportSuffix } from '../analyzerV2Utils.js';
@@ -27,13 +28,14 @@ import { formatCityAndCountry, withAirportSuffix } from '../analyzerV2Utils.js';
  *
  * When the block stands for ONE flight, `flight` carries it - its number, its
  * date and its tracker links - and the buttons for those trackers sit under the
- * AIR line (see TrackerCircles). A heading over several flights passes nothing,
- * because a tracker is asked about one flight.
+ * AIR line (see TrackerCircles). A heading over several flights passes
+ * `journeyLegs` instead, and gets one button per tracker that opens every one
+ * of those flights in it (see JourneyTrackers).
  *
  * Built from spans so the journey heading can hold it inside its <h3>.
  */
 export default function RouteBlock({
-  from, to, distanceKm, compensation = null, flight = null, variant = 'flight'
+  from, to, distanceKm, compensation = null, flight = null, journeyLegs = null, variant = 'flight'
 }) {
   const className = variant === 'journey' ? 'av2-route av2-route--journey' : 'av2-route';
 
@@ -43,7 +45,7 @@ export default function RouteBlock({
       <span className="av2-route__line">
         <RouteDistance distanceKm={distanceKm} compensation={compensation} />
         <span className="av2-route__air" aria-hidden="true">AIR</span>
-        <TrackerCircles flight={flight} />
+        {journeyLegs ? <JourneyTrackers legs={journeyLegs} /> : <TrackerCircles flight={flight} />}
       </span>
       <RoutePoint place={to} />
     </span>

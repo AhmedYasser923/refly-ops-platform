@@ -88,6 +88,12 @@ function AirlineCard({ id, details, hidden }) {
           {details.oneTimeSubmission && (
             <span className="av2-airline-chip av2-airline-chip--success">One-time submission</span>
           )}
+          {details.directFlightOperator && (
+            <span className="av2-airline-chip av2-airline-chip--operator">Direct flight operator</span>
+          )}
+          {details.fastTrack && (
+            <span className="av2-airline-chip av2-airline-chip--fast-track">Fast track</span>
+          )}
           {details.ceasedOperations && (
             <span className="av2-airline-chip av2-airline-chip--muted">Ceased operations</span>
           )}
@@ -101,6 +107,16 @@ function AirlineCard({ id, details, hidden }) {
         </span>
 
         {details.claimNote && <span className="av2-airline-card__note">{details.claimNote}</span>}
+
+        {/* What this airline's booking reference looks like, as the file
+            describes it. Display only - the server's reference rules are in
+            airlineBookingRules.js. */}
+        {details.pnrFormat && (
+          <span className="av2-airline-card__documents">
+            <span className="av2-airline-card__label">PNR format</span>
+            <span className="av2-airline-card__requirements">{details.pnrFormat}</span>
+          </span>
+        )}
       </span>
     </span>
   );

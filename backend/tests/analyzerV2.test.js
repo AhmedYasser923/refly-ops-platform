@@ -1680,9 +1680,9 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
     saudia.marketingAirlineDetails,
     {
       name: 'Saudia', iata: 'SV', icao: 'SVA', ticketPrefix: '065',
-      requiredDocuments: 'Ticket number, Passport / ID', claimNote: '',
-      ticketNumberCanReplacePnr: false, oneTimeSubmission: false, ceasedOperations: false,
-      country: 'Saudi Arabia', claimLimit: 'N/A'
+      requiredDocuments: 'Ticket number, Passport / ID', claimNote: '', pnrFormat: '',
+      ticketNumberCanReplacePnr: false, oneTimeSubmission: false, directFlightOperator: false, fastTrack: false,
+      ceasedOperations: false, country: 'Saudi Arabia', claimLimit: 'N/A'
     },
     'the card carries what the old analyzer shows, from the same file'
   );
@@ -1704,6 +1704,10 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
   // An airline that has stopped flying still has its entry, and it says so.
   const ceased = flightIn([leg({ flightNumber: 'VX900', marketingAirline: 'Virgin America', operatingAirline: '' })]);
   assert.equal(ceased.marketingAirlineDetails.ceasedOperations, true);
+
+  // Jet2.com is marked as a direct flight operator, and the card says so.
+  const jet2 = flightIn([leg({ flightNumber: 'LS123', marketingAirline: 'Jet2.com', operatingAirline: '' })]);
+  assert.equal(jet2.marketingAirlineDetails.directFlightOperator, true);
 
   // A name the file does not have gets no card: "No documents required", which
   // the old analyzer shows for it, would be a guess.
@@ -1915,6 +1919,87 @@ async function eocCheckAssertions() {
   );
 }
 
-eocCheckAssertions().then(() => {
+// --- a specialist corrects an assumed year ---------------------------------------
+// The year a boarding pass did not print is a guess, so the screen lets a
+// specialist pick it and the server re-runs the engine with `yearPin`. Every
+// assumed year moves with the pin, a New Year rollover survives in both
+// directions, and a year the document printed never moves.
+async function yearPinAssertions() {
+  const {
+    buildReplyFromExtraction,
+    readYearPin,
+    isRebuildableExtraction
+  } = require('../controllers/analyzerV2Controller');
+
+  const outOnDecember = (date = '28DEC') => leg({ rawExtractedDate: date, departureDate: date, arrivalDate: '' });
+  const backInJanuary = leg({
+    flightNumber: 'BA569', departureIata: 'LYN', departureCity: 'Lyon',
+    arrivalIata: 'LHR', arrivalCity: 'London',
+    rawExtractedDate: '03JAN', departureDate: '03JAN', arrivalDate: ''
+  });
+  const datesOf = ({ journeys }) =>
+    journeys.flatMap((journey) => journey.legs).map((entry) => entry.departureDate);
+
+  // Pinning the December flight carries January into the next year...
+  const pinnedDecember = buildItinerary([outOnDecember(), backInJanuary],
+    { yearPin: { legId: 'leg-1', year: 2024 } });
+  assert.deepEqual(datesOf(pinnedDecember), ['2024-12-28', '2025-01-03'], 'December 2024 -> January 2025');
+
+  // ...and pinning January carries December into the year before.
+  const pinnedJanuary = buildItinerary([outOnDecember(), backInJanuary],
+    { yearPin: { legId: 'leg-2', year: 2025 } });
+  assert.deepEqual(datesOf(pinnedJanuary), ['2024-12-28', '2025-01-03'], 'January 2025 -> December 2024');
+
+  const pinnedLegs = pinnedJanuary.journeys.flatMap((journey) => journey.legs);
+  assert.ok(pinnedLegs.every((entry) => entry.yearSource === 'specialist'), 'a chosen year is not an assumption');
+  assert.ok(pinnedLegs.every((entry) => !entry.flags.includes(FLAGS.ASSUMED_YEAR)), 'so it carries no assumed-year flag');
+  assert.ok(!pinnedJanuary.warnings.some((w) => w.code === FLAGS.ASSUMED_YEAR), 'and the warning to correct it is gone');
+  assert.deepEqual(pinnedJanuary.journeys.map((journey) => journey.role), ['OUTBOUND', 'RETURN'],
+    'the trip is rebuilt in the corrected order');
+
+  // A year the document printed is never moved, and cannot be pinned.
+  const printedDecember = outOnDecember('28 Dec 2025');
+  const pinnedBesidePrinted = buildItinerary([printedDecember, backInJanuary],
+    { yearPin: { legId: 'leg-2', year: 2030 } });
+  assert.deepEqual(datesOf(pinnedBesidePrinted), ['2025-12-28', '2030-01-03'], 'the printed year stays put');
+  assert.equal(pinnedBesidePrinted.journeys[0].legs[0].yearSource, 'document');
+
+  const unpinned = buildItinerary([printedDecember, backInJanuary]);
+  assert.deepEqual(
+    buildItinerary([printedDecember, backInJanuary], { yearPin: { legId: 'leg-1', year: 2030 } }),
+    unpinned,
+    'a pin on a printed year is ignored'
+  );
+  assert.deepEqual(
+    buildItinerary([printedDecember, backInJanuary], { yearPin: { legId: 'leg-9', year: 2030 } }),
+    unpinned,
+    'as is a pin naming no flight'
+  );
+
+  // The envelope the rebuild endpoint accepts.
+  assert.deepEqual(readYearPin({ legId: 'leg-2', year: '2025' }), { legId: 'leg-2', year: 2025 });
+  assert.equal(readYearPin({ legId: 'leg-2', year: 2025.5 }), null, 'a year is a whole number');
+  assert.equal(readYearPin({ legId: 'leg-2', year: 1800 }), null, 'and a plausible one');
+  assert.equal(readYearPin({ legId: '__proto__', year: 2025 }), null, 'a leg id has one shape');
+  assert.equal(isRebuildableExtraction({ legs: [] }), false, 'nothing to rebuild');
+  assert.equal(isRebuildableExtraction({ legs: [{}], airlinesFoundOnline: { OE: 42 } }), false);
+  assert.equal(isRebuildableExtraction({ legs: [{}], airlinesFoundOnline: { OE: 'FlyOne Romania' } }), true);
+
+  // The whole reply is rebuilt, so the trackers and the EOC check follow the year.
+  const datesAskedAbout = new Set();
+  const reply = await buildReplyFromExtraction(
+    { documentType: 'boarding_pass', legs: [outOnDecember(), backInJanuary], passengers: [], bookingReferences: [] },
+    {
+      yearPin: { legId: 'leg-1', year: 2024 },
+      findEvents: async ({ date }) => { datesAskedAbout.add(date); return { events: [] }; }
+    }
+  );
+  const [firstFlight] = reply.booking.journeys[0].legs;
+  assert.match(firstFlight.trackers.flightStats, /\/2024\/12\/28$/, 'the tracker link carries the chosen year');
+  assert.deepEqual([...datesAskedAbout].sort(), ['2024-12-28', '2025-01-03'], 'and the EOC check asks about it');
+  assert.equal(reply.extraction.legs.length, 2, 'the facts go back out, so the year can be corrected again');
+}
+
+eocCheckAssertions().then(yearPinAssertions).then(() => {
   console.log('analyzerV2: all assertions passed');
 });

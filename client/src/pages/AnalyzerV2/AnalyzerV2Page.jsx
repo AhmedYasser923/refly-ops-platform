@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { analyzeDocuments } from '../../api/analyzerV2.js';
+import { analyzeDocuments, rebuildWithYear } from '../../api/analyzerV2.js';
 import ResultsPanel from './components/ResultsPanel.jsx';
 import UploadPanel from './components/UploadPanel.jsx';
 import './AnalyzerV2Page.css';
@@ -24,14 +24,17 @@ export default function AnalyzerV2Page() {
   const [error, setError] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [rebuilding, setRebuilding] = useState(false);
 
   const abortRef = useRef(null);
+  const rebuildAbortRef = useRef(null);
   const timerRef = useRef(null);
 
-  // An in-flight upload must not outlive the page, and a stray interval must not
-  // keep ticking after it. Both are cleaned up together.
+  // An in-flight request must not outlive the page, and a stray interval must
+  // not keep ticking after it. All are cleaned up together.
   useEffect(() => () => {
     abortRef.current?.abort();
+    rebuildAbortRef.current?.abort();
     clearInterval(timerRef.current);
   }, []);
 
@@ -46,6 +49,7 @@ export default function AnalyzerV2Page() {
 
   const clearAll = () => {
     abortRef.current?.abort();
+    rebuildAbortRef.current?.abort();
     setFiles([]);
     setResult(null);
     setError('');
@@ -58,6 +62,7 @@ export default function AnalyzerV2Page() {
     }
 
     abortRef.current?.abort();
+    rebuildAbortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
@@ -82,6 +87,43 @@ export default function AnalyzerV2Page() {
     } finally {
       clearInterval(timerRef.current);
       setAnalyzing(false);
+    }
+  };
+
+  // A specialist picked a different year on one flight. The server rebuilds the
+  // whole trip from the facts the first run read - every assumed year moves with
+  // it, and the trackers and the EOC check follow - so nothing is recomputed
+  // here. A newer pick cancels an older one still on its way.
+  const changeYear = async (legId, year) => {
+    if (!result?.extraction) return;
+
+    rebuildAbortRef.current?.abort();
+    const controller = new AbortController();
+    rebuildAbortRef.current = controller;
+
+    setRebuilding(true);
+    setError('');
+
+    try {
+      const rebuilt = await rebuildWithYear({
+        extraction: result.extraction,
+        yearPin: { legId, year },
+        signal: controller.signal
+      });
+      // Nothing was spent on a rebuild, so the footer keeps the original run's
+      // time, cost and model.
+      setResult((previous) => ({
+        ...rebuilt,
+        processingTimeMs: previous?.processingTimeMs,
+        costUSD: previous?.costUSD,
+        model: previous?.model
+      }));
+    } catch (requestError) {
+      if (requestError.name !== 'AbortError') {
+        setError(requestError.message || 'The year could not be changed. Please try again.');
+      }
+    } finally {
+      if (rebuildAbortRef.current === controller) setRebuilding(false);
     }
   };
 
@@ -111,7 +153,7 @@ export default function AnalyzerV2Page() {
 
       {result && (
         <>
-          <ResultsPanel result={result} />
+          <ResultsPanel result={result} onChangeYear={changeYear} rebuilding={rebuilding} />
 
           {/* Cost and model are shown because this is a staff tool and the
               person running it is choosing how to spend the budget. The

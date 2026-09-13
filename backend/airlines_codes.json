@@ -15,7 +15,10 @@
       "claimNote": "string - free-form note shown next to the reqs body, e.g. 'PNR mandatory', 'Ticket number mandatory', 'Either PNR or ticket number'. Rendered as a separate paragraph beneath reqs in both tools.",
       "oneTimeSubmission": "boolean (default false) - when true, the Document Check page and Ticket Analyzer FlightCard render a 'One-time submission' label for airlines where a passenger-submitted claim allows a parallel request.",
       "trackerSearchCodes": "object { airportInfo?: string, flightStats?: string, flightera?: string } - per-tracker replacement code used when the airline's IATA doesn't resolve on an external tracker (e.g. { 'flightStats': 'PU*' } for Plus Ultra, or { 'airportInfo': 'EVE', 'flightStats': 'EVE', 'flightera': 'EVE' } for Iberojet). Trackers not listed fall back to the parsed IATA. Surfaced via GET /api/tools/tracker-overrides and consumed by client/src/pages/TicketAnalyzer/ticketAnalyzerUtils.js::buildTrackerURLs.",
-      "ceasedOperations": "boolean (default false) - when true, the Document Check page and Ticket Analyzer FlightCard render a 'Ceased operations' label for airlines that no longer operate."
+      "ceasedOperations": "boolean (default false) - when true, the Document Check page and Ticket Analyzer FlightCard render a 'Ceased operations' label for airlines that no longer operate.",
+      "pnrFormat": "string - how this airline's booking reference (PNR) is written, e.g. '6 letters and digits' or '8 digits'. Shown as 'PNR format' on the Document Check page and on Ticket Analyzer v2's airline card. Display only: the booking-reference validation rules live in backend/utils/airlineBookingRules.js and do not read it. Omit when unknown.",
+      "fastTrack": "boolean (default false) - when true, the Document Check page and Ticket Analyzer v2's airline card render a 'Fast track' label.",
+      "directFlightOperator": "boolean (default false) - when true, the Document Check page and Ticket Analyzer v2's airline card render a 'Direct flight operator' label."
     }
   },
   {
@@ -213,7 +216,8 @@
     "icao": "MAC",
     "country": "Morocco",
     "reqs": "Ticket number, Boarding pass, ID (If delayed: need rescheduled time)",
-    "ticketPrefix": "452"
+    "ticketPrefix": "452",
+    "pnrFormat": "8-Numbers"
   },
   {
     "name": "AIRDO",
@@ -415,7 +419,8 @@
     "reqs": "ID",
     "claimNote": "PNR mandatory",
     "oneTimeSubmission": true,
-    "ticketPrefix": "057"
+    "ticketPrefix": "057",
+    "fastTrack": true
   },
   {
     "name": "Aircalin/Air Caledonie International",
@@ -775,7 +780,8 @@
     "iata": "BT",
     "icao": "BTI",
     "country": "Latvia",
-    "ticketPrefix": "657"
+    "ticketPrefix": "657",
+    "directFlightOperator": true
   },
   {
     "name": "Air Nippon",
@@ -1047,7 +1053,8 @@
     "icao": "AIZ",
     "country": "Israel",
     "ticketNumberCanReplacePnr": true,
-    "ticketPrefix": "238"
+    "ticketPrefix": "238",
+    "pnrFormat": "8-Numbers"
   },
   {
     "name": "Air Kiribati",
@@ -2284,6 +2291,14 @@
     "ticketNumberCanReplacePnr": true
   },
   {
+    "name": "Blue Bird Airways ",
+    "iata": "BZ",
+    "icao": "BBG",
+    "country": "Greece",
+    "ticketPrefix": "404",
+    "pnrFormat": "8 characters / Might starts with 305 "
+  },
+  {
     "name": "BB Airways",
     "iata": "BO",
     "icao": "BBW",
@@ -3010,7 +3025,22 @@
     "iata": "DE",
     "icao": "CFG",
     "country": "Germany",
-    "ticketPrefix": "881"
+    "ticketPrefix": "881",
+    "pnrFormat": "8-Numbers"
+  },
+  {
+    "name": "Electra Airways",
+    "iata": "3E",
+    "icao": "EAF",
+    "country": "Bulgaria",
+    "pnrFormat": "8-Numbers"
+  },
+  {
+    "name": "Heston Airlines",
+    "iata": "HN",
+    "icao": "HST",
+    "country": "Lithuania",
+    "pnrFormat": "6-Numbers"
   },
   {
     "name": "Continental Airlines",
@@ -3067,7 +3097,8 @@
     "ticketNumberCanReplacePnr": true,
       "trackerSearchCodes": {
       "flightStats": "CND"
-    }
+    },
+    "pnrFormat": "7- Numbers"
   },
   {
     "name": "Corendon Airlines Europe",
@@ -3089,7 +3120,8 @@
     "country": "France",
     "reqs": "Ticket number, DOB",
     "claimNote": "Ticket number mandatory",
-    "ticketPrefix": "923"
+    "ticketPrefix": "923",
+    "fastTrack": true
   },
   {
     "name": "Corse Méditerranée",
@@ -3427,7 +3459,8 @@
     "iata": "DK",
     "icao": "VKG",
     "country": "Denmark",
-    "ticketPrefix": "630"
+    "ticketPrefix": "630",
+    "pnrFormat": "6-Numbers"
   },
   {
     "name": "Eastwind Airlines",
@@ -3440,21 +3473,30 @@
     "iata": "EC",
     "icao": "EJU",
     "country": "Austria",
-    "claimNote": "PNR mandatory"
+    "claimNote": "PNR mandatory",
+    "directFlightOperator": true,
+    "oneTimeSubmission": true,
+    "fastTrack": true
   },
   {
     "name": "easyJet Switzerland",
     "iata": "DS",
     "icao": "EZS",
     "country": "Switzerland",
-    "claimNote": "PNR mandatory"
+    "claimNote": "PNR mandatory",
+    "directFlightOperator": true,
+    "oneTimeSubmission": true
+
   },
   {
     "name": "easyJet UK",
     "iata": "U2",
     "icao": "EZY",
     "country": "United Kingdom",
-    "claimNote": "PNR mandatory"
+    "claimNote": "PNR mandatory",
+    "directFlightOperator": true,
+    "oneTimeSubmission": true
+
   },
   {
     "name": "Edelweiss Air",
@@ -3833,7 +3875,8 @@
     "country": "Pakistan",
     "trackerSearchCodes": {
       "flightStats": "FJL"
-    }
+    },
+    "pnrFormat": "9-Numbers"
   },
   {
     "name": "SKY EXPRESS S.A.",
@@ -4247,7 +4290,8 @@
     "iata": "GF",
     "icao": "GFA",
     "country": "Bahrain",
-    "ticketPrefix": "072"
+    "ticketPrefix": "072",
+    "fastTrack": true
   },
   {
     "name": "Guyana Airways 2000",
@@ -4508,7 +4552,8 @@
     "country": "Spain",
     "reqs": "Ticket number, passport number",
     "claimNote": "can proceed without ticket number / Not without passport number",
-    "ticketPrefix": "075"
+    "ticketPrefix": "075",
+    "oneTimeSubmission": true
   },
   {
     "name": "Iberojet",
@@ -4931,7 +4976,8 @@
     "name": "Jet2.com",
     "iata": "LS",
     "icao": "EXS",
-    "country": "United Kingdom"
+    "country": "United Kingdom",
+    "directFlightOperator": true
   },
   {
     "name": "JetBlue Airways",
@@ -5059,7 +5105,8 @@
     "reqs": "ID",
     "claimNote": "PNR mandatory",
     "oneTimeSubmission": true,
-    "ticketPrefix": "074"
+    "ticketPrefix": "074",
+    "fastTrack": true
   },
   {
     "name": "Kabo Air",
@@ -5354,7 +5401,8 @@
     "country": "Italy",
     "reqs": "Please collect all the data: Birth details, birth place, passport no. ,Codice Fiscale for Italian citizens",
     "claimNote": "PNR mandatory",
-    "oneTimeSubmission": true
+    "oneTimeSubmission": true,
+    "pnrFormat": "Sometimes it's numbers"
   },
   {
     "name": "plus ultra",
@@ -6125,14 +6173,6 @@
     "icao": "RNA",
     "country": "Nepal",
     "ticketPrefix": "285"
-  },
-  {
-    "name": "Neos",
-    "iata": "NO",
-    "icao": "NOS",
-    "country": "Italy",
-    "reqs": "Birth details/place, Passport no. (Codice Fiscale for Italian citizens)",
-    "oneTimeSubmission": true
   },
   {
     "name": "Neosiam Airways",
@@ -7148,7 +7188,9 @@
     "iata": "FR",
     "icao": "RYR",
     "country": "Ireland",
-    "claimNote": "PNR mandatory"
+    "claimNote": "PNR mandatory",
+    "directFlightOperator": true,
+    "fastTrack": true
   },
   {
     "name": "Ryanair UK",
@@ -7158,7 +7200,9 @@
     "claimNote": "PNR mandatory",
     "trackerSearchCodes": {
       "flightStats": "RK*"
-    }
+    },
+    "directFlightOperator": true,
+    "fastTrack": true
   },
   {
     "name": "UVT Aero",
@@ -8072,7 +8116,8 @@
     "iata": "PQ",
     "icao": "SQP",
     "country": "Ukraine",
-    "reqs": "Boarding pass, Passport"
+    "reqs": "Boarding pass, Passport",
+    "pnrFormat": "6-alphanumeric "
   },
   {
     "name": "SkyUp MT",
@@ -8082,7 +8127,8 @@
     "reqs": "Boarding pass, Passport",
     "trackerSearchCodes": {
       "flightStats": "SEU"
-    }
+    },
+    "pnrFormat": "6-alphanumeric "
   },
   {
     "name": "Aura Airlines",
@@ -8434,13 +8480,15 @@
     "name": "Transavia France",
     "iata": "TO",
     "icao": "TVF",
-    "country": "France"
+    "country": "France",
+    "directFlightOperator": true
   },
   {
     "name": "Transavia Holland",
     "iata": "HV",
     "icao": "TRA",
-    "country": "Netherlands"
+    "country": "Netherlands",
+    "directFlightOperator": true
   },
   {
     "name": "TransAVIAexport Airlines",
@@ -8536,7 +8584,8 @@
     "ticketNumberCanReplacePnr": true,
     "trackerSearchCodes": {
       "flightStats": "TOM"
-    }
+    },
+    "pnrFormat": "8 numbers, 6 alphanumeric characters, or up to 12 numbers."
   },
   {
     "name": "TUI fly Belgium",

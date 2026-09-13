@@ -29,58 +29,69 @@ const BOOKING_CODE_EXCEPTIONS = [
     // easyJet runs 7, and operates under several AOCs.
     iata: ['U2', 'EC', 'DS'],
     names: ['easyjet'],
-    pattern: /^[A-Z0-9]{5,7}$/
+    pattern: /^[A-Z0-9]{5,7}$/,
+    shape: '5 to 7 letters and digits'
   },
   {
     iata: ['3O'],
     names: ['air arabia maroc'],
-    pattern: /^\d{8}$/
+    pattern: /^\d{8}$/,
+    shape: '8 digits'
   },
   {
     iata: ['IZ'],
     names: ['arkia'],
-    pattern: /^\d{8}$/
+    pattern: /^\d{8}$/,
+    shape: '8 digits'
   },
   {
     iata: ['DE'],
     names: ['condor'],
-    pattern: /^\d{8}$/
+    pattern: /^\d{8}$/,
+    shape: '8 digits'
   },
   {
     // Not in airlines_codes.json, so name-only.
     names: ['electra'],
-    pattern: /^\d{8}$/
+    pattern: /^\d{8}$/,
+    shape: '8 digits'
   },
   {
     // TUI runs long numeric references, up to twelve digits.
     iata: ['BY', 'TB', 'X3', 'OR'],
     names: ['tui'],
-    pattern: /^\d{6,12}$/
+    pattern: /^\d{6,12}$/,
+    shape: '6 to 12 digits'
   },
   {
     iata: ['9P'],
     names: ['fly jinnah'],
-    pattern: /^\d{9}$/
+    pattern: /^\d{9}$/,
+    shape: '9 digits'
   },
   {
     iata: ['CD'],
     names: ['corendon dutch'],
-    pattern: /^[A-Z0-9]{7}$/
+    pattern: /^[A-Z0-9]{7}$/,
+    shape: '7 letters and digits'
   },
   {
     // Purely numerical references.
     iata: ['NO'],
     names: ['neos'],
-    pattern: /^\d{5,12}$/
+    pattern: /^\d{5,12}$/,
+    shape: '5 to 12 digits'
   },
   {
     names: ['heston'],
-    pattern: /^\d{5,12}$/
+    pattern: /^\d{5,12}$/,
+    shape: '5 to 12 digits'
   },
   {
     iata: ['DK'],
     names: ['sunclass'],
-    pattern: /^\d{5,12}$/
+    pattern: /^\d{5,12}$/,
+    shape: '5 to 12 digits'
   }
 ];
 
@@ -164,7 +175,7 @@ function normaliseBookingCode(rawValue, { iataCodes = [], airlineNames = [] } = 
 // -----------------------------------------------------------------------------
 
 // Character pairs OCR routinely confuses. The airline NAME is ground truth; the
-// glyph is not. Norse Atlantic Airways is "N0…" with a zero, and a scan that
+// glyph is not. Norse Atlantic Airways is "N0â€¦" with a zero, and a scan that
 // reads "NO379" is wrong in a way we can prove and fix.
 const CONFUSABLE_CHARACTERS = new Map([
   ['0', 'O'], ['O', '0'],

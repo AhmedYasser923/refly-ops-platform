@@ -17,7 +17,7 @@ import {
  * airline contracted to provide. What they were moved onto instead lives in the
  * replacement section, not here.
  */
-export default function JourneyCard({ journey }) {
+export default function JourneyCard({ journey, onChangeYear, rebuilding = false }) {
   const legs = Array.isArray(journey.legs) ? journey.legs : [];
   const connections = Array.isArray(journey.connections) ? journey.connections : [];
   const flags = Array.isArray(journey.flags) ? journey.flags : [];
@@ -32,10 +32,12 @@ export default function JourneyCard({ journey }) {
   // A direct journey IS one flight - `isDirect` is set when the booked chain has
   // a single leg - and that flight's row prints no route block of its own, so
   // the heading's block carries its tracker buttons. A journey with connections
-  // is not one flight, and its heading gets none; every row below has its own.
+  // gets the journey version instead: one button per tracker that opens every
+  // flight below in it, first flight in the first tab (see JourneyTrackers).
   const directFlight = journey.isDirect && legs[0]
     ? { flightNumber: legs[0].flightNumber, date: legs[0].departureDate, trackers: legs[0].trackers }
     : null;
+  const journeyLegs = journey.isDirect ? null : legs;
 
   return (
     <article className="av2-journey">
@@ -74,6 +76,7 @@ export default function JourneyCard({ journey }) {
             distanceKm={journey.distanceKm}
             compensation={journey.compensation}
             flight={directFlight}
+            journeyLegs={journeyLegs}
           />
         </h3>
       </header>
@@ -82,7 +85,13 @@ export default function JourneyCard({ journey }) {
         {/* A direct trip's one flight has the heading's two airports, so its
             row drops the route block rather than print it a second time. */}
         {legs.map((leg) => (
-          <FlightRow key={leg.id} leg={leg} showRoute={!journey.isDirect} />
+          <FlightRow
+            key={leg.id}
+            leg={leg}
+            showRoute={!journey.isDirect}
+            onChangeYear={onChangeYear}
+            rebuilding={rebuilding}
+          />
         ))}
       </ul>
 

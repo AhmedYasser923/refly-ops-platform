@@ -36,6 +36,16 @@ function DocumentResult({ result }) {
                 One-time submission
               </span>
             )}
+            {result.directFlightOperator && (
+              <span className="document-check-badge document-check-badge--direct-operator">
+                Direct flight operator
+              </span>
+            )}
+            {result.fastTrack && (
+              <span className="document-check-badge document-check-badge--fast-track">
+                Fast track
+              </span>
+            )}
             {result.ceasedOperations && (
               <span className="document-check-badge document-check-badge--ceased">
                 Ceased operations
@@ -61,6 +71,13 @@ function DocumentResult({ result }) {
       {result.claimNote && (
         <div className="document-check-note document-check-note--claim">
           {result.claimNote}
+        </div>
+      )}
+
+      {result.pnrFormat && (
+        <div className="document-check-row document-check-row--spaced">
+          <span>PNR format</span>
+          <strong>{result.pnrFormat}</strong>
         </div>
       )}
     </article>

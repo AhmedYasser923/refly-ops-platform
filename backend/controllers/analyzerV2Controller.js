@@ -62,6 +62,7 @@
 // ORDER OF PLAY
 // -------------
 //   Step  1  analyzeDocuments ............. the HTTP entry point
+//   Step 1b  rebuildWithYear .............. same facts, a year the specialist chose
 //   Step  2  readModelJson ................ parse what the model returned
 //   Step 2b  lookUpAirlinesOnline ......... ask the web about unnamed airlines
 //   Step  3  normalisePassengers .......... clean the people
@@ -326,35 +327,22 @@ exports.analyzeDocuments = catchAsync(async (request, response, next) => {
     });
   }
 
-  const documentType = DOCUMENT_TYPES.has(asTrimmedText(extractedPayload?.documentType))
-    ? asTrimmedText(extractedPayload.documentType)
-    : 'unknown';
-
-  // Boarding passes are evidence of what HAPPENED, not of how the trip was
-  // sold. Every airline prints its own record locator, so a perfectly normal
-  // Swiss-to-Air-Serbia connection shows two different codes - comparing them
-  // would manufacture a "booked separately" warning out of nothing.
-  const isBoardingPassUpload = documentType === 'boarding_pass';
-
+  // What the documents said, kept so a year correction can re-run the engine
+  // on exactly these facts without asking the model again (Step 1b).
+  //
   // `_chronology_scratchpad` is the model's reasoning workspace. The schema
   // requires it because asking for it measurably improves the extraction, but
-  // it is never copied into the reply below - the old analyzer ships it to the
+  // it is never copied into the reply - the old analyzer ships it to the
   // browser inside every journey, where nothing reads it.
-  const analysis = buildAnalysisResponse({
-    documentType,
-    evidenceMode: isBoardingPassUpload ? 'boarding_passes' : 'documents',
-    passengers: normalisePassengers(extractedPayload?.passengers),
-    bookingReferences: normaliseBookingReferences(extractedPayload?.bookingReferences),
+  const extraction = {
+    documentType: extractedPayload?.documentType,
     legs: extractedLegs,
-    options: {
-      ignorePnr: isBoardingPassUpload,
-      airlinesFoundOnline: airlineLookup.airlinesFoundOnline
-    }
-  });
+    passengers: extractedPayload?.passengers,
+    bookingReferences: extractedPayload?.bookingReferences,
+    airlinesFoundOnline: airlineLookup.airlinesFoundOnline
+  };
 
-  // Step 4b. It reads the EOC records from the database, so it runs out here
-  // on the finished reply rather than inside the engine.
-  await checkAirportsForEoc(analysis);
+  const analysis = await buildReplyFromExtraction(extraction);
 
   response.json({
     ...analysis,
@@ -363,6 +351,134 @@ exports.analyzeDocuments = catchAsync(async (request, response, next) => {
     model: modelName
   });
 });
+
+
+// =============================================================================
+// STEP 1b — Re-run the engine with a year the specialist corrected
+// =============================================================================
+
+const MIN_PINNABLE_YEAR = 1900;
+const MAX_PINNABLE_YEAR = 2100;
+const LEG_ID_PATTERN = /^leg-\d+$/;
+
+/**
+ * POST /api/analyzer-v2/rebuild
+ *
+ * WHAT IT DOES
+ *   Takes the `extraction` a previous analysis returned and a `yearPin`
+ *   ({ legId, year }), and returns the whole analysis again with that year.
+ *
+ * WHY IT IS BUILT THIS WAY
+ *   A year decides far more than the label on a row. It orders the flights,
+ *   so it decides which journeys exist, which flight replaced which, whether
+ *   the trip reads outbound/return, the dates inside every tracker link, and
+ *   which EOC events apply. Patching the dates in the browser would make the
+ *   client re-decide the trip, which this tool never lets it do. So the server
+ *   runs the same engine on the same facts, with the year pinned.
+ *
+ *   No model call: the facts are the ones the first run extracted, sent back
+ *   by the client. They are exactly as untrusted as the model's reply was the
+ *   first time, and Step 6 already treats them that way, so nothing is trusted
+ *   here that was not trusted before. Only the envelope is checked.
+ *
+ *   The reply carries no cost or model. Nothing was spent, and the screen
+ *   keeps showing what the original run cost.
+ */
+exports.rebuildWithYear = catchAsync(async (request, response, next) => {
+  const extraction = request.body?.extraction;
+  const yearPin = readYearPin(request.body?.yearPin);
+
+  if (!isRebuildableExtraction(extraction)) {
+    return next(new AppError('This analysis cannot be rebuilt. Please analyze the documents again.', 400));
+  }
+  if (!yearPin) {
+    return next(new AppError('Choose a year between 1900 and 2100.', 400));
+  }
+
+  const startedAt = Date.now();
+  const analysis = await buildReplyFromExtraction(extraction, { yearPin });
+
+  response.json({ ...analysis, processingTimeMs: Date.now() - startedAt });
+});
+
+/** The pin as the engine takes it, or null when it is not one. */
+function readYearPin(value) {
+  const legId = String(value?.legId || '');
+  const year = Number(value?.year);
+
+  if (!LEG_ID_PATTERN.test(legId)) return null;
+  if (!Number.isInteger(year) || year < MIN_PINNABLE_YEAR || year > MAX_PINNABLE_YEAR) return null;
+
+  return { legId, year };
+}
+
+/** The shape Step 1 put in `extraction`, and nothing that could not be. */
+function isRebuildableExtraction(extraction) {
+  if (!extraction || typeof extraction !== 'object') return false;
+  if (!Array.isArray(extraction.legs) || extraction.legs.length === 0) return false;
+
+  const airlines = extraction.airlinesFoundOnline;
+  if (airlines === undefined) return true;
+  if (!airlines || typeof airlines !== 'object' || Array.isArray(airlines)) return false;
+
+  return Object.values(airlines).every(
+    (name) => typeof name === 'string' && name.length <= MAX_AIRLINE_NAME_LENGTH
+  );
+}
+
+/**
+ * WHAT IT DOES
+ *   Turns an extraction into the finished reply: the engine, Steps 4a-4d, and
+ *   the EOC check.
+ *
+ * WHY IT IS BUILT THIS WAY
+ *   Step 1 and Step 1b must produce the same reply for the same facts, so they
+ *   share this rather than each assembling their own. The reply carries the
+ *   extraction back out, so a correction can be followed by another.
+ *
+ * @param {Object} extraction What Step 1 kept from the model's reply.
+ * @param {{ yearPin?: {legId: string, year: number}, findEvents?: Function }} [options]
+ *   findEvents is eocService.findEOCEvents unless a test passes a fake.
+ */
+async function buildReplyFromExtraction(extraction, { yearPin = null, findEvents } = {}) {
+  const documentType = DOCUMENT_TYPES.has(asTrimmedText(extraction?.documentType))
+    ? asTrimmedText(extraction.documentType)
+    : 'unknown';
+
+  // Boarding passes are evidence of what HAPPENED, not of how the trip was
+  // sold. Every airline prints its own record locator, so a perfectly normal
+  // Swiss-to-Air-Serbia connection shows two different codes - comparing them
+  // would manufacture a "booked separately" warning out of nothing.
+  const isBoardingPassUpload = documentType === 'boarding_pass';
+
+  const analysis = buildAnalysisResponse({
+    documentType,
+    evidenceMode: isBoardingPassUpload ? 'boarding_passes' : 'documents',
+    passengers: normalisePassengers(extraction.passengers),
+    bookingReferences: normaliseBookingReferences(extraction.bookingReferences),
+    legs: extraction.legs,
+    options: {
+      ignorePnr: isBoardingPassUpload,
+      airlinesFoundOnline: extraction.airlinesFoundOnline || {},
+      yearPin
+    }
+  });
+
+  // Step 4b. It reads the EOC records from the database, so it runs out here
+  // on the finished reply rather than inside the engine.
+  await checkAirportsForEoc(analysis, findEvents);
+
+  return {
+    ...analysis,
+    extraction: {
+      documentType: extraction.documentType,
+      legs: extraction.legs,
+      passengers: extraction.passengers,
+      bookingReferences: extraction.bookingReferences,
+      airlinesFoundOnline: extraction.airlinesFoundOnline || {}
+    }
+  };
+}
 
 
 // =============================================================================
@@ -994,8 +1110,11 @@ function airlineDetailsFor(airlineName, flightNumber) {
     ticketPrefix: record.ticketPrefix || '',
     requiredDocuments: record.reqs || '',
     claimNote: record.claimNote || '',
+    pnrFormat: record.pnrFormat || '',
     ticketNumberCanReplacePnr: Boolean(record.ticketNumberCanReplacePnr),
     oneTimeSubmission: Boolean(record.oneTimeSubmission),
+    directFlightOperator: Boolean(record.directFlightOperator),
+    fastTrack: Boolean(record.fastTrack),
     ceasedOperations: Boolean(record.ceasedOperations),
     country: record.country || '',
     claimLimit: claimLimitLabel(record.country)
@@ -1268,8 +1387,10 @@ function asEocEvent(record) {
  *     group        — everything left over, under the flight it stands in for
  *
  * @param {Array} extractedLegs Flat legs as read from the uploaded documents.
- * @param {{ ignorePnr?: boolean }} [options] ignorePnr for boarding-pass-only
- *   uploads, where booking references say nothing about how the trip was sold.
+ * @param {{ ignorePnr?: boolean, yearPin?: {legId: string, year: number} }} [options]
+ *   ignorePnr for boarding-pass-only uploads, where booking references say
+ *   nothing about how the trip was sold. yearPin when a specialist has
+ *   corrected an assumed year - see resolveMissingYears.
  */
 function buildItineraryFromLegs(extractedLegs, options = {}) {
   const ignorePnr = Boolean(options.ignorePnr);
@@ -1292,7 +1413,7 @@ function buildItineraryFromLegs(extractedLegs, options = {}) {
       mergeDuplicateLegs(
         resolveMissingYears(extractedLegs.map(
           (extractedLeg, index) => normaliseExtractedLeg(extractedLeg, index, options)
-        ))
+        ), options.yearPin)
       )
     )
   );
@@ -1839,8 +1960,32 @@ function monthDayOrderKey(dateParts) {
  *
  *   The discipline is not "never guess". It is NEVER GUESS INVISIBLY. That is
  *   the entire job of `yearSource`.
+ *
+ * WHEN A SPECIALIST HAS CORRECTED THE YEAR
+ *   A guess can be wrong, so the screen lets a specialist pick the year on any
+ *   flight whose year was NOT printed, and the server re-runs the whole engine
+ *   with that choice as `yearPin` ({ legId, year }). A printed year is never
+ *   moved - the document said it.
+ *
+ *   The pin has to move every assumed year with it, and keep a New Year
+ *   rollover intact in both directions:
+ *
+ *     28DEC, then 03JAN     pin 28DEC to 2024  ->  03JAN becomes 2025
+ *                           pin 03JAN to 2025  ->  28DEC becomes 2024
+ *
+ *   Both fall out of one number per leg, its CALENDAR LAP: how many times the
+ *   walk below has gone backwards in the calendar before reaching it (28DEC is
+ *   lap 0, 03JAN lap 1). The pinned leg's lap fixes the year lap 0 is in, and
+ *   every unprinted leg is that year plus its own lap. No special case for
+ *   December; the subtraction is the rule.
+ *
+ *   One pin is all there ever is: the latest correction decides every assumed
+ *   year, so corrections compose. With no pin this is exactly the walk above.
+ *
+ * @param {Object[]} legs Normalised legs, in document order. Changed in place.
+ * @param {{legId: string, year: number}|null} [yearPin] A specialist's year.
  */
-function resolveMissingYears(legs) {
+function resolveMissingYears(legs, yearPin = null) {
   const parsedLegs = legs.map((leg) => ({
     leg,
     departureParts: readPrintedDate(leg.departureDateRaw),
@@ -1850,15 +1995,24 @@ function resolveMissingYears(legs) {
   const anchorYear = parsedLegs
     .find((entry) => entry.departureParts?.hasYear)?.departureParts.year ?? null;
 
+  const pinnedYearOnLapZero = yearOnLapZeroFromPin(parsedLegs, yearPin);
+
   let workingYear = anchorYear ?? currentUtcYear();
   let previousMonthDay = null;
+  let calendarLap = 0;
 
   parsedLegs.forEach(({ leg, departureParts, arrivalParts }) => {
     if (!departureParts) return;
 
+    const wentBackwards = previousMonthDay !== null
+      && monthDayOrderKey(departureParts) < previousMonthDay;
+    if (wentBackwards) calendarLap += 1;
+
     if (departureParts.hasYear) {
       workingYear = departureParts.year;
-    } else if (previousMonthDay !== null && monthDayOrderKey(departureParts) < previousMonthDay) {
+    } else if (pinnedYearOnLapZero !== null) {
+      workingYear = pinnedYearOnLapZero + calendarLap;
+    } else if (wentBackwards) {
       // The itinerary went backwards in the calendar. That is a New Year
       // rollover, not time travel.
       workingYear += 1;
@@ -1870,6 +2024,9 @@ function resolveMissingYears(legs) {
 
     if (departureParts.hasYear) {
       leg.yearSource = 'document';
+    } else if (pinnedYearOnLapZero !== null) {
+      // Chosen by a person looking at the case, so no longer an assumption.
+      leg.yearSource = 'specialist';
     } else {
       // 'sibling' — another document in this upload printed the year, so it is
       // as good as printed. 'current' — nothing did, so this is our assumption.
@@ -1908,6 +2065,36 @@ function resolveMissingYears(legs) {
   });
 
   return legs;
+}
+
+/**
+ * The year a specialist's pin puts calendar lap 0 in, or null when there is no
+ * pin to honour: none was given, it names no leg, the leg has no readable date,
+ * or the leg printed its own year (which a pin never moves).
+ *
+ * The laps are counted exactly as resolveMissingYears counts them, over every
+ * dated leg, so both walks agree on which lap each leg is.
+ */
+function yearOnLapZeroFromPin(parsedLegs, yearPin) {
+  if (!yearPin || !Number.isInteger(yearPin.year)) return null;
+
+  let previousMonthDay = null;
+  let calendarLap = 0;
+
+  for (const { leg, departureParts } of parsedLegs) {
+    if (!departureParts) continue;
+
+    if (previousMonthDay !== null && monthDayOrderKey(departureParts) < previousMonthDay) {
+      calendarLap += 1;
+    }
+    previousMonthDay = monthDayOrderKey(departureParts);
+
+    if (leg.id === yearPin.legId) {
+      return departureParts.hasYear ? null : yearPin.year - calendarLap;
+    }
+  }
+
+  return null;
 }
 
 // =============================================================================
@@ -3195,6 +3382,9 @@ function buildTicketRecords(legs) {
 // this engine still agrees with the one it came from.
 exports.buildItinerary = buildItineraryFromLegs;
 exports.buildAnalysisResponse = buildAnalysisResponse;
+exports.buildReplyFromExtraction = buildReplyFromExtraction;
+exports.readYearPin = readYearPin;
+exports.isRebuildableExtraction = isRebuildableExtraction;
 exports.normalizeLeg = normaliseExtractedLeg;
 exports.codesTheFileCannotSettle = codesTheFileCannotSettle;
 exports.readAirlineLookupAnswer = readAirlineLookupAnswer;

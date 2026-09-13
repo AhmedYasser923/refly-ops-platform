@@ -16,7 +16,7 @@ import {
  *   a specialist reconstruct that link by eye every time; grouping them states
  *   it once, in the heading.
  */
-export default function ReplacementGroup({ itinerary }) {
+export default function ReplacementGroup({ itinerary, onChangeYear, rebuilding = false }) {
   const legs = Array.isArray(itinerary.legs) ? itinerary.legs : [];
   const insteadOf = itinerary.insteadOf;
 
@@ -43,7 +43,13 @@ export default function ReplacementGroup({ itinerary }) {
         {legs.map((leg) => (
           // The heading already established that everything here is a
           // replacement, so the per-row chip would only repeat it.
-          <FlightRow key={leg.id} leg={leg} suppressFlags={['REPLACEMENT']} />
+          <FlightRow
+            key={leg.id}
+            leg={leg}
+            suppressFlags={['REPLACEMENT']}
+            onChangeYear={onChangeYear}
+            rebuilding={rebuilding}
+          />
         ))}
       </ul>
     </article>
