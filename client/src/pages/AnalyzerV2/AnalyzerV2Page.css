@@ -1545,3 +1545,11 @@
   font-size: 11px;
   color: var(--text-muted);
 }
+
+/* The server placed this code by the order it was printed in, not because the
+   document printed it on the flight. Quiet, but there to be checked. */
+.av2-reference__matched {
+  font-size: 10px;
+  font-style: italic;
+  color: var(--warning);
+}

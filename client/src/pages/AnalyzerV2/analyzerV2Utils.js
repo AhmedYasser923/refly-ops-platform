@@ -153,7 +153,8 @@ const FLAG_LABELS = {
   REPLACEMENT: 'Replacement',
   REPORTED_NOT_FLOWN: 'Reported unused',
   ASSUMED_YEAR: 'Assumed year',
-  SPLIT_PASSENGER_PNR: 'Separate PNRs'
+  SPLIT_PASSENGER_PNR: 'Separate PNRs',
+  SELF_TRANSFER: 'Self transfer'
 };
 
 export function formatFlag(flag) {
@@ -173,6 +174,7 @@ const ATTENTION_FLAGS = new Set([
   'ARRIVAL_DATE_IMPLAUSIBLE',
   'ASSUMED_YEAR',
   'SPLIT_PNR_CONNECTION',
+  'SELF_TRANSFER',
   'SPLIT_PASSENGER_PNR',
   'AIRPORT_CHANGE',
   'UNPLANNED_STOP'

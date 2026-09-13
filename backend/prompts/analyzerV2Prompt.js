@@ -102,6 +102,15 @@ Each airline in a booking can issue its own PNR.
 3. Assign each leg the PNR of its OPERATING carrier. An American Airlines leg gets SNMAUJ; a British Airways leg gets 7IQHOL. Never copy a PNR across carriers.
 4. If only one unlabelled reference exists and all flights share an operating carrier, use it for every leg.
 5. List every reference you saw in bookingReferences, with the carrier prefix in carrier and the bare code in value.
+6. UNLABELLED REFERENCES PRINTED TOGETHER: booking sites often print several references side by side for a group of flights without saying which is whose, e.g. "Booking reference: B378KI · EIHSFO" over "IndiGo, Lufthansa · 6E6627, LH755, LH904". Do NOT guess which flight each belongs to, and do NOT put one of them in pnr. Leave pnr empty and put the whole list, in the order printed, in bookingReferencesPrinted on EVERY flight in that block. The server matches them to the flights.
+   - WRONG: pnr "B378KI" on all three flights. WRONG: dropping "EIHSFO" because you could not place it.
+   - CORRECT: pnr "" and bookingReferencesPrinted ["B378KI", "EIHSFO"] on 6E6627, LH755 and LH904.
+   When a reference IS clearly tied to one flight (printed inside that flight's own row, or labelled with its carrier), use pnr as in rules 1-4, and still list what the block printed in bookingReferencesPrinted.
+
+SELF TRANSFER:
+Report a self transfer ("Self transfer", "self-transfer", "separate tickets", "collect your baggage and check in again") only when it is printed - never infer it from different airlines or booking references.
+- The label names the connection ("Self transfer in Bangalore", or a note between two specific flights): set selfTransferAfter true on the flight BEFORE that connection.
+- The label is on the whole block without saying where: set selfTransferInBlock true on every flight in the block, and leave selfTransferAfter false. Do NOT mark every connection - in "Trivandrum to London, 2 stops, IndiGo, Lufthansa, Self transfer" only one of the two stops is a self transfer, and the server works out which from the booking references.
 WHAT IS AND IS NOT A BOOKING REFERENCE:
 - A standard record locator is 5 to 7 alphanumeric characters, most often 6, and contains at least one letter.
 - NOT A PNR: a generic 8-character alphanumeric string such as "7464F99C" or "LXC6A4E3" is an internal document id printed by the agent or the airport system. Output an empty string rather than using one as a fallback. Do not treat a leading two-letter run as a carrier prefix to strip — "LXC6A4E3" is an id in its entirety.

@@ -73,6 +73,23 @@ const ANALYZER_V2_SCHEMA = {
             type: SchemaType.STRING,
             description: 'Booking reference for THIS leg\'s operating carrier. If the document shows "AA/SNMAUJ, BA/7IQHOL" and this leg is operated by British Airways, output "7IQHOL". NEVER copy a PNR across different carriers. Empty string if absent.'
           },
+          // What the document printed beside this flight when it does NOT say
+          // which reference is whose: "Booking reference: B378KI · EIHSFO" over
+          // a block of IndiGo and Lufthansa flights. The server matches them to
+          // the flights - see assignPrintedBookingReferences.
+          bookingReferencesPrinted: {
+            type: SchemaType.ARRAY,
+            description: 'Every booking reference printed in the same itinerary block as this flight, IN THE ORDER PRINTED, whether or not the document says which flight each belongs to. "Booking reference: B378KI · EIHSFO" -> ["B378KI", "EIHSFO"] on every flight in that block. Empty array if none is printed with this flight.',
+            items: { type: SchemaType.STRING }
+          },
+          selfTransferAfter: {
+            type: SchemaType.BOOLEAN,
+            description: 'true only when the document marks the SPECIFIC connection after this flight as a self transfer ("Self transfer in Bangalore", a self-transfer note between these two flights). false when the label is on the whole block without saying where - use selfTransferInBlock for that.'
+          },
+          selfTransferInBlock: {
+            type: SchemaType.BOOLEAN,
+            description: 'true when the itinerary block this flight is printed in is labelled as a self transfer ("Self transfer", "self-transfer", "separate tickets") without saying at which airport. Set it on every flight in that block. false otherwise.'
+          },
           departureIata: { type: SchemaType.STRING, description: 'Three-letter airport code. Empty string if absent.' },
           // Name and country are display-only: the journey heading prints them.
           // Flights are matched and chained on the codes, never on these.
@@ -136,6 +153,9 @@ const ANALYZER_V2_SCHEMA = {
           'operatingAirline',
           'operatingAirlineIata',
           'pnr',
+          'bookingReferencesPrinted',
+          'selfTransferAfter',
+          'selfTransferInBlock',
           'departureIata',
           'departureAirportName',
           'departureCity',

@@ -75,6 +75,7 @@
 //   Step  6  normaliseExtractedLeg ........ clean each flight
 //   Step  7  resolveMissingYears .......... "05MAR" -> a real date
 //   Step  8  mergeDuplicateLegs ........... one flight listed twice
+//   Step 8a  assignPrintedBookingReferences  references printed beside a block
 //   Step 8b  auditPrintedValues ........... what the document printed and we lost
 //   Step  9  sortLegsChronologically ...... put them in order
 //   Step 10  detectReplacementFlights ..... which flight replaced which
@@ -157,6 +158,9 @@ const FLAGS = {
   // Connection-level
   SPLIT_PNR_CONNECTION: 'SPLIT_PNR_CONNECTION',
   UNPLANNED_STOP: 'UNPLANNED_STOP',
+  // The document itself calls this connection a self transfer. Printed, never
+  // inferred - see describeConnection.
+  SELF_TRANSFER: 'SELF_TRANSFER',
   // Journey-level
   AIRPORT_CHANGE: 'AIRPORT_CHANGE',
   HAS_REPLACEMENT: 'HAS_REPLACEMENT',
@@ -960,11 +964,20 @@ function buildBookingReferenceRecords(legs, extractedReferences) {
   legs.forEach((leg) => {
     bookingCodesOn(leg).forEach((code) => {
       if (!recordsByCode.has(code)) {
-        recordsByCode.set(code, { value: code, carrier: '', flightNumbers: [], legIds: [] });
+        recordsByCode.set(code, {
+          value: code, carrier: '', flightNumbers: [], legIds: [], matchedByPrintedOrder: false
+        });
       }
 
       const record = recordsByCode.get(code);
       record.legIds.push(leg.id);
+      // Placed by Step 8a from a list printed beside the flights rather than
+      // printed against them - said on the screen, never left implicit.
+      if (leg.pnrSource === 'printed-order' && leg.pnr === code) {
+        record.matchedByPrintedOrder = true;
+        // The match was made on the airline, so the airline is known.
+        if (!record.carrier) record.carrier = carrierCodeOf(leg.flightNumber);
+      }
       if (leg.flightNumber && !record.flightNumbers.includes(leg.flightNumber)) {
         record.flightNumbers.push(leg.flightNumber);
       }
@@ -991,7 +1004,8 @@ function buildBookingReferenceRecords(legs, extractedReferences) {
       value: validated,
       carrier: reference.carrier,
       flightNumbers: [],
-      legIds: []
+      legIds: [],
+      matchedByPrintedOrder: false
     });
   });
 
@@ -1414,10 +1428,12 @@ function buildItineraryFromLegs(extractedLegs, options = {}) {
   // one flight, and a value one copy lost may be present on the other.
   const legs = sortLegsChronologically(
     auditPrintedValues(
-      mergeDuplicateLegs(
-        resolveMissingYears(extractedLegs.map(
-          (extractedLeg, index) => normaliseExtractedLeg(extractedLeg, index, options)
-        ), options.yearPin)
+      assignPrintedBookingReferences(
+        mergeDuplicateLegs(
+          resolveMissingYears(extractedLegs.map(
+            (extractedLeg, index) => normaliseExtractedLeg(extractedLeg, index, options)
+          ), options.yearPin)
+        )
       )
     )
   );
@@ -1514,6 +1530,21 @@ function asIsoDateOrEmpty(value) {
 function asBookingCode(value, airlines = {}) {
   const code = normaliseBookingCode(value, airlines);
   return PLACEHOLDER_VALUES.has(code.toLowerCase()) ? '' : code;
+}
+
+/**
+ * A list of references as printed beside a block of flights: trimmed,
+ * uppercase, placeholders dropped, each once, ORDER KEPT. Not validated here -
+ * validation needs the airline each one turns out to belong to, which only
+ * Step 8a knows.
+ */
+function asPrintedReferenceList(values) {
+  if (!Array.isArray(values)) return [];
+
+  const printed = values
+    .map((value) => asMeaningfulText(value).toUpperCase())
+    .filter(Boolean);
+  return [...new Set(printed)];
 }
 
 /**
@@ -1810,6 +1841,17 @@ function normaliseExtractedLeg(extractedLeg, index, options = {}) {
     pnr,
     pnrAsPrinted: printedPnr,
     pnrRejection,
+    // 'document' when the document tied the reference to this flight,
+    // 'printed-order' when Step 8a matched it from a list printed beside a block
+    // of flights, '' when there is none.
+    pnrSource: '',
+    // References printed beside this flight's block without saying whose they
+    // are, in printed order. Step 8a matches them; nothing else reads them.
+    bookingReferencesPrinted: asPrintedReferenceList(extractedLeg?.bookingReferencesPrinted),
+    // Printed self-transfer markers: on the connection after this flight, or on
+    // the block as a whole. Never inferred.
+    selfTransferAfter: extractedLeg?.selfTransferAfter === true,
+    selfTransferInBlock: extractedLeg?.selfTransferInBlock === true,
 
     departureIata,
     departureIataAsPrinted: printedOriginal(extractedLeg?.departureIata, departureIata),
@@ -1879,6 +1921,7 @@ function normaliseExtractedLeg(extractedLeg, index, options = {}) {
   } else if (!leg.pnr && distinctBookingCodes.length === 1) {
     leg.pnr = distinctBookingCodes[0];
   }
+  if (leg.pnr) leg.pnrSource = 'document';
 
   if (!leg.departureDateRaw) leg.flags.push(FLAGS.MISSING_DATE);
   if (NOT_FLOWN_STATUSES.has(leg.reportedStatus.toLowerCase())) {
@@ -2156,7 +2199,7 @@ function mergeDuplicateLegInto(keptLeg, duplicateLeg) {
     'pnr', 'departureCity', 'arrivalCity', 'rawExtractedDate', 'reportedStatus',
     // The printed originals travel with their fields, so a loss recorded on only
     // one printing of a flight is still reported after the two are folded.
-    'pnrAsPrinted', 'pnrRejection', 'departureIataAsPrinted', 'arrivalIataAsPrinted',
+    'pnrAsPrinted', 'pnrRejection', 'pnrSource', 'departureIataAsPrinted', 'arrivalIataAsPrinted',
     // Display only, but a confirmation that names the airports on one copy of
     // a segment and not the other must not lose them in the merge.
     'departureAirportName', 'departureCountry', 'arrivalAirportName', 'arrivalCountry'
@@ -2165,6 +2208,14 @@ function mergeDuplicateLegInto(keptLeg, duplicateLeg) {
   FIELDS_TO_BACKFILL.forEach((field) => {
     if (!keptLeg[field] && duplicateLeg[field]) keptLeg[field] = duplicateLeg[field];
   });
+
+  // Not in the list above: an empty array is truthy, and a printed marker on
+  // either copy is printed.
+  if (keptLeg.bookingReferencesPrinted.length === 0) {
+    keptLeg.bookingReferencesPrinted = duplicateLeg.bookingReferencesPrinted;
+  }
+  keptLeg.selfTransferAfter = keptLeg.selfTransferAfter || duplicateLeg.selfTransferAfter;
+  keptLeg.selfTransferInBlock = keptLeg.selfTransferInBlock || duplicateLeg.selfTransferInBlock;
 
   duplicateLeg.passengerNames.forEach((name) => {
     if (!keptLeg.passengerNames.includes(name)) keptLeg.passengerNames.push(name);
@@ -2205,6 +2256,160 @@ function mergeDuplicateLegs(legs) {
     legByFlightKey.set(flightKey, leg);
     return true;
   });
+}
+
+// =============================================================================
+// STEP 8a — Match references printed beside a block of flights
+// =============================================================================
+//
+// Booking sites print a trip like this:
+//
+//     Trivandrum (TRV) to London (LHR)              Booking reference:
+//     IndiGo, Lufthansa · 6E6627, LH755, LH904      B378KI · EIHSFO
+//     Self transfer
+//
+// Two references, three flights, and no line saying which is whose. The model
+// is told not to guess (a guess is exactly what produced "not matched to a
+// flight" on both), and to hand the list over as printed. This step works it
+// out, from a fact about booking references rather than about this document:
+//
+//   A BOOKING REFERENCE IS ONE AIRLINE'S RECORD OF SOME CONSECUTIVE FLIGHTS.
+//
+// So a block splits into runs - a new run wherever the airline changes, or
+// wherever the document prints a self transfer between two flights - and when
+// the block printed exactly as many references as it has runs, the Nth
+// reference is the Nth run's. IndiGo 6E6627 is B378KI; Lufthansa LH755 and
+// LH904 are EIHSFO. The references and the airlines are listed in the same
+// order because the site generates both from the same list of flights.
+//
+// It declines rather than guesses: a count that does not match, a reference
+// that is not a valid code for its run's airline, or a flight in the block that
+// already carries a different reference all leave the block exactly as it was.
+// A match it does make is marked `pnrSource: 'printed-order'`, so the screen
+// can say how the reference was placed.
+//
+// It runs after the merge, so a flight printed twice is one flight in its run,
+// and before everything that compares references - the connection check in
+// Step 12 is what turns two matched references into SPLIT_PNR_CONNECTION.
+
+/**
+ * WHAT IT DOES
+ *   Gives each flight in a block the reference printed for its run, when the
+ *   block's references and runs line up one to one.
+ *
+ * @param {Object[]} legs Normalised, merged legs. Changed in place.
+ */
+function assignPrintedBookingReferences(legs) {
+  const blocks = new Map();
+
+  legs.forEach((leg) => {
+    if (leg.bookingReferencesPrinted.length === 0) return;
+    const blockKey = `${leg.documentIndex}|${leg.bookingReferencesPrinted.join(' ')}`;
+    if (!blocks.has(blockKey)) blocks.set(blockKey, []);
+    blocks.get(blockKey).push(leg);
+  });
+
+  blocks.forEach((blockLegs) => {
+    const printedReferences = blockLegs[0].bookingReferencesPrinted;
+    const inPrintedOrder = [...blockLegs].sort((first, second) =>
+      first.documentOrderIndex - second.documentOrderIndex);
+
+    // A round trip on one confirmation can print the same list over both
+    // directions. Each trip is matched on its own - and all of them must work,
+    // or none is applied.
+    const plannedRuns = [];
+    const tripsMatch = tripsWithinBlock(inPrintedOrder).every((trip) => {
+      const runs = runsOfOneBooking(trip);
+      if (runs.length !== printedReferences.length) return false;
+
+      return runs.every((run, index) => {
+        // Every reference must be a real code for the airline it lands on, the
+        // same rule a reference printed on a flight's own row has to pass.
+        const reference = asBookingCode(printedReferences[index], {
+          iataCodes: run.map((leg) => carrierCodeOf(leg.flightNumber)).filter(Boolean),
+          airlineNames: run.map((leg) => leg.marketingAirline).filter(Boolean)
+        });
+        if (!reference) return false;
+        plannedRuns.push({ run, reference });
+        return true;
+      });
+    });
+    if (!tripsMatch) return;
+
+    // A reference is one airline's record. If the same code would land on two
+    // airlines - a return that lists its flights in the opposite order under the
+    // same printed list - the printed order cannot be trusted, so nothing is.
+    const airlineByReference = new Map();
+    const onOneAirlineEach = plannedRuns.every(({ run, reference }) => {
+      const airline = airlineOfLeg(run[0]);
+      if (!airlineByReference.has(reference)) airlineByReference.set(reference, airline);
+      return airlineByReference.get(reference) === airline;
+    });
+    if (!onOneAirlineEach) return;
+
+    // A flight the document already tied to a different reference means the
+    // order rule and the document disagree, and the document wins.
+    const contradicted = plannedRuns.some(({ run, reference }) => run.some((leg) =>
+      bookingCodesOn(leg).some((code) => code !== reference)));
+    if (contradicted) return;
+
+    plannedRuns.forEach(({ run, reference }) => run.forEach((leg) => {
+      if (leg.pnr || leg.pnrIsSplit) return;
+      leg.pnr = reference;
+      leg.pnrSource = 'printed-order';
+      leg.travellers.forEach((traveller) => {
+        if (!traveller.pnr) traveller.pnr = reference;
+      });
+    }));
+  });
+
+  return legs;
+}
+
+/** The airline a run is keyed on: the flight number's code, else the name. */
+function airlineOfLeg(leg) {
+  return carrierCodeOf(leg.flightNumber)
+    || leg.marketingAirlineIata
+    || leg.marketingAirline.toLowerCase();
+}
+
+/**
+ * A block's flights, in printed order, cut into trips: a new trip wherever a
+ * flight does not leave from the airport the previous one landed at, or leaves
+ * more than a connection's gap later. Dates that are unknown never cut.
+ */
+function tripsWithinBlock(legsInPrintedOrder) {
+  return legsInPrintedOrder.reduce((trips, leg, index) => {
+    const previous = legsInPrintedOrder[index - 1];
+    const daysApart = previous
+      ? wholeDaysBetween(previous.arrivalDateISO || previous.departureDateISO, leg.departureDateISO)
+      : null;
+    const startsNewTrip = !previous
+      || previous.arrivalIata !== leg.departureIata
+      || (daysApart !== null && daysApart > MAX_CONNECTION_DAYS);
+
+    if (startsNewTrip) trips.push([leg]);
+    else trips[trips.length - 1].push(leg);
+    return trips;
+  }, []);
+}
+
+/**
+ * A block's flights, in printed order, cut into the runs one booking reference
+ * can cover: a new run at every change of airline, and after any flight the
+ * document printed a self transfer behind.
+ */
+function runsOfOneBooking(legsInPrintedOrder) {
+  return legsInPrintedOrder.reduce((runs, leg, index) => {
+    const previous = legsInPrintedOrder[index - 1];
+    const startsNewRun = !previous
+      || previous.selfTransferAfter
+      || airlineOfLeg(previous) !== airlineOfLeg(leg);
+
+    if (startsNewRun) runs.push([leg]);
+    else runs[runs.length - 1].push(leg);
+    return runs;
+  }, []);
 }
 
 // =============================================================================
@@ -2812,6 +3017,17 @@ function describeConnection(arrivingLeg, departingLeg, ignorePnr) {
   // surface about a connection.
   if (samePnr === false) connection.flags.push(FLAGS.SPLIT_PNR_CONNECTION);
 
+  // A self transfer is only ever what the document printed. Where it named this
+  // connection, that is the end of it. Where it labelled the whole block without
+  // saying where ("2 stops · IndiGo, Lufthansa · Self transfer"), it is the
+  // connection inside that block whose two flights hold different references:
+  // Bangalore, where IndiGo's B378KI meets Lufthansa's EIHSFO, and not
+  // Frankfurt, where both Lufthansa flights are EIHSFO.
+  const printedHere = Boolean(arrivingLeg.selfTransferAfter);
+  const printedOnBlock = Boolean(arrivingLeg.selfTransferInBlock && departingLeg.selfTransferInBlock)
+    && samePnr === false;
+  if (printedHere || printedOnBlock) connection.flags.push(FLAGS.SELF_TRANSFER);
+
   return connection;
 }
 
@@ -3298,6 +3514,10 @@ function collectWarnings(journeys, replacementFlights) {
       if (connection.flags.includes(FLAGS.SPLIT_PNR_CONNECTION)) {
         addWarning(FLAGS.SPLIT_PNR_CONNECTION,
           'Some connecting flights were booked under separate booking references.');
+      }
+      if (connection.flags.includes(FLAGS.SELF_TRANSFER)) {
+        addWarning(FLAGS.SELF_TRANSFER,
+          'The document marks a connection as a self transfer: the flights on either side of it are separate bookings.');
       }
     });
 

@@ -1134,7 +1134,10 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
     // telling you how solid its own answer is, which the passenger tool does
     // not do. Neither can move a flight.
     'unreadable', 'datesComplete',
-    'pnrAsPrinted', 'pnrRejection', 'departureIataAsPrinted', 'arrivalIataAsPrinted'
+    'pnrAsPrinted', 'pnrRejection', 'departureIataAsPrinted', 'arrivalIataAsPrinted',
+    // Step 8a's inputs and its record of how a reference was placed. The
+    // fixtures print no reference lists, so the match itself never runs here.
+    'pnrSource', 'bookingReferencesPrinted', 'selfTransferAfter', 'selfTransferInBlock'
   ];
 
   const withoutSpecialistFields = (value) => JSON.parse(JSON.stringify(
@@ -2060,6 +2063,99 @@ async function yearPinAssertions() {
   })]);
   assert.equal(condor.journeys[0].legs[0].pnr, '12345678');
   assert.deepEqual(condor.journeys[0].legs[0].unreadable, []);
+}
+
+// --- references printed beside a block of flights are matched to them ----------
+// The real booking-site confirmation: "Trivandrum (TRV) to London (LHR) ·
+// IndiGo, Lufthansa · 6E6627, LH755, LH904 · Self transfer", with "Booking
+// reference: B378KI · EIHSFO" and nothing saying which is whose. Both codes
+// came back "not matched to a flight".
+{
+  const block = { bookingReferencesPrinted: ['B378KI', 'EIHSFO'], selfTransferInBlock: true, pnr: '' };
+  const indigo = { marketingAirline: 'IndiGo', marketingAirlineIata: '6E', operatingAirline: '', operatingAirlineIata: '' };
+  const lufthansa = { marketingAirline: 'Lufthansa', marketingAirlineIata: 'LH', operatingAirline: '', operatingAirlineIata: '' };
+  const trivandrumToLondon = (overrides = [{}, {}, {}]) => [
+    leg({ ...block, ...indigo, flightNumber: '6E6627', departureIata: 'TRV', arrivalIata: 'BLR',
+      departureDate: '2026-02-18', arrivalDate: '2026-02-18', ...overrides[0] }),
+    leg({ ...block, ...lufthansa, flightNumber: 'LH755', departureIata: 'BLR', arrivalIata: 'FRA',
+      departureDate: '2026-02-18', arrivalDate: '2026-02-19', ...overrides[1] }),
+    leg({ ...block, ...lufthansa, flightNumber: 'LH904', departureIata: 'FRA', arrivalIata: 'LHR',
+      departureDate: '2026-02-19', arrivalDate: '2026-02-19', ...overrides[2] })
+  ];
+
+  const reply = buildAnalysisResponse({
+    documentType: 'booking_confirmation', evidenceMode: 'documents', passengers: [],
+    bookingReferences: [{ value: 'B378KI', carrier: '' }, { value: 'EIHSFO', carrier: '' }],
+    legs: trivandrumToLondon()
+  });
+  const [journey] = reply.booking.journeys;
+
+  assert.equal(reply.booking.journeys.length, 1, 'still one trip');
+  assert.deepEqual(journey.legs.map((entry) => entry.pnr), ['B378KI', 'EIHSFO', 'EIHSFO'],
+    'IndiGo is B378KI, both Lufthansa flights are EIHSFO');
+  assert.ok(journey.legs.every((entry) => entry.pnrSource === 'printed-order'), 'and says how it was placed');
+
+  const [atBangalore, atFrankfurt] = journey.connections;
+  assert.ok(atBangalore.flags.includes(FLAGS.SPLIT_PNR_CONNECTION), 'Bangalore joins two bookings');
+  assert.ok(atBangalore.flags.includes(FLAGS.SELF_TRANSFER), 'so it is the self transfer the block printed');
+  assert.deepEqual(atFrankfurt.flags, [], 'Frankfurt is one Lufthansa booking, not a self transfer');
+  assert.ok(reply.warnings.some((w) => w.code === FLAGS.SELF_TRANSFER));
+
+  const record = (code) => reply.bookingReferences.find((reference) => reference.value === code);
+  assert.deepEqual(record('B378KI').flightNumbers, ['6E6627']);
+  assert.deepEqual(record('EIHSFO').flightNumbers, ['LH755', 'LH904']);
+  assert.equal(record('B378KI').matchedByPrintedOrder, true);
+  assert.equal(record('EIHSFO').carrier, 'LH', 'the airline it was matched on');
+  assert.deepEqual(reply.flightsWithoutBookingReference, [], 'no flight is left without one');
+
+  const pnrsOf = (legs) => buildItinerary(legs).journeys.flatMap((j) => j.legs).map((entry) => entry.pnr);
+
+  // It declines rather than guesses.
+  assert.deepEqual(
+    pnrsOf(trivandrumToLondon([{}, {}, { flightNumber: 'LX318', marketingAirline: 'SWISS', marketingAirlineIata: 'LX' }])),
+    ['', '', ''],
+    'three airlines, two references: no match'
+  );
+  assert.deepEqual(
+    pnrsOf(trivandrumToLondon([{ pnr: 'EIHSFO' }, {}, {}])),
+    ['EIHSFO', '', ''],
+    'a flight the document tied to another reference wins, and the rest is left alone'
+  );
+  assert.deepEqual(
+    pnrsOf(trivandrumToLondon([{ bookingReferencesPrinted: ['B378KI', '7464F99C'] }, { bookingReferencesPrinted: ['B378KI', '7464F99C'] }, { bookingReferencesPrinted: ['B378KI', '7464F99C'] }])),
+    ['', '', ''],
+    'a document id in the list is not a reference, so the count no longer lines up'
+  );
+
+  // A printed self transfer between two flights of the same airline splits the run.
+  const ryanair = { marketingAirline: 'Ryanair', marketingAirlineIata: 'FR', operatingAirline: '', operatingAirlineIata: '' };
+  const kiwiStyle = buildItinerary([
+    leg({ ...ryanair, flightNumber: 'FR1234', departureIata: 'STN', arrivalIata: 'BGY', pnr: '',
+      bookingReferencesPrinted: ['ABC123', 'DEF456'], selfTransferAfter: true }),
+    leg({ ...ryanair, flightNumber: 'FR5678', departureIata: 'BGY', arrivalIata: 'CTA', pnr: '',
+      bookingReferencesPrinted: ['ABC123', 'DEF456'] })
+  ]);
+  const [kiwiJourney] = kiwiStyle.journeys;
+  assert.deepEqual(kiwiJourney.legs.map((entry) => entry.pnr), ['ABC123', 'DEF456']);
+  assert.ok(kiwiJourney.connections[0].flags.includes(FLAGS.SELF_TRANSFER), 'printed on the connection itself');
+
+  // A round trip printing the same list over both directions, with the return
+  // listing its airlines the other way round: the same code would land on two
+  // airlines, so the printed order is not trusted anywhere.
+  const back = (overrides) => leg({ ...block, departureDate: '2026-03-01', arrivalDate: '2026-03-01', ...overrides });
+  assert.deepEqual(
+    pnrsOf([
+      ...trivandrumToLondon(),
+      back({ ...lufthansa, flightNumber: 'LH905', departureIata: 'LHR', arrivalIata: 'FRA' }),
+      back({ ...lufthansa, flightNumber: 'LH754', departureIata: 'FRA', arrivalIata: 'BLR' }),
+      back({ ...indigo, flightNumber: '6E6628', departureIata: 'BLR', arrivalIata: 'TRV' })
+    ]),
+    ['', '', '', '', '', ''],
+    'B378KI cannot be both IndiGo and Lufthansa'
+  );
+
+  // Without a printed list nothing changes: the claim-intake parity above relies on it.
+  assert.deepEqual(pnrsOf([leg({ pnr: '' }), onward({ pnr: '' })]), ['', '']);
 }
 
 eocCheckAssertions().then(yearPinAssertions).then(() => {

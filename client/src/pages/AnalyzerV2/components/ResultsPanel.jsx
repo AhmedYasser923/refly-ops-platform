@@ -80,6 +80,12 @@ export default function ResultsPanel({ result, onChangeYear, rebuilding = false 
                       ? reference.flightNumbers.join(' · ')
                       : 'not matched to a flight'}
                   </span>
+                  {/* The document listed the codes beside the flights without
+                      saying whose is whose; the server matched them by airline,
+                      in the order printed. Said, so it can be checked. */}
+                  {reference.matchedByPrintedOrder && (
+                    <span className="av2-reference__matched">matched by printed order</span>
+                  )}
                 </li>
               ))}
             </ul>
