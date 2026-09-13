@@ -663,7 +663,7 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
   assert.equal(undated.departureDate, '', 'nothing was invented to fill the gap');
   assert.ok(undated.flags.includes(FLAGS.UNREADABLE_DATE), 'and the loss is flagged');
   assert.deepEqual(undated.unreadable, [
-    { field: 'date', printed: 'Terminal 3', flag: FLAGS.UNREADABLE_DATE }
+    { field: 'date', printed: 'Terminal 3', flag: FLAGS.UNREADABLE_DATE, recognisedAs: '', hint: '', explanation: '' }
   ], 'carrying what the document printed, so it can be shown and corrected');
 
   assert.ok(warnings.some((entry) => entry.code === 'UNREADABLE_VALUE'));
@@ -1134,7 +1134,7 @@ const flightNumbers = (legs) => legs.map((entry) => entry.flightNumber);
     // telling you how solid its own answer is, which the passenger tool does
     // not do. Neither can move a flight.
     'unreadable', 'datesComplete',
-    'pnrAsPrinted', 'departureIataAsPrinted', 'arrivalIataAsPrinted'
+    'pnrAsPrinted', 'pnrRejection', 'departureIataAsPrinted', 'arrivalIataAsPrinted'
   ];
 
   const withoutSpecialistFields = (value) => JSON.parse(JSON.stringify(
@@ -1998,6 +1998,68 @@ async function yearPinAssertions() {
   assert.match(firstFlight.trackers.flightStats, /\/2024\/12\/28$/, 'the tracker link carries the chosen year');
   assert.deepEqual([...datesAskedAbout].sort(), ['2024-12-28', '2025-01-03'], 'and the EOC check asks about it');
   assert.equal(reply.extraction.legs.length, 2, 'the facts go back out, so the year can be corrected again');
+}
+
+// --- a value recognised as something else is explained, not reported lost -------
+// The Air Serbia / Lufthansa upload: the Lufthansa passes print "747S4E01",
+// the pass's own document number, where a booking reference would be. It is
+// right to reject it, and wrong to tell the specialist "we could not read it".
+{
+  const lufthansa = {
+    flightNumber: 'LH1407', marketingAirline: 'Lufthansa', marketingAirlineIata: 'LH',
+    operatingAirline: '', operatingAirlineIata: '',
+    departureIata: 'BEG', departureCity: 'Belgrade', arrivalIata: 'FRA', arrivalCity: 'Frankfurt',
+    departureDate: '2026-05-20', arrivalDate: '2026-05-20'
+  };
+
+  const boardingPasses = { ignorePnr: true, fromBoardingPasses: true };
+  const documentNumber = buildItinerary([leg({ ...lufthansa, pnr: '747S4E01' })], boardingPasses);
+  const [lhLeg] = documentNumber.journeys[0].legs;
+  assert.equal(lhLeg.pnr, '', 'still not used as a booking reference');
+  assert.equal(lhLeg.unreadable.length, 1, 'still recorded - nothing printed vanishes');
+  assert.deepEqual(
+    lhLeg.unreadable[0],
+    {
+      field: 'booking reference', printed: '747S4E01', flag: FLAGS.UNREADABLE_PNR,
+      recognisedAs: 'document number', hint: 'scan barcode', explanation: ''
+    },
+    'named in one line, with what to do instead'
+  );
+  assert.ok(!lhLeg.flags.includes(FLAGS.UNREADABLE_PNR), 'but it is not a failure to read');
+  assert.ok(!documentNumber.warnings.some((w) => w.code === 'UNREADABLE_VALUE'), 'and raises no warning');
+
+  // Only a boarding pass prints its own document number. On any other document
+  // the same eight characters are an unreadable reference, not explained away.
+  const onAConfirmation = buildItinerary([leg({ ...lufthansa, pnr: '747S4E01' })]);
+  const [confirmationLeg] = onAConfirmation.journeys[0].legs;
+  assert.equal(confirmationLeg.unreadable[0].recognisedAs, '');
+  assert.equal(confirmationLeg.unreadable[0].hint, '');
+  assert.ok(confirmationLeg.flags.includes(FLAGS.UNREADABLE_PNR));
+
+  const ticketNumber = buildItinerary([leg({ ...lufthansa, pnr: '1152126205606' })]);
+  assert.equal(ticketNumber.journeys[0].legs[0].unreadable[0].recognisedAs, 'e-ticket number');
+
+  // A value that is simply not a reference we can read is still a failure, and
+  // now says what a reference should look like.
+  const misread = buildItinerary([leg({ ...lufthansa, pnr: 'AB' })]);
+  const [misreadLeg] = misread.journeys[0].legs;
+  assert.equal(misreadLeg.unreadable[0].recognisedAs, '');
+  assert.match(misreadLeg.unreadable[0].explanation, /may be misread/);
+  assert.ok(misreadLeg.flags.includes(FLAGS.UNREADABLE_PNR));
+  assert.ok(misread.warnings.some((w) => w.code === 'UNREADABLE_VALUE'));
+
+  // An airline with its own shape is described by it.
+  const tui = buildItinerary([leg({
+    ...lufthansa, flightNumber: 'BY123', marketingAirline: 'TUI Airways', marketingAirlineIata: 'BY', pnr: 'AB'
+  })]);
+  assert.match(tui.journeys[0].legs[0].unreadable[0].explanation, /is 6 to 12 digits/);
+
+  // Condor's real references are eight digits: accepted, never explained away.
+  const condor = buildItinerary([leg({
+    ...lufthansa, flightNumber: 'DE1234', marketingAirline: 'Condor', marketingAirlineIata: 'DE', pnr: '12345678'
+  })]);
+  assert.equal(condor.journeys[0].legs[0].pnr, '12345678');
+  assert.deepEqual(condor.journeys[0].legs[0].unreadable, []);
 }
 
 eocCheckAssertions().then(yearPinAssertions).then(() => {

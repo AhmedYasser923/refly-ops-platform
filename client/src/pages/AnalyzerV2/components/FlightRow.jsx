@@ -55,6 +55,10 @@ export default function FlightRow({
   // cannot correct what they are not shown.
   const unreadable = Array.isArray(leg.unreadable) ? leg.unreadable : [];
   const dateWasUnreadable = unreadable.some((entry) => entry.field === 'date');
+  // The server marks the entries it recognised as something else; those are
+  // not failures and are shown apart from the ones that are.
+  const lost = unreadable.filter((entry) => !entry.recognisedAs);
+  const setAside = unreadable.filter((entry) => entry.recognisedAs);
 
   // `suppressFlags` handles the contextual case: inside a replacement group the
   // heading has already said these are replacements, so the chip is noise.
@@ -164,14 +168,36 @@ export default function FlightRow({
 
       {/* Each line names the field, quotes what the document printed, and says
           plainly that we could not read it. The printed text is the whole point:
-          "01Oct" on the screen turns a mystery into a two-second fix. */}
-      {unreadable.length > 0 && (
+          "01Oct" on the screen turns a mystery into a two-second fix. When the
+          server can say why a value was not usable, that is shown too. */}
+      {lost.length > 0 && (
         <ul className="av2-flight__unreadable">
-          {unreadable.map((entry) => (
+          {lost.map((entry) => (
             <li key={`${entry.field}-${entry.printed}`}>
               <span className="av2-flight__unreadable-field">{entry.field}</span>
               <span className="av2-flight__unreadable-printed">{entry.printed}</span>
               <span className="av2-flight__unreadable-note">printed here, but we could not read it</span>
+              {entry.explanation && (
+                <span className="av2-flight__unreadable-explanation">{entry.explanation}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* A value the server recognised as something else - a boarding pass's
+          document number where a booking reference would be. It was read
+          correctly and set aside, so one line names it and says what to do
+          instead; it is not reported as a failure. */}
+      {setAside.length > 0 && (
+        <ul className="av2-flight__set-aside">
+          {setAside.map((entry) => (
+            <li key={`${entry.field}-${entry.printed}`}>
+              <span className="av2-flight__unreadable-printed">{entry.printed}</span>
+              <span className="av2-flight__set-aside-label">
+                {entry.recognisedAs}, not a {entry.field}
+              </span>
+              {entry.hint && <span className="av2-flight__set-aside-hint">{entry.hint}</span>}
             </li>
           ))}
         </ul>

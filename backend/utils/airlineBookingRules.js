@@ -170,6 +170,71 @@ function normaliseBookingCode(rawValue, { iataCodes = [], airlineNames = [] } = 
   return extractEmbeddedBookingCode(withoutCarrierPrefix);
 }
 
+// What a value normaliseBookingCode rejected most likely IS, when its shape says
+// so. Checked only after a rejection, so an airline whose real references have
+// one of these shapes (Condor's 8 digits) never reaches them.
+const E_TICKET_NUMBER_SHAPE = /^\d{13,15}$/;
+const DOCUMENT_NUMBER_SHAPE = /^(?=.*[A-Z])(?=.*\d)[A-Z0-9]{8}$/;
+
+/**
+ * Why a printed value was not accepted as a booking reference. Call it only for
+ * a value normaliseBookingCode rejected.
+ *
+ * Returns { recognisedAs, hint, explanation }.
+ *
+ *   recognisedAs  what the value really is when its shape makes that plain -
+ *                 'document number' or 'e-ticket number' - or '' when it is
+ *                 simply not a reference we can read. The first is the rule
+ *                 working; the second may be a misread.
+ *   hint          the one thing to do next, short enough for a heading
+ *                 ('scan barcode'), or ''.
+ *   explanation   a sentence for the unrecognised case only. A recognised
+ *                 value is named in its heading and needs no paragraph.
+ *
+ * A DOCUMENT NUMBER IS ONLY RECOGNISED ON A BOARDING PASS. That is the document
+ * that prints one (Lufthansa's "747S4E01", SWISS's "7464F99C"), and the one
+ * whose barcode carries the real reference - so "scan barcode" is advice that
+ * works there and nowhere else. Eight mixed characters on a confirmation or an
+ * e-ticket is not explained away; it stays an unreadable reference.
+ *
+ * `pnrFormat` is the airline's own description from airlines_codes.json, and is
+ * preferred over the shape the rules check, because it is what the specialist
+ * who wrote it wanted shown.
+ *
+ * @param {string} rawValue The value as printed.
+ * @param {{iataCodes?: string[], airlineNames?: string[], pnrFormat?: string, onBoardingPass?: boolean}} [context]
+ */
+function explainRejectedBookingCode(rawValue, {
+  iataCodes = [], airlineNames = [], pnrFormat = '', onBoardingPass = false
+} = {}) {
+  const printed = String(rawValue || '').trim();
+  const value = printed.toUpperCase().replace(/[^A-Z0-9/]/g, '').replace(/^[A-Z0-9]{2,3}\//, '');
+
+  const exception = bookingCodeExceptionFor(iataCodes, airlineNames);
+  const airlineName = airlineNames.find(Boolean) || '';
+  const expectedShape = String(pnrFormat || '').trim()
+    || exception?.shape
+    || 'usually 6 letters and digits (5 to 7, with at least one letter)';
+  const whatAReferenceIs = airlineName
+    ? `A booking reference (PNR) on ${airlineName} is ${expectedShape}.`
+    : `A booking reference (PNR) is ${expectedShape}.`;
+
+  if (E_TICKET_NUMBER_SHAPE.test(value)) {
+    return { recognisedAs: 'e-ticket number', hint: '', explanation: '' };
+  }
+
+  if (onBoardingPass && DOCUMENT_NUMBER_SHAPE.test(value)) {
+    return { recognisedAs: 'document number', hint: 'scan barcode', explanation: '' };
+  }
+
+  return {
+    recognisedAs: '',
+    hint: '',
+    explanation: `This does not have the shape of a booking reference, so it was not used. ${whatAReferenceIs} `
+      + 'It may be misread, or another number printed next to the reference - check it on the document.'
+  };
+}
+
 // -----------------------------------------------------------------------------
 // Flight-number IATA prefix correction
 // -----------------------------------------------------------------------------
@@ -380,6 +445,7 @@ function resolveAirline({ nameFromModel, flightNumber, airlinesFoundOnline = {} 
 
 module.exports = {
   normaliseBookingCode,
+  explainRejectedBookingCode,
   bookingCodeExceptionFor,
   extractEmbeddedBookingCode,
   correctFlightNumberPrefix,

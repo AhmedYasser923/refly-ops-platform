@@ -106,6 +106,7 @@ const { readPrintedTicketNumber } = require('../utils/ticketNumber');
 const { airlineForTicketPrefix } = require('../utils/barcodeTicketEnrichment');
 const {
   normaliseBookingCode,
+  explainRejectedBookingCode,
   correctFlightNumberPrefix,
   resolveAirline,
   airlinesHoldingCode,
@@ -459,6 +460,9 @@ async function buildReplyFromExtraction(extraction, { yearPin = null, findEvents
     legs: extraction.legs,
     options: {
       ignorePnr: isBoardingPassUpload,
+      // Only a boarding pass prints its own document number where a booking
+      // reference would be, so only then is one read as that.
+      fromBoardingPasses: isBoardingPassUpload,
       airlinesFoundOnline: extraction.airlinesFoundOnline || {},
       yearPin
     }
@@ -1770,6 +1774,22 @@ function normaliseExtractedLeg(extractedLeg, index, options = {}) {
   const printedOriginal = (printedValue, keptValue) =>
     (keptValue ? '' : asMeaningfulText(printedValue));
 
+  // A rejected booking reference is explained where it was rejected, by the
+  // rules that rejected it, so Step 8b only has to read the answer. Some
+  // rejections are the rule working rather than a failure: "747S4E01" on a
+  // Lufthansa pass is the pass's document number, and saying "we could not read
+  // it" teaches the specialist the opposite of what happened. That reading is
+  // only made on a boarding-pass upload - see explainRejectedBookingCode.
+  const printedPnr = printedOriginal(extractedLeg?.pnr, pnr);
+  const pnrRejection = printedPnr
+    ? explainRejectedBookingCode(printedPnr, {
+      ...airlines,
+      airlineNames: [marketingAirline.name, ...airlineNames].filter(Boolean),
+      pnrFormat: findAirlineRecord(marketingAirline.name, flightNumber)?.pnrFormat,
+      onBoardingPass: Boolean(options.fromBoardingPasses)
+    })
+    : null;
+
   const leg = {
     id: `leg-${index + 1}`,
     documentOrderIndex: index,
@@ -1788,7 +1808,8 @@ function normaliseExtractedLeg(extractedLeg, index, options = {}) {
     airlineSource: marketingAirline.source,
     airlineAsExtracted: marketingAirline.name === marketingAirlineFromModel ? '' : marketingAirlineFromModel,
     pnr,
-    pnrAsPrinted: printedOriginal(extractedLeg?.pnr, pnr),
+    pnrAsPrinted: printedPnr,
+    pnrRejection,
 
     departureIata,
     departureIataAsPrinted: printedOriginal(extractedLeg?.departureIata, departureIata),
@@ -2135,7 +2156,7 @@ function mergeDuplicateLegInto(keptLeg, duplicateLeg) {
     'pnr', 'departureCity', 'arrivalCity', 'rawExtractedDate', 'reportedStatus',
     // The printed originals travel with their fields, so a loss recorded on only
     // one printing of a flight is still reported after the two are folded.
-    'pnrAsPrinted', 'departureIataAsPrinted', 'arrivalIataAsPrinted',
+    'pnrAsPrinted', 'pnrRejection', 'departureIataAsPrinted', 'arrivalIataAsPrinted',
     // Display only, but a confirmation that names the airports on one copy of
     // a segment and not the other must not lose them in the merge.
     'departureAirportName', 'departureCountry', 'arrivalAirportName', 'arrivalCountry'
@@ -2219,7 +2240,7 @@ const PRINTED_VALUE_AUDIT = [
   { field: 'date', printedOn: 'departureDateRaw', keptIn: 'departureDateISO', flag: FLAGS.UNREADABLE_DATE },
   { field: 'departure airport', printedOn: 'departureIataAsPrinted', keptIn: 'departureIata', flag: FLAGS.UNREADABLE_AIRPORT },
   { field: 'arrival airport', printedOn: 'arrivalIataAsPrinted', keptIn: 'arrivalIata', flag: FLAGS.UNREADABLE_AIRPORT },
-  { field: 'booking reference', printedOn: 'pnrAsPrinted', keptIn: 'pnr', flag: FLAGS.UNREADABLE_PNR }
+  { field: 'booking reference', printedOn: 'pnrAsPrinted', keptIn: 'pnr', flag: FLAGS.UNREADABLE_PNR, explainedBy: 'pnrRejection' }
 ];
 
 /**
@@ -2236,18 +2257,37 @@ const PRINTED_VALUE_AUDIT = [
  *   The printed text is carried with each entry so the row can show it. Being
  *   told a date could not be read is useful; being shown that the paper says
  *   "01Oct" is what lets a specialist fix it in seconds.
+ *
+ *   An entry may also carry what Step 6 said about the rejection
+ *   (`explainedBy` in the table): `recognisedAs` when the value was recognisably
+ *   something else - a boarding pass's document number printed where a booking
+ *   reference would be - with a short `hint` ("scan barcode"), or an
+ *   `explanation` sentence when it was not recognised. That
+ *   one is still recorded, because nothing printed vanishes unrecorded, but it
+ *   is NOT a loss: it raises no UNREADABLE flag and no "could not be read"
+ *   warning, and the row explains it instead of apologising for it.
  */
 function auditPrintedValues(legs) {
   legs.forEach((leg) => {
     leg.unreadable = [];
 
-    const recordLoss = (field, printed, flag) => {
-      leg.unreadable.push({ field, printed, flag });
-      if (!leg.flags.includes(flag)) leg.flags.push(flag);
+    const recordLoss = (field, printed, flag, rejection = null) => {
+      const recognisedAs = rejection?.recognisedAs || '';
+      leg.unreadable.push({
+        field,
+        printed,
+        flag,
+        recognisedAs,
+        hint: rejection?.hint || '',
+        explanation: rejection?.explanation || ''
+      });
+      if (!recognisedAs && !leg.flags.includes(flag)) leg.flags.push(flag);
     };
 
-    PRINTED_VALUE_AUDIT.forEach(({ field, printedOn, keptIn, flag }) => {
-      if (leg[printedOn] && !leg[keptIn]) recordLoss(field, leg[printedOn], flag);
+    PRINTED_VALUE_AUDIT.forEach(({ field, printedOn, keptIn, flag, explainedBy }) => {
+      if (leg[printedOn] && !leg[keptIn]) {
+        recordLoss(field, leg[printedOn], flag, explainedBy ? leg[explainedBy] : null);
+      }
     });
 
     // Ticket numbers belong to a traveller, not to the flight, so they are
@@ -3276,7 +3316,9 @@ function collectWarnings(journeys, replacementFlights) {
     // The document printed something and we have nothing to show for it. Stated
     // once here and in full on the row, where the printed text is: a banner
     // quoting every lost value would bury the one thing it needs to say.
-    if ((leg.unreadable || []).length > 0) {
+    // A value recognised as something else (a document number where a booking
+    // reference would be) was read correctly and set aside - not a failure.
+    if ((leg.unreadable || []).some((entry) => !entry.recognisedAs)) {
       addWarning(UNREADABLE_VALUE,
         'Some values printed on your documents could not be read. They are marked on the flights below.');
     }

@@ -1295,6 +1295,56 @@
   color: var(--text-secondary);
 }
 
+.av2-flight__unreadable-explanation {
+  flex-basis: 100%;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* A value recognised as something else and set aside on purpose - a document
+   number printed where a booking reference would be. Informative, not an
+   alarm: the tool did its job, and this says what the number was. */
+.av2-flight__set-aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  grid-column: 1 / -1;
+  margin: var(--space-1) 0 0;
+  padding: var(--space-2) var(--space-3);
+  list-style: none;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+}
+
+.av2-flight__set-aside li {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.av2-flight__set-aside-label {
+  color: var(--accent-hover);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* What to do instead, set off from the label with a dot. */
+.av2-flight__set-aside-hint {
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.av2-flight__set-aside-hint::before {
+  content: '·';
+  margin-right: var(--space-2);
+  color: var(--text-muted);
+}
+
 /* --- Chips --------------------------------------------------------------- */
 
 .av2-chips {
